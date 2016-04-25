@@ -1,7 +1,8 @@
-/**
- * Created by chenqifeng on 2016/4/21.
- */
-
-require('./a.js');
-require('./b.js');
-require('./c.js');
+require('guaguaka.js');
+require('warterFall.js');
+require('dataPick.js');
+require('clock.js');
+require('tab.js');
+require('mask.js');
+require('slider.js');
+require('dialog.js');
