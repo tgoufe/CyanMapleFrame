@@ -1,0 +1,36 @@
+{
+  "name": "CyanMapleFrame",
+  "version": "0.0.1",
+  "description": "Ç°¶Ë UI ¿ò¼Ü",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tgoufe/CyanMapleFrame.git"
+  },
+  "author": "",
+  "keywords": [
+    "ui",
+    "webapp",
+    "mobile"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tgoufe/CyanMapleFrame/issues"
+  },
+  "homepage": "https://github.com/tgoufe/CyanMapleFrame#readme",
+  "devDependencies": {
+    "webpack": "^1.13.0"
+  },
+  "dependencies": {
+    "hammer": "0.0.5",
+    "jquery": "^2.2.3",
+    "lodash": "^4.11.1",
+    "vue": "^1.0.21"
+  }
+}
