@@ -1,0 +1,135 @@
+//grid
+$body-bg:               #fff !default;
+$container_padding:.25rem;
+$container_width:10rem;
+//text-color
+$black:              #000 !default;
+$gray-darker:        #222 !default;
+$gray-dark:          #666 !default;
+$gray-light:         #999 !default;
+$gray-lighter:       #ccc !default;
+$white:              #fff !default;
+$green:              #41b560 !default;
+$red:                #ff6565 !default;
+$orange:             #ffb71c !default;
+$blue:               #25aaff !default;
+$yellow:             #EAFB1C !default;
+$coffee:             #853F3A !default;
+$purple:             #7000C8 !default;
+$gray-color-list:('darker':$gray-darker,'dark':$gray-dark,'light':$gray-light,'lighter':$gray-lighter);
+$base-color-list:('black':$black,'white':$white,'green':$green,'red':$red,'orange':$orange,'blue':$blue,'yellow':$yellow,'coffee':$coffee,'purple':$purple) !default;
+$font-color-list:('black':$black,'white':$white,'green':$green,'red':#f5253c,'orange':$orange,'blue':$blue,'yellow':$yellow,'coffee':$coffee,'purple':$purple) !default;
+$base-color:$green !default;
+//base font
+//$font-family-base:   "Microsoft YaHei", "Times New Roman", Times, serif !default;
+$font-family-base: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif !default;
+$font-size-base:     14px !default;
+$font-size-large:    18px !default; 
+$font-size-small:    12px !default; 
+$font-size-h1:       36px !default; 
+$font-size-h2:       30px !default; 
+$font-size-h3:       24px !default; 
+$font-size-h4:       18px !default; 
+$font-size-h5:       14px !default;
+$font-size-h6:       12px !default; 
+$line-height-base:   20/14 !default;
+//base padding
+$padding-base-vertical:     6px !default;
+$padding-base-horizontal:   12px !default;
+$padding-large-vertical:    10px !default;
+$padding-large-horizontal:  16px !default;
+$padding-small-vertical:    5px !default;
+$padding-small-horizontal:  10px !default;
+$padding-xs-vertical:       1px !default;
+$padding-xs-horizontal:     5px !default;
+//extra line-height
+$line-height-large:         1.3333333 !default;
+$line-height-small:         1.5 !default;
+//base border-radius
+$border-radius-base:        4px !default;
+$border-radius-large:       6px !default;
+$border-radius-small:       3px !default;
+
+//link
+$link-color:            #337ab7 !default;
+$link-hover-color:      #22527b !default;
+$link-hover-decoration: underline !default;
+//button
+$btn-font-weight:                normal !default;
+$btn-font-size:                  15px  !default;
+$btn-font-lineHeight:            26px  !default;
+$btn-height-base:                ($font-size-base * $line-height-base) * 2 !default;  //40px
+$btn-default-color:              #333 !default;//default
+$btn-default-bg:                 #fff !default;
+$btn-default-border:             #ccc !default;
+$btn-link-disabled-color:        #999 !default;
+$btn-border-radius-base:         $border-radius-base !default;
+//** Disabled cursor for form controls and buttons.
+$cursor-disabled:                not-allowed !default;
+//Tables
+
+//** Padding for `<th>`s and `<td>`s.
+$table-cell-padding:            8px !default;
+//** Padding for cells in `.table-condensed`.
+$table-condensed-cell-padding:  5px !default;
+//** Default background color used for all tables.
+$table-bg:                      transparent !default;
+//** Background color used for `.table-striped`.
+$table-bg-accent:               #f9f9f9 !default;
+//** Background color used for `.table-hover`.
+$table-bg-hover:                #f5f5f5 !default;
+$table-bg-active:               $table-bg-hover !default;
+//** Border color for table and cell borders.
+$table-border-color:            #ddd !default;
+//alert
+$alert-overlay-index:          1000 !default;
+$alert-dialog-index:           1050 !default;
+$alert-padding:                17px !default;
+$alert-title-font-size:        18px !default;
+$alert-title-font-color:       $gray-dark !default;
+$alert-sub-title-font-size:    14px !default;
+$alert-sub-title-font-color:   $gray-dark !default;
+$alert-button-line-height:     2 !default;
+
+// tab
+$tabNav-line-height:$line-height-base !default;
+$tabNav-background-color:$orange !default;
+$tabNav-border-color:darken($orange,15%) !default;
+$tabNav-active-color:$white !default;
+$tabNav-padding-vertical: 10px !default;
+$tabNav-padding-horizontal : 10px !default;
+
+//badge
+$badge-border-radius:         $border-radius-small !default;  //3px
+$badge-height:                $font-size-base * $line-height-base !default;  //20px
+$badge-paddingh:              7px !default;
+$badge-font-size:             $font-size-small !default;
+
+//border
+$border-color-default:#e0e0e0 !default;
+//media
+$media-img-size:75px !default;
+$media-img-max-size:25% !default;
+$media-img-right-space:0.75rem !default;
+$media-vertical-space:0.75rem !default;
+//mask
+$mask-close-size:20px !default;
+//numberBox
+$numberBox-height-base:         ($font-size-base * $line-height-base) * 2 !default;
+$numberBox-border-radius:       $border-radius-large !default;
+$numberBox-border-color:        darken($border-color-default,10%) !default;
+
+
+//form
+$form-color-base : $base-color !default;
+$form-height-base: $btn-height-base;
+$form-font-lineHeight: $btn-font-lineHeight !default;
+$form-font-size:$btn-font-size !default;
+$form-font-lineHeight: $btn-font-lineHeight !default;
+$form-border-radius-base:         $border-radius-base !default;
+$from-control-size: 28px;
+
+//dialog
+$dialog-base-color:$base-color !default;
+$dialog-title-size: $font-size-base * $line-height-base !default;
+$dialog-button-font-size: 16px !default;
