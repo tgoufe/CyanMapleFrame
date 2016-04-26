@@ -1,7 +1,7 @@
 {
   "name": "CyanMapleFrame",
   "version": "0.0.1",
-  "description": "Ç°¶Ë UI ¿ò¼Ü",
+  "description": "Ç°ï¿½ï¿½ UI ï¿½ï¿½ï¿½ï¿½",
   "main": "index.js",
   "directories": {
     "example": "examples"
@@ -25,6 +25,8 @@
   },
   "homepage": "https://github.com/tgoufe/CyanMapleFrame#readme",
   "devDependencies": {
+    "file-loader": "^0.8.5",
+    "url-loader": "^0.5.7",
     "webpack": "^1.13.0"
   },
   "dependencies": {

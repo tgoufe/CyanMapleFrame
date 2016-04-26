@@ -1,9 +1,9 @@
 /**
  * Created by chenqifeng on 2016/4/22.
  */
-var util = require('../util/maple.util'),
-    support = require('../util/maple.support'),
-    config = require('../maple.config'),
+var util = require('../util/util'),
+    support = require('../util/support'),
+    config = require('../config'),
     sessionKey = config.localStorageNameSpace,
     cache = support.localStorage ? localStorage : false,
     data = support.localStorage ?　JSON.parse((cache.getItem(sessionKey) || JSON.stringify({}))) : {},

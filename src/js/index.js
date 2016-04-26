@@ -6,7 +6,7 @@ require('./ui');
 require('./util');
 require('./data');
 
-var maple = window.maple = require('./maple.ns');
-var config = require('./maple.config');
+var maple = window.maple = require('./ns');
+var config = require('./config');
 maple.version = config.Version;
 

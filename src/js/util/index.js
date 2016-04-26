@@ -1,8 +1,8 @@
 /**
  * Created by chenqifeng on 2016/4/21.
  */
-var maple = require('../maple.ns');
-maple.aspects = require('./maple.aspects');
-maple.Class = require('./maple.class');
-maple.support = require('./maple.support');
-maple.util = require('./maple.util');
+var maple = require('../ns');
+maple.aspects = require('./aspects');
+maple.Class = require('./class');
+maple.support = require('./support');
+maple.util = require('./util');

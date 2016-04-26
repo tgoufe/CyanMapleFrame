@@ -1,7 +1,7 @@
 /**
  * Created by chenqifeng on 2016/4/22.
  */
-var util = require('../util/maple.util');
+var util = require('../util/util');
 var _ = require('_');
 var $= {};
 var cookie;
