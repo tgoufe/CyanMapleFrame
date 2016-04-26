@@ -1,3 +1,4 @@
+@charset "utf-8";
 /* base reset*/
 //
 // 1. Set default font family to sans-serif.
@@ -10,14 +11,16 @@ html {
   -ms-text-size-adjust: 100%; // 2
   -webkit-text-size-adjust: 100%; // 2
 }
-
+html * {
+  outline: 0;
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: transparent; }
 //
 // Remove default margin.
 //
-
-body {
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td, hr, button, article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
   margin: 0;
-}
+  padding: 0; }
 
 // HTML5 display definitions
 // ==========================================================================
@@ -99,6 +102,8 @@ a:active,
 a:hover {
   outline: 0;
 }
+ins, a {  text-decoration: none; }
+
 
 // Text-level semantics
 // ==========================================================================
@@ -133,10 +138,9 @@ dfn {
 // contexts in Firefox 4+, Safari, and Chrome.
 //
 
-h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
-}
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+  font-weight: 500; }
 
 //
 // Address styling not present in IE 8/9.
@@ -420,3 +424,5 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+ol, ul {
+  list-style: none; }

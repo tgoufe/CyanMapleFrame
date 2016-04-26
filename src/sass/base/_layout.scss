@@ -136,9 +136,9 @@ blockquote,  dd, div, dl, dt, fieldset, form, h1, h2, h3, h4, h5, h6, input, pre
 	.flex-grow#{$i}{flex-grow:$i}
 	.flex#{$i}{flex:$i}
 }
-@for $i from 0 through 20{
-	.flex-basis#{$i * 5}{flex-basis:($i * 5) * 1%}
-}
+// @for $i from 0 through 20{
+// 	.flex-basis#{$i * 5}{flex-basis:($i * 5) * 1%}
+// }
 /**
  * ratio container
  */
