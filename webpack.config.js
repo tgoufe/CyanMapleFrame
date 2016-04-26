@@ -3,16 +3,21 @@ module.exports = {
     //入口文件，用于打包的文集爱你
     entry: {
         maple:'./src/js/index.js'
+
+        , vendors: ['vue', 'lodash', 'hammer']
     },
     output: {
         path: 'dist',
         //文件输入的目录
-        filename: '[name].js'
+        filename: '[name].[hash].js'
     },
     plugins: [
        new webpack.optimize.UglifyJsPlugin({
             minimize: true
         })
+
+        // 将入口文件的数组打包成 vendors.js
+        , new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js')
     ],
     resolve: {
         //用于缺省的文件名后缀
@@ -37,6 +42,11 @@ module.exports = {
             { test: /\.css$/, loader: 'style-loader!css-loader' },
             { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'} // inline base64 URLs for <=8k images, direct URLs for the rest
         ]
+        , preLoader: [{    // jshint-loader
+            test: /\.jsx?$/
+            , include: './src/js/'
+            , loader: 'jshint-loader'
+        }]
     }
 }
 

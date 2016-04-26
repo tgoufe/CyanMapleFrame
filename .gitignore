@@ -1,6 +1,8 @@
-# idea/webstrom ÏîÄ¿ÎÄ¼ş
+# idea/webstrom é¡¹ç›®æ–‡ä»¶
 .idea
 *.iml
 
-# node ÒÀÀµ°ü£¬Í¨¹ı npm °²×°
+# node æ¨¡å—ï¼Œä½¿ç”¨ npm å‘½ä»¤è‡ªåŠ¨ä¸‹è½½
 node_modules/
+
+dist/

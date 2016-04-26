@@ -1,7 +1,7 @@
 {
   "name": "CyanMapleFrame",
   "version": "0.0.1",
-  "description": "ǰ�� UI ����",
+  "description": "前端 UI 框架",
   "main": "index.js",
   "directories": {
     "example": "examples"
@@ -25,7 +25,11 @@
   },
   "homepage": "https://github.com/tgoufe/CyanMapleFrame#readme",
   "devDependencies": {
+    "css-loader": "^0.23.1",
     "file-loader": "^0.8.5",
+    "jshint-loader": "^0.8.3",
+    "sass-loader": "^3.2.0",
+    "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.0"
   },
