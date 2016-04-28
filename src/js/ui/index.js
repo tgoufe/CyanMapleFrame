@@ -1,8 +1,9 @@
-require('./guaguaka.js');
-require('./warterFall.js');
-require('./dataPick.js');
-require('./clock.js');
-require('./tab.js');
-require('./mask.js');
-require('./slider.js');
-require('./dialog.js');
+var maple = require('../ns');
+maple.slider=require('./slider');
+maple.guaguaka=require('./guaguaka');
+maple.warterFall=require('./warterFall');
+maple.dataPick=require('./dataPick');
+maple.clock=require('./clock');
+maple.tab=require('./tab');
+maple.mask=require('./mask');
+maple.dialog=require('./dialog');

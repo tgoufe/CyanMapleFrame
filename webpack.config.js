@@ -9,7 +9,7 @@ module.exports = {
     output: {
         path: 'dist',
         //文件输入的目录
-        filename: '[name].[hash].js'
+        filename: '[name].js'
     },
     plugins: [
        new webpack.optimize.UglifyJsPlugin({
@@ -44,8 +44,8 @@ module.exports = {
         ]
         , preLoader: [{    // jshint-loader
             test: /\.jsx?$/
-            , include: './src/js/'
-            , loader: 'jshint-loader'
+            ,include: './src/js/'
+            ,loader: 'jshint-loader'
         }]
     }
 }
