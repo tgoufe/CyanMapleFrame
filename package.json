@@ -7,6 +7,7 @@
     "example": "examples"
   },
   "scripts": {
+    "dev": "node tools/dev-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,13 +26,29 @@
   },
   "homepage": "https://github.com/tgoufe/CyanMapleFrame#readme",
   "devDependencies": {
+    "connect-history-api-fallback": "^1.2.0",
     "css-loader": "^0.23.1",
+    "eventsource-polyfill": "^0.9.6",
+    "express": "^4.13.4",
+    "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
+    "function-bind": "^1.1.0",
+    "html-webpack-plugin": "^2.16.0",
+    "http-proxy-middleware": "^0.14.0",
+    "jshint": "^2.9.2",
     "jshint-loader": "^0.8.3",
-    "sass-loader": "^3.2.0",
+    "json-loader": "^0.5.4",
+    "ora": "^0.2.1",
+    "shelljs": "^0.7.0",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
-    "webpack": "^1.13.0"
+    "vue-hot-reload-api": "^1.3.2",
+    "vue-html-loader": "^1.2.2",
+    "vue-loader": "^8.2.3",
+    "vue-style-loader": "^1.0.0",
+    "webpack": "^1.13.0",
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-hot-middleware": "^2.10.0"
   },
   "dependencies": {
     "hammer": "0.0.5",

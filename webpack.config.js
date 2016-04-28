@@ -1,4 +1,7 @@
-var webpack=require('webpack')
+var webpack = require('webpack')
+    , HtmlWebpackPlugin = require('html-webpack-plugin')
+    ;
+
 module.exports = {
     //入口文件，用于打包的文集爱你
     entry: {
@@ -10,10 +13,23 @@ module.exports = {
         path: 'dist',
         //文件输入的目录
         filename: '[name].js'
+        //filename: '[name]-[hash:8].js'
     },
     plugins: [
        new webpack.optimize.UglifyJsPlugin({
             minimize: true
+        })
+
+        // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
+        ,
+        new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NoErrorsPlugin(),
+        // https://github.com/ampedandwired/html-webpack-plugin
+        new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: 'index.html',
+            inject: true
         })
 
         // 将入口文件的数组打包成 vendors.js
@@ -41,6 +57,10 @@ module.exports = {
             { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' }, // use ! to chain loade   rs
             { test: /\.css$/, loader: 'style-loader!css-loader' },
             { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'} // inline base64 URLs for <=8k images, direct URLs for the rest
+            , {
+                test: /\.html$/
+                , loader: 'vue-html'
+            }
         ]
         , preLoader: [{    // jshint-loader
             test: /\.jsx?$/
