@@ -2,19 +2,47 @@ var path = require('path')
 	, express = require('express')
 	, webpack = require('webpack')
 	, webpackConfig = require('../webpack.config.js')
-	, PORT = process.env.PORT || 8080
+	, PORT = process.env.PORT || 9002
+
+	, PROJECT_ROOT = path.resolve(__dirname, '../') +'/'
 
 	, app = express()
-	, compiler = webpack( webpackConfig )
-	, devMiddleware = require('webpack-dev-middleware')(compiler, {
-		publicPath: '/'
-		, stats: {
-			colors: true
-			, chunks: false
-		}
-	})
-	, hotMiddleware = require('webpack-hot-middleware')(compiler)
+	, compiler
+	, HtmlWebpackPlugin = require('html-webpack-plugin')
+	, devMiddleware
+	, hotMiddleware
 	;
+
+webpackConfig.entry['hot-load-test'] = PROJECT_ROOT +'examples/hot-load-test.js';
+Object.keys(webpackConfig.entry).forEach(function(name){
+	webpackConfig.entry[name] = [PROJECT_ROOT +'tools/dev-client.js'].concat(webpackConfig.entry[name])
+});
+
+webpackConfig.plugins.push(
+	// https://github.com/glenjamin/webpack-hot-middleware#installation--usage
+	new webpack.optimize.OccurenceOrderPlugin(),
+	new webpack.HotModuleReplacementPlugin(),
+	new webpack.NoErrorsPlugin()
+	,
+	// https://github.com/ampedandwired/html-webpack-plugin
+	new HtmlWebpackPlugin({
+		filename: 'examples/hot-load-test.html',
+		template: PROJECT_ROOT +'examples/hot-load-test.html',
+		chunks:['vendors', 'maple', 'hot-load-test'],
+		inject: 'body'
+	})
+);
+
+compiler  = webpack( webpackConfig );
+
+devMiddleware = require('webpack-dev-middleware')(compiler, {
+	publicPath: webpackConfig.output.publicPath
+	, stats: {
+		colors: true
+		, chunks: false
+	}
+});
+hotMiddleware = require('webpack-hot-middleware')(compiler);
 
 compiler.plugin('compilation', function(compilation){
 	compilation.plugin('html-webpack-plugin-after-emit', function(data, callback){
@@ -33,6 +61,14 @@ app.use( devMiddleware );
 
 // 热部署功能
 app.use( hotMiddleware );
+
+//app.use('/examples', express.static(PROJECT_ROOT +'examples'));
+app.use('/dist', express.static(PROJECT_ROOT +'dist'));
+app.use('/src', express.static(PROJECT_ROOT +'src'));
+//app.get('/', function(req, res){  console.log(123123)
+//	res.send('test');
+//	res.end();
+//});
 
 module.exports = app.listen(PORT, function(e){
 	if( e ){
