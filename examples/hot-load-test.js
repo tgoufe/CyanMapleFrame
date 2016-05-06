@@ -1,6 +1,7 @@
 var vue = require('vue')
 	, maple = require('../src/js/index')
 	, slider = require('../src/js/ui/slider')
+	;
 
 maple.component(slider,{
 	a: '123'

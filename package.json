@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "node tools/dev-server.js",
+    "server": "node server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,10 +30,10 @@
     "connect-history-api-fallback": "^1.2.0",
     "css-loader": "^0.23.1",
     "eventsource-polyfill": "^0.9.6",
-    "express": "^4.13.4",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
     "function-bind": "^1.1.0",
+    "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.16.0",
     "http-proxy-middleware": "^0.14.0",
     "jshint": "^2.9.2",
@@ -51,9 +52,15 @@
     "webpack-hot-middleware": "^2.10.0"
   },
   "dependencies": {
+    "body-parser": "^1.15.0",
+    "cookie": "^0.2.3",
+    "cookie-parser": "^1.4.1",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
     "hammer": "0.0.5",
     "jquery": "^2.2.3",
     "lodash": "^4.11.1",
+    "log4js": "^0.6.36",
     "vue": "^1.0.21"
   }
 }

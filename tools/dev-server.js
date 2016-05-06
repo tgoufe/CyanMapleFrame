@@ -1,8 +1,12 @@
+'use strict';
+
 var path = require('path')
+	, fs = require('fs')
 	, express = require('express')
 	, webpack = require('webpack')
 	, webpackConfig = require('../webpack.config.js')
-	, PORT = process.env.PORT || 9002
+	, CONFIG = require('../config.js')
+	, PORT = CONFIG.PORT
 
 	, PROJECT_ROOT = path.resolve(__dirname, '../') +'/'
 
@@ -11,9 +15,75 @@ var path = require('path')
 	, HtmlWebpackPlugin = require('html-webpack-plugin')
 	, devMiddleware
 	, hotMiddleware
+	, DEV_DIR = [   // 项目开发目录
+		'examples'
+		, 'test'
+	]
+	, i, j
+	, handle = function(readPath){
+		var stat
+			;
+
+		if( fs.existsSync(readPath) ){
+			stat = fs.statSync( readPath );
+			//console.log(stat)
+			if( stat.isFile() ){
+				console.log(readPath, ' 读取 file');
+
+				handleFile( readPath );
+			}
+			else if( stat.isDirectory() ){
+				console.log(readPath, ' 读取 dir');
+
+				handleDir( readPath );
+			}
+			else{
+				console.log(readPath, '未知错误');
+			}
+		}
+		else{
+			console.log(readPath, '文件或目录不存在');
+		}
+	}
+	, handleFile = function(filePath){
+		var ext = path.extname( filePath )
+			, name
+			;
+
+		if( ext === '.js' ){
+			// js 文件，在 entry 中添加
+			name = path.basename(filePath.replace(PROJECT_ROOT, ''), '.js');
+			webpackConfig.entry[name] = filePath;
+		}
+		else if( ext === '.html' ){
+			// html 文件，在 plugins 中插入
+			name = path.basename(filePath, '.html');
+			webpackConfig.plugins.push(new HtmlWebpackPlugin({
+				filename: filePath.replace(PROJECT_ROOT, ''),    // todo ?
+				template: filePath,
+				chunks: [name, 'maple', 'vendors'], // 注入的 js 执行文件与该 html 文件同名
+				inject: 'body'
+			}));
+		}
+		else{
+			// 不需要处理的文件类型
+		}
+	}
+	, handleDir = function(dirPath){
+		var files = fs.readdirSync( dirPath )
+			, i, j
+			;
+
+		for( i = 0, j = files.length; i < j; i++){
+			handle( dirPath +'/'+ files[i] );
+		}
+	}
 	;
 
-webpackConfig.entry['hot-load-test'] = PROJECT_ROOT +'examples/hot-load-test.js';
+for(i = 0, j = DEV_DIR.length; i < j; i++){
+	handle( PROJECT_ROOT + DEV_DIR[i] );
+}
+//webpackConfig.entry['hot-load-test'] = PROJECT_ROOT +'examples/hot-load-test.js';
 Object.keys(webpackConfig.entry).forEach(function(name){
 	webpackConfig.entry[name] = [PROJECT_ROOT +'tools/dev-client.js'].concat(webpackConfig.entry[name])
 });
@@ -23,14 +93,14 @@ webpackConfig.plugins.push(
 	new webpack.optimize.OccurenceOrderPlugin(),
 	new webpack.HotModuleReplacementPlugin(),
 	new webpack.NoErrorsPlugin()
-	,
-	// https://github.com/ampedandwired/html-webpack-plugin
-	new HtmlWebpackPlugin({
-		filename: 'examples/hot-load-test.html',
-		template: PROJECT_ROOT +'examples/hot-load-test.html',
-		chunks:['vendors', 'maple', 'hot-load-test'],
-		inject: 'body'
-	})
+	//,
+	//// https://github.com/ampedandwired/html-webpack-plugin
+	//new HtmlWebpackPlugin({
+	//	filename: 'examples/hot-load-test.html',
+	//	template: PROJECT_ROOT +'examples/hot-load-test.html',
+	//	chunks:['vendors', 'maple', 'hot-load-test'],
+	//	inject: 'body'
+	//})
 );
 
 compiler  = webpack( webpackConfig );
