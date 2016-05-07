@@ -44,7 +44,8 @@ var path = require('path')
 				'hammer': PROJECT_ROOT +'src/js/external/lib/hammer/1.0.10/hammer.min',
 				'lodash': PROJECT_ROOT +'src/js/external/lib/lodash/4.11.1/lodash',
 				'_': PROJECT_ROOT +'src/js/external/lib/lodash/4.11.1/lodash',
-				'vue': PROJECT_ROOT +'src/js/external/lib/vue/1.0.17/vue.min'
+				'vue': PROJECT_ROOT +'src/js/external/lib/vue/1.0.17/vue.min',
+				'swiper': PROJECT_ROOT +'src/js/external/plugin/swiper/3.3.1/swiper.min'
 			}
 		},
 		//加载cdn,尽量保证不使用jquery
