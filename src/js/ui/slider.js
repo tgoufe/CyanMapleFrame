@@ -2,6 +2,7 @@ var Vue=require('vue');
 var _=require('_');
 var Swiper=require('swiper');
 var tpl=require('./tpl/slider/theme1.html');
+// var component=require('../component/index');
 function Slider(selector,options){
 	return new Slider.prototype.init(selector,options)
 }
@@ -49,11 +50,14 @@ Slider.prototype.init=function(selector,options){
 		}else if(options.data){
 			if(typeof options.dataFormate==='function' ){
 				vm.$data=options.dataFormate(options.data)
+				console.log(options.data)
 			}else{
 				vm.$data=options.data
+				console.log(options.data)
 			}
 		}
 	}
+	return vm;
 	// return new Swiper(selector, options)
 }
 Slider.prototype.init.prototype=Slider.prototype;
