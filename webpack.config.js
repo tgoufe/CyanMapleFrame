@@ -7,7 +7,7 @@ var path = require('path')
 		//入口文件，用于打包的文集爱你
 		entry: {
 			maple: PROJECT_ROOT +'src/js/index.js'
-			, vendors: ['vue', 'lodash', 'hammer']
+			, vendors: ['vue', 'lodash', 'hammer','swiper']
 			//, index: PROJECT_ROOT +'examples/hot-load-test.js'
 		},
 		output: {

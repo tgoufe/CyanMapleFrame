@@ -7,23 +7,26 @@ function Slider(selector,options){
 	return new Slider.prototype.init(selector,options)
 }
 Slider.prototype.init=function(selector,options){
-	var vm=new Vue({
+	var opts={
 		el: selector,
 		template:tpl,
 		data:null,
 		watch:{
-			data:function(newData,oldData){
+			itemList:function(newData,oldData){
 				new Swiper(this.$el,{
 					pagination : '.swiper-pagination'
 				})
 			}
 		},
 		methods:{
-			itemEvent:function(index,event){
-				console.dir(arguments)
+			itemEvent:function(index,event,data){
+				console.log(arguments)
 			}
 		}
-	})
+	}
+	_.extend(opts.data,options.data)
+	_.extend(opts.methods,options.methods)
+	var vm=new Vue(opts)
 	if(options===undefined){
 		
 	}else{
