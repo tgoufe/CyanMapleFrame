@@ -1,10 +1,18 @@
-<div class="flex-container center">
-	<i class="icon-close text-green"></i>
-	<img src="http://tg-image.b0.upaiyun.com/tgou2/img2/main/android_download_logo2.png" alt="">
-	<div class="text-green">
-		<div class="fs-16">您掌中不打烊的实体店</div>
-		<div class="fs-12">消息订阅·降价通知·专属试衣间</div>
+<div class="flex-container center bg-white padding20">
+	<i class="icon-wrong text-green paddingr20" @click="closeEvent()"></i>
+	<img src="http://tg-image.b0.upaiyun.com/tgou2/img2/main/android_download_logo2.png" style="width:47px;height:47px" alt="">
+	<div class="text-green flex1 paddingl20">
+		<div class="fs-16">不一样的逛街方式</div>
+		<div class="fs-10">
+			<span class="paddingr20">电子会员领优惠</span>
+			<span>试衣献花更惊喜</span>
+		</div>
 	</div>
-	<a href="###" class="btn btn-green btn-radius" @click="downloadEvent">立即下载</a>
-	<a href="###" class="btn btn-green btn-radius marginl10" @click="WeChartEvent" v-show="isWeChart">关注微信</a>
+	<div v-if="isWeChart">
+		<a href="###" style="padding:3px 6px" class="btn btn-green btn-radius" @click="downloadEvent">立即下载</a>
+		<a href="###" style="padding:3px 6px" class="btn btn-green btn-radius marginl10" @click="WeChartEvent" v-show="isWeChart">关注微信</a>
+	</div>
+	<div v-else="">
+		<a href="###" style="width:92px" class="btn btn-green btn-radius" @click="downloadEvent">立即下载</a>
+	</div>
 </div>

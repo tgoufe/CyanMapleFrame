@@ -5,7 +5,7 @@ module.exports=function(selector,options){
 		el: selector,
 		template:tpl,
 		data:{
-			isWeChart:false
+			isWeChart:window.navigator.userAgent.toLowerCase().match(/MicroMessenger/i) == 'micromessenger'
 		},
 		methods:{
 			downloadEvent:function(){
@@ -13,6 +13,9 @@ module.exports=function(selector,options){
 			},
 			WeChartEvent:function(){
 				alert(2)
+			},
+			closeEvent:function(){
+				this.$destroy(true)
 			}
 		}
 	}
