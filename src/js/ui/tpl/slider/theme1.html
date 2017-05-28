@@ -1,0 +1,8 @@
+<div class="swiper-container">
+  <div class="swiper-wrapper">
+    <div class="swiper-slide img-container" v-for="item in itemList" @click.stop.prevent="itemEvent($index,$event,$data.itemList[$index],$data.itemList)">
+    	<img src="{{item.imageUrl}}" alt="" >
+    </div>
+    <div class="swiper-pagination"></div>
+  </div>
+</div>
