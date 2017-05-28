@@ -1,9 +1,0 @@
-var maple = require('../ns');
-maple.slider=require('./slider');
-maple.guaguaka=require('./guaguaka');
-maple.warterFall=require('./warterFall');
-maple.dataPick=require('./dataPick');
-maple.clock=require('./clock');
-maple.tab=require('./tab');
-maple.mask=require('./mask');
-maple.dialog=require('./dialog');
