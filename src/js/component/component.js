@@ -1,1 +1,0 @@
-var Vue=require('vue')

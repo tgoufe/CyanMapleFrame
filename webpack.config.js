@@ -1,53 +1,57 @@
-var webpack=require('webpack')
+var webpack = require('webpack');
+var path = require('path');
+var compiler = require('vue-template-compiler')
 module.exports = {
-    //入口文件，用于打包的文集爱你
-    entry: {
-        maple:'./src/js/index.js'
-
-        , vendors: ['vue', 'lodash', 'hammer']
-    },
-    output: {
-        path: 'dist',
-        //文件输入的目录
-        filename: '[name].[hash].js'
-    },
+    //插件项
     plugins: [
-       new webpack.optimize.UglifyJsPlugin({
-            minimize: true
-        })
-
-        // 将入口文件的数组打包成 vendors.js
-        , new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js')
+        // new webpack.optimize.CommonsChunkPlugin({name:'base'})//提取公共文件
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {
+        //         warnings: false
+        //     }
+        // }) //压缩JS
     ],
-    resolve: {
-        //用于缺省的文件名后缀
-        extensions: ['', '.coffee', '.js'],
-        //root:'E:/code/java/tgou/branch/dev/src/main/webapp/static/CyanMapleFrame/src/js/external',
-        //别名
-        alias: {
-            'hammer':__dirname+'/src/js/external/lib/hammer/1.0.10/hammer.min',
-            '_':__dirname+'/src/js/external/lib/lodash/4.11.1/lodash',
-            'vue':__dirname+'/src/js/external/lib/vue/1.0.17/vue.min'
-        }
+    //页面入口文件配置
+    entry: {
+        maple: [__dirname + '/source/maple/index.js']
     },
-    //加载cdn,尽量保证不使用jquery
-    externals: {
-        //'jquery': 'jQuery',
-        //'_':'_'
+    //入口文件输出配置
+    output: {
+        path: './',
+        filename: './javascript/[name].js'
     },
-    //加载器
     module: {
-        loaders: [
-            { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' }, // use ! to chain loade   rs
-            { test: /\.css$/, loader: 'style-loader!css-loader' },
-            { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'} // inline base64 URLs for <=8k images, direct URLs for the rest
-        ]
-        , preLoader: [{    // jshint-loader
-            test: /\.jsx?$/
-            , include: './src/js/'
-            , loader: 'jshint-loader'
+        //加载器配置
+        loaders: [{
+            test: /\.css$/,
+            loader: 'style-loader!css-loader!sass-loader'
+        }, {
+            test: /\.js$/,
+            loader: 'babel-loader',
+            query: {
+                presets: ['es2015']
+            }
+        }, {
+            test: /\.scss$/,
+            loader: 'style-loader!css-loader!sass-loader?sourceMap'
+        }, {
+            test: /\.(png|jpg)$/,
+            loader: 'url-loader?limit=8192'
+        }, {
+            test: /\.vue$/,
+            loader: 'vue-loader',
+            options: {
+                loaders: {
+                    js: 'babel-loader?{"presets":["es2015"],"plugins": ["transform-object-rest-spread"]}',
+                    css: 'vue-style-loader!css-loader'
+                }
+            }
+        }, {
+            test: /\.json$/,
+            loader: 'json-loader'
         }]
+    },
+    resolve: {
+        modules: [__dirname]
     }
-}
-
-//'http://libs.baidu.com/jquery/2.1.1/jquery.min'
+};
