@@ -14,7 +14,7 @@ import component from './component';
 import alert from './ui/alert/index.js';
 import confirm from './ui/confirm/index.js';
 import notice from './ui/notice/index.js';
-import cutImage from './ui/cutImage.js';
+import actions from './ui/actions/index.js';
 
 //挂载工具方法
 maple._ = util;
@@ -44,6 +44,7 @@ maple.vm = vm;
 maple.notice = notice;
 maple.alert = alert;
 maple.confirm = confirm;
+maple.actions = actions;
 
 
 // 初始化通用组件

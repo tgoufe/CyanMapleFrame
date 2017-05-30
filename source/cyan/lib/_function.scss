@@ -65,6 +65,13 @@
     clear: both;
   }
 }
+@function getLayoutSize($i,$reverse:1){
+  @if($isPC){
+    @return $i * $reverse * 10 +px;
+  }@else{
+    @return $i * $reverse / 7.5 +rem
+  }
+}
 @mixin scale($ratio...) {
   -webkit-transform: scale($ratio);
       -ms-transform: scale($ratio);

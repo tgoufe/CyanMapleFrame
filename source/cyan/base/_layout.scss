@@ -223,17 +223,7 @@ blockquote,  dd, div, dl, dt, fieldset, form, h1, h2, h3, h4, h5, h6, input, pre
 		}
 	}
 }
-/**
- * margin and padding
- */
 
-@function getLayoutSize($i,$reverse){
-	@if($isPC){
-		@return $i * $reverse * 10 +px;
-	}@else{
-		@return $i * $reverse / 7.5 +rem
-	}
-}
 @for $i from 0 through $layoutNumber{
 	.margin#{$i * 10}{margin:getLayoutSize($i,1)}
 	.margint#{$i * 10}{margin-top:getLayoutSize($i,1)}

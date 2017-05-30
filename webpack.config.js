@@ -17,7 +17,7 @@ module.exports = {
     },
     //入口文件输出配置
     output: {
-        path: './',
+        path: __dirname,
         filename: './javascript/[name].js'
     },
     module: {
@@ -43,7 +43,9 @@ module.exports = {
             options: {
                 loaders: {
                     js: 'babel-loader?{"presets":["es2015"],"plugins": ["transform-object-rest-spread"]}',
-                    css: 'vue-style-loader!css-loader'
+                    css: 'vue-style-loader!css-loader',
+                    scss: 'style-loader!css-loader!sass-loader',
+                    sass: 'style-loader!css-loader!sass-loader?indentedSyntax'
                 }
             }
         }, {
