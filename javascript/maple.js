@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 102);
+/******/ 	return __webpack_require__(__webpack_require__.s = 105);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -199,7 +199,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(8)
+var listToStyles = __webpack_require__(10)
 
 /*
 type StyleObject = {
@@ -699,1671 +699,66 @@ var pushState = exports.pushState = typeof history.pushState === 'function';
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+	value: true
 });
+var sliderMethodsList = ['disableMousewheelControl'];
+var sliderPropsList = ['container'];
+function CMUI_SliderList() {
+	this.length = 0;
+}
+sliderMethodsList.forEach(function (item) {
+	CMUI_SliderList.prototype[item] = function (arg) {
+		var _this = this;
 
-exports.default = function (text, data) {
-    var styleString = '';
-    styleString += 'font-size:13px;';
-    styleString += 'font-family:"microsoft yahei";';
-    styleString += 'color:#125ce8;';
-    var line = '------------------';
-    if (arguments.length !== 1) {
-        console.log('%c' + line + text.toString() + line + '', styleString);
-        for (var i = 1; i < arguments.length; i++) {
-            console.log(arguments[i]);
-        }
-        console.log('%c' + line + text.toString() + line + '\n\n\n', styleString);
-    } else {
-        console.log('%c' + line + line + '', styleString);
-        console.log(text);
-        console.log('%c' + line + line + '\n\n\n', styleString);
-    }
+		_.times(this.length).forEach(function (index) {
+			if (_this[index] instanceof Swiper) {
+				_this[index][item](arg);
+			}
+		});
+		return this;
+	};
+});
+sliderPropsList.forEach(function (item) {
+	CMUI_SliderList.prototype[item] = function () {
+		return _.get(this, '[0]' + item);
+	};
+});
+CMUI_SliderList.prototype.add = function (item) {
+	if (item instanceof Swiper) {
+		this[this.length++] = item;
+	}
+	return this;
 };
+CMUI_SliderList.prototype.remove = function () {
+	var _this2 = this;
+
+	_.times(this.length, function (index) {
+		var swiper = _this2[index];
+		if (swiper instanceof Swiper) {
+			var container = swiper.container;
+			var baseIndex = _.findKey(sliderList, swiper);
+			swiper.destroy(false, true);
+			container.remove();
+			_this2[index] = null;
+			if (_this2 != sliderList) {
+				sliderList[baseIndex] = null;
+			}
+		}
+	});
+	return this;
+};
+CMUI_SliderList.prototype.eq = function () {
+	var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+
+	var temp = new CMUI_SliderList();
+	return temp.add(this[index]);
+};
+var sliderList = new CMUI_SliderList();
+exports.CMUI_SliderList = CMUI_SliderList;
+exports.default = sliderList;
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _core = __webpack_require__(21);
-
-var _core2 = _interopRequireDefault(_core);
-
-var _cookie = __webpack_require__(9);
-
-var _session = __webpack_require__(11);
-
-var _local = __webpack_require__(10);
-
-var _util = __webpack_require__(4);
-
-var util = _interopRequireWildcard(_util);
-
-var _support = __webpack_require__(5);
-
-var support = _interopRequireWildcard(_support);
-
-var _url = __webpack_require__(30);
-
-var _url2 = _interopRequireDefault(_url);
-
-var _log = __webpack_require__(6);
-
-var _log2 = _interopRequireDefault(_log);
-
-var _load = __webpack_require__(24);
-
-var _load2 = _interopRequireDefault(_load);
-
-var _scroll_bar = __webpack_require__(25);
-
-var _scroll_bar2 = _interopRequireDefault(_scroll_bar);
-
-var _device = __webpack_require__(22);
-
-var _device2 = _interopRequireDefault(_device);
-
-var _vm = __webpack_require__(3);
-
-var _vm2 = _interopRequireDefault(_vm);
-
-var _component = __webpack_require__(12);
-
-var _component2 = _interopRequireDefault(_component);
-
-var _index = __webpack_require__(27);
-
-var _index2 = _interopRequireDefault(_index);
-
-var _index3 = __webpack_require__(28);
-
-var _index4 = _interopRequireDefault(_index3);
-
-var _index5 = __webpack_require__(29);
-
-var _index6 = _interopRequireDefault(_index5);
-
-var _index7 = __webpack_require__(26);
-
-var _index8 = _interopRequireDefault(_index7);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//挂载工具方法
-_core2.default._ = util;
-_core2.default.util = util;
-//挂载支持
-_core2.default.support = support;
-//挂载cookie
-_core2.default.cookie = _cookie.cookie;
-//挂载localStorage
-_core2.default.localData = _local.localData;
-//挂载sessionStorage
-_core2.default.sessionData = _session.sessionData;
-//挂载url处理方法
-_core2.default.url = _url2.default;
-//挂载console.log
-_core2.default.log = _log2.default;
-//挂载load
-_core2.default.load = _load2.default;
-//挂载滚动事件
-_core2.default.scrollBar = _scroll_bar2.default;
-//挂载设备信息
-_core2.default.device = _device2.default;
-//挂载vm控制器
-_core2.default.vm = _vm2.default;
-
-_core2.default.notice = _index6.default;
-_core2.default.alert = _index2.default;
-_core2.default.confirm = _index4.default;
-_core2.default.actions = _index8.default;
-
-// 初始化通用组件
-Object.keys(_component2.default).forEach(function (d) {
-  return Vue.component(d, _component2.default[d]);
-});
-exports.default = window.maple = _core2.default;
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Translates the list format produced by css-loader into something
- * easier to manipulate.
- */
-module.exports = function listToStyles(parentId, list) {
-  var styles = [];
-  var newStyles = {};
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i];
-    var id = item[0];
-    var css = item[1];
-    var media = item[2];
-    var sourceMap = item[3];
-    var part = {
-      id: parentId + ':' + i,
-      css: css,
-      media: media,
-      sourceMap: sourceMap
-    };
-    if (!newStyles[id]) {
-      styles.push(newStyles[id] = { id: id, parts: [part] });
-    } else {
-      newStyles[id].parts.push(part);
-    }
-  }
-  return styles;
-};
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.cookie = undefined;
-
-var _util = __webpack_require__(4);
-
-var pluses = /\+/g;
-
-function encode(s) {
-    return config.raw ? s : encodeURIComponent(s);
-}
-
-function decode(s) {
-    return config.raw ? s : decodeURIComponent(s);
-}
-
-function stringifyCookieValue(value) {
-    return encode(config.json ? JSON.stringify(value) : String(value));
-}
-
-function parseCookieValue(s) {
-    if (s.indexOf('"') === 0) {
-        // This is a quoted cookie as according to RFC2068, unescape...
-        s = s.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-    }
-
-    try {
-        // Replace server-side written pluses with spaces.
-        // If we can't decode the cookie, ignore it, it's unusable.
-        // If we can't parse the cookie, ignore it, it's unusable.
-        s = decodeURIComponent(s.replace(pluses, ' '));
-        return config.json ? JSON.parse(s) : s;
-    } catch (e) {}
-}
-
-function read(s, converter) {
-    var value = config.raw ? s : parseCookieValue(s);
-    return $.isFunction(converter) ? converter(value) : value;
-}
-
-var config = $.cookie = function (key, value, options) {
-
-    // Write
-
-    if (value !== undefined && !$.isFunction(value)) {
-        options = $.extend({}, config.defaults, options);
-
-        if (typeof options.expires === 'number') {
-            var days = options.expires,
-                t = options.expires = new Date();
-            t.setTime(+t + days * 864e+5);
-        }
-        return document.cookie = [encode(key), '=', stringifyCookieValue(value), options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
-        options.path ? '; path=' + options.path : '', options.domain ? '; domain=' + options.domain : '', options.secure ? '; secure' : ''].join('');
-    }
-
-    // Read
-
-    var result = key ? undefined : {};
-
-    // To prevent the for loop in the first place assign an empty array
-    // in case there are no cookies at all. Also prevents odd result when
-    // calling $.cookie().
-    var cookies = document.cookie ? document.cookie.split('; ') : [];
-
-    for (var i = 0, l = cookies.length; i < l; i++) {
-
-        var parts = cookies[i].split('=');
-        var name = decode(parts.shift());
-        var _cookie = parts.join('=');
-
-        if (key && key === name) {
-            // If second argument (value) is a function it's a converter...
-            result = read(_cookie, value);
-            //break;
-        }
-
-        // Prevent storing a cookie that we couldn't decode.
-        if (!key && (_cookie = read(_cookie)) !== undefined) {
-            result[name] = _cookie;
-        }
-    }
-    return result;
-};
-
-config.defaults = {};
-
-$.removeCookie = function (key, options) {
-    if ($.cookie(key) === undefined) {
-        return false;
-    }
-
-    // Must not alter options, thus extending a fresh object...
-    $.cookie(key, '', $.extend({}, options, { expires: -1 }));
-    return !$.cookie(key);
-};
-/*---------- copy jquery.cookie end----------------*/
-
-var cookie = function cookie() {
-    if (arguments[2] && (0, _util.isObject)(arguments[2])) {
-        if ((0, _util.isTimeStr)(arguments[2]['expires'])) {
-            arguments[2]['expires'] = new Date(new Date().getTime() + (0, _util.formatTimeStr)(arguments[2]['expires']));
-        }
-    }
-    return $.cookie.apply(this, arguments);
-};
-cookie.remove = function () {
-    return $.removeCookie.apply(this, arguments);
-};
-
-exports.cookie = cookie;
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.localData = undefined;
-
-var _support = __webpack_require__(5);
-
-var _util = __webpack_require__(4);
-
-var sessionKey = 'tg_local_cache',
-    cache = _support.localStorage ? localStorage : false,
-    data = _support.localStorage ? JSON.parse(cache.getItem(sessionKey) || JSON.stringify({})) : {},
-    formatData = function formatData() {
-    var d = {},
-        t = new Date().getTime();
-    for (var i in data) {
-        if (t - data[i].t < data[i].time || !data[i].time) {
-            d[i] = data[i].value;
-        }
-    }
-    return d;
-},
-    localData = function localData() {
-    var length = arguments.length,
-        d = {},
-        t = new Date().getTime();
-    if (!length) {
-        return formatData();
-    } else if (length === 1) {
-        if ((0, _util.isObject)(arguments[0])) {
-            for (var i in arguments[0]) {
-                d[i] = { value: arguments[0][i], time: 0, t: t };
-            }
-            data = Object.assign({}, data, d);
-            cache && cache.setItem(sessionKey, JSON.stringify(data));
-        } else {
-            return formatData()[arguments[0]];
-        }
-    } else if (length === 2) {
-        if ((0, _util.isObject)(arguments[0]) && (0, _util.isTimeStr)(arguments[1])) {
-            for (var _i in arguments[0]) {
-                d[_i] = { value: arguments[0][_i], time: (0, _util.formatTimeStr)(arguments[1]), t: t };
-            }
-            data = Object.assign({}, data, d);
-        } else {
-            data[arguments[0]] = { value: arguments[1], time: 0, t: t };
-        }
-        cache && cache.setItem(sessionKey, JSON.stringify(data));
-    } else if (length === 3) {
-        d[arguments[0]] = { value: arguments[1], time: (0, _util.formatTimeStr)(arguments[2]), t: t };
-        data = Object.assign({}, data, d);
-        cache && cache.setItem(sessionKey, JSON.stringify(data));
-    }
-};
-
-localData.remove = function (key) {
-    var length = arguments.length;
-    if (!length) {
-        this.removeAll();
-    } else {
-        for (var i = 0; i < length; i++) {
-            data[arguments[i]] = undefined;
-            delete data[arguments[i]];
-        }
-        cache && cache.setItem(sessionKey, JSON.stringify(data));
-    }
-};
-localData.removeAll = function () {
-    data = {};
-    cache && cache.setItem(sessionKey, JSON.stringify(data));
-};
-
-exports.localData = localData;
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.sessionData = undefined;
-
-var _support = __webpack_require__(5);
-
-var _util = __webpack_require__(4);
-
-var sessionKey = 'tg_session_cache',
-    cache = _support.sessionStorage ? sessionStorage : false,
-    data = _support.sessionStorage ? JSON.parse(cache.getItem(sessionKey) || JSON.stringify({})) : {},
-    sessionData = function sessionData() {
-    var length = arguments.length;
-    if (!length) {
-        return data;
-    } else if (length === 1) {
-        if ((0, _util.isObject)(arguments[0])) {
-            data = $.extend({}, data, arguments[0]);
-            cache && cache.setItem(sessionKey, JSON.stringify(data));
-        } else {
-            return data[arguments[0]];
-        }
-    } else if (length === 2) {
-        data[arguments[0]] = arguments[1];
-        cache && cache.setItem(sessionKey, JSON.stringify(data));
-    }
-};
-sessionData.remove = function (key) {
-    var length = arguments.length;
-    if (!length) {
-        this.removeAll();
-    } else {
-        for (var i = 0; i < length; i++) {
-            data[arguments[i]] = undefined;
-            delete data[arguments[i]];
-        }
-        cache && cache.setItem(sessionKey, JSON.stringify(data));
-    }
-};
-sessionData.removeAll = function () {
-    data = {};
-    cache && cache.setItem(sessionKey, JSON.stringify(data));
-};
-
-exports.sessionData = sessionData;
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-		value: true
-});
-
-var _slider = __webpack_require__(72);
-
-var _slider2 = _interopRequireDefault(_slider);
-
-var _sliderItem = __webpack_require__(71);
-
-var _sliderItem2 = _interopRequireDefault(_sliderItem);
-
-var _number = __webpack_require__(67);
-
-var _number2 = _interopRequireDefault(_number);
-
-var _img = __webpack_require__(63);
-
-var _img2 = _interopRequireDefault(_img);
-
-var _list = __webpack_require__(66);
-
-var _list2 = _interopRequireDefault(_list);
-
-var _listItem = __webpack_require__(65);
-
-var _listItem2 = _interopRequireDefault(_listItem);
-
-var _input = __webpack_require__(64);
-
-var _input2 = _interopRequireDefault(_input);
-
-var _picker = __webpack_require__(68);
-
-var _picker2 = _interopRequireDefault(_picker);
-
-var _scrollbox = __webpack_require__(70);
-
-var _scrollbox2 = _interopRequireDefault(_scrollbox);
-
-var _scrollboxItem = __webpack_require__(69);
-
-var _scrollboxItem2 = _interopRequireDefault(_scrollboxItem);
-
-var _collapse = __webpack_require__(62);
-
-var _collapse2 = _interopRequireDefault(_collapse);
-
-var _collapseItem = __webpack_require__(61);
-
-var _collapseItem2 = _interopRequireDefault(_collapseItem);
-
-var _affix = __webpack_require__(60);
-
-var _affix2 = _interopRequireDefault(_affix);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// import time from './component/time/time.vue';
-exports.default = {
-		'cmui-slider': _slider2.default,
-		'cmui-slider-item': _sliderItem2.default,
-		'cmui-number': _number2.default,
-		'cmui-img': _img2.default,
-		'cmui-list': _list2.default,
-		'cmui-list-item': _listItem2.default,
-		'cmui-input': _input2.default,
-		'cmui-picker': _picker2.default,
-		'cmui-scrollbox': _scrollbox2.default,
-		'cmui-scrollbox-item': _scrollboxItem2.default,
-		'cmui-collapse': _collapse2.default,
-		'cmui-collapse-item': _collapseItem2.default,
-		'cmui-affix': _affix2.default
-		// ,	'cmui-time': time
-};
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = {
-  functional: true,
-  render: function render(h, context) {
-    var data = {
-      on: {
-        beforeEnter: function beforeEnter(el) {
-          el.classList.add('collapse-transition');
-          if (!el.dataset) el.dataset = {};
-          el.dataset.oldPaddingTop = el.style.paddingTop;
-          el.dataset.oldPaddingBottom = el.style.paddingBottom;
-          el.style.height = '0';
-          el.style.paddingTop = 0;
-          el.style.paddingBottom = 0;
-        },
-        enter: function enter(el) {
-          el.dataset.oldOverflow = el.style.overflow;
-          if (el.scrollHeight !== 0) {
-            el.style.height = el.scrollHeight + 'px';
-            el.style.paddingTop = el.dataset.oldPaddingTop;
-            el.style.paddingBottom = el.dataset.oldPaddingBottom;
-          } else {
-            el.style.height = '';
-            el.style.paddingTop = el.dataset.oldPaddingTop;
-            el.style.paddingBottom = el.dataset.oldPaddingBottom;
-          }
-
-          el.style.overflow = 'hidden';
-        },
-        afterEnter: function afterEnter(el) {
-          // for safari: remove class then reset height is necessary
-          el.classList.remove('collapse-transition');
-          el.style.height = '';
-          el.style.overflow = el.dataset.oldOverflow;
-        },
-        beforeLeave: function beforeLeave(el) {
-          if (!el.dataset) el.dataset = {};
-          el.dataset.oldPaddingTop = el.style.paddingTop;
-          el.dataset.oldPaddingBottom = el.style.paddingBottom;
-          el.dataset.oldOverflow = el.style.overflow;
-
-          el.style.height = el.scrollHeight + 'px';
-          el.style.overflow = 'hidden';
-        },
-        leave: function leave(el) {
-          if (el.scrollHeight !== 0) {
-            // for safari: add class after set height, or it will jump to zero height suddenly, weired
-            el.classList.add('collapse-transition');
-            el.style.height = 0;
-            el.style.paddingTop = 0;
-            el.style.paddingBottom = 0;
-          }
-        },
-        afterLeave: function afterLeave(el) {
-          el.classList.remove('collapse-transition');
-          el.style.height = '';
-          el.style.overflow = el.dataset.oldOverflow;
-          el.style.paddingTop = el.dataset.oldPaddingTop;
-          el.style.paddingBottom = el.dataset.oldPaddingBottom;
-        }
-      }
-    };
-    return h('transition', data, context.children);
-  }
-};
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.default = imageLazyLoad;
-function imageLazyLoad() {
-    if (this.lazyLoad) {
-        var el = this.$el;
-        var elTop = el.y;
-        var htmlBottomPosition = document.body.scrollTop + document.documentElement.clientHeight;
-        if (htmlBottomPosition > elTop) {
-            this.lazyLoad = false;
-        }
-    }
-}
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-function _broadcast(componentName, eventName, params) {
-  this.$children.forEach(function (child) {
-    var name = child.$options.componentName;
-
-    if (name === componentName) {
-      child.$emit.apply(child, [eventName].concat(params));
-    } else {
-      _broadcast.apply(child, [componentName, eventName].concat([params]));
-    }
-  });
-}
-exports.default = {
-  methods: {
-    dispatch: function dispatch(componentName, eventName, params) {
-      var parent = this.$parent || this.$root;
-      var name = parent.$options.componentName;
-
-      while (parent && (!name || name !== componentName)) {
-        parent = parent.$parent;
-
-        if (parent) {
-          name = parent.$options.componentName;
-        }
-      }
-      if (parent) {
-        parent.$emit.apply(parent, [eventName].concat(params));
-      }
-    },
-    broadcast: function broadcast(componentName, eventName, params) {
-      _broadcast.call(this, componentName, eventName, params);
-    }
-  }
-};
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var time = Date.now || function () {
-  return +new Date();
-};
-
-var running = {};
-var counter = 1;
-var desiredFrames = 60;
-var millisecondsPerSecond = 1000;
-
-exports.default = {
-
-  // A requestAnimationFrame wrapper / polyfill.
-  requestAnimationFrame: function () {
-    var requestFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-    return function (callback, root) {
-      requestFrame(callback, root);
-    };
-  }(),
-
-  // Stops the given animation.
-  stop: function stop(id) {
-    var cleared = running[id] != null;
-    if (cleared) {
-      running[id] = null;
-    }
-    return cleared;
-  },
-
-
-  // Whether the given animation is still running.
-  isRunning: function isRunning(id) {
-    return running[id] != null;
-  },
-
-
-  // Start the animation.
-  start: function start(stepCallback, verifyCallback, completedCallback, duration, easingMethod, root) {
-    var _this = this;
-    var start = time();
-    var lastFrame = start;
-    var percent = 0;
-    var dropCounter = 0;
-    var id = counter++;
-
-    if (!root) {
-      root = document.body;
-    }
-
-    // Compacting running db automatically every few new animations
-    if (id % 20 === 0) {
-      var newRunning = {};
-      for (var usedId in running) {
-        newRunning[usedId] = true;
-      }
-      running = newRunning;
-    }
-
-    // This is the internal step method which is called every few milliseconds
-    var step = function step(virtual) {
-      // Normalize virtual value
-      var render = virtual !== true;
-      // Get current time
-      var now = time();
-
-      // Verification is executed before next animation step
-      if (!running[id] || verifyCallback && !verifyCallback(id)) {
-        running[id] = null;
-        completedCallback && completedCallback(desiredFrames - dropCounter / ((now - start) / millisecondsPerSecond), id, false);
-        return;
-      }
-
-      // For the current rendering to apply let's update omitted steps in memory.
-      // This is important to bring internal state variables up-to-date with progress in time.
-      if (render) {
-        var droppedFrames = Math.round((now - lastFrame) / (millisecondsPerSecond / desiredFrames)) - 1;
-        for (var j = 0; j < Math.min(droppedFrames, 4); j++) {
-          step(true);
-          dropCounter++;
-        }
-      }
-
-      // Compute percent value
-      if (duration) {
-        percent = (now - start) / duration;
-        if (percent > 1) {
-          percent = 1;
-        }
-      }
-
-      // Execute step callback, then...
-      var value = easingMethod ? easingMethod(percent) : percent;
-      if ((stepCallback(value, now, render) === false || percent === 1) && render) {
-        running[id] = null;
-        completedCallback && completedCallback(desiredFrames - dropCounter / ((now - start) / millisecondsPerSecond), id, percent === 1 || duration == null);
-      } else if (render) {
-        lastFrame = now;
-        _this.requestAnimationFrame(step, root);
-      }
-    };
-
-    // Mark as running
-    running[id] = true;
-    // Init first step
-    _this.requestAnimationFrame(step, root);
-    // Return unique animation ID
-    return id;
-  }
-};
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Manager = function () {
-  function Manager(data, count) {
-    _classCallCheck(this, Manager);
-
-    this.data = data;
-    this.count = count;
-  }
-
-  _createClass(Manager, [{
-    key: "getChildren",
-    value: function getChildren(value) {
-      return this.data.filter(function (one) {
-        return one.parent === value;
-      });
-    }
-  }, {
-    key: "getFirstColumn",
-    value: function getFirstColumn() {
-      return this.data.filter(function (one) {
-        return !one.parent || one.parent === 0;
-      });
-    }
-  }, {
-    key: "getColumns",
-    value: function getColumns(value) {
-      var datas = [];
-      for (var i = 0; i < this.count; i++) {
-        if (i === 0) {
-          datas.push(this.getFirstColumn());
-        } else {
-          // 没有数据时，取得上一级的第一个
-          if (!value[i]) {
-            var topValue = datas[i - 1][0].value;
-            datas.push(this.getChildren(topValue));
-          } else {
-            datas.push(this.getChildren(value[i - 1]));
-          }
-        }
-      }
-      return datas;
-    }
-  }]);
-
-  return Manager;
-}();
-
-exports.default = Manager;
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _animate = __webpack_require__(16);
-
-var _animate2 = _interopRequireDefault(_animate);
-
-var _util = __webpack_require__(19);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/*
- * Anima Scroller
- * Based Zynga Scroller (http://github.com/zynga/scroller)
- * Copyright 2011, Zynga Inc.
- * Licensed under the MIT License.
- * https://raw.github.com/zynga/scroller/master/MIT-LICENSE.txt
- */
-var TEMPLATE = '\n<div class="scroller-component" data-role="component">\n  <div class="scroller-mask" data-role="mask"></div>\n  <div class="scroller-indicator" data-role="indicator"></div>\n  <div class="scroller-content" data-role="content"></div>\n</div>\n';
-
-var Scroller = function Scroller(container, options) {
-  var self = this;
-
-  options = options || {};
-
-  self.options = {
-    itemClass: 'scroller-item',
-    onSelect: function onSelect() {},
-
-    defaultValue: 0,
-    data: []
-  };
-
-  for (var key in options) {
-    if (options[key] !== undefined) {
-      self.options[key] = options[key];
-    }
-  }
-
-  self.__container = (0, _util.getElement)(container);
-
-  var tempContainer = document.createElement('div');
-  tempContainer.innerHTML = options.template || TEMPLATE;
-
-  var component = self.__component = tempContainer.querySelector('[data-role=component]');
-  var content = self.__content = component.querySelector('[data-role=content]');
-  var indicator = component.querySelector('[data-role=indicator]');
-
-  var data = self.options.data;
-  var html = '';
-  if (data.length && data[0].constructor === Object) {
-    data.forEach(function (row) {
-      html += '<div class="' + self.options.itemClass + '" data-value="' + row.value + '">' + row.name + '</div>';
-    });
-  } else {
-    data.forEach(function (val) {
-      html += '<div class="' + self.options.itemClass + '" data-value="' + val + '">' + val + '</div>';
-    });
-  }
-  content.innerHTML = html;
-  self.__container.appendChild(component);
-
-  self.__itemHeight = parseInt((0, _util.getComputedStyle)(indicator, 'height'), 10);
-
-  self.__callback = options.callback || function (top) {
-    content.style.webkitTransform = 'translate3d(0, ' + -top + 'px, 0)';
-  };
-
-  var rect = component.getBoundingClientRect();
-
-  self.__clientTop = rect.top + component.clientTop || 0;
-
-  self.__setDimensions(component.clientHeight, content.offsetHeight);
-
-  if (component.clientHeight === 0) {
-    self.__setDimensions(parseInt((0, _util.getComputedStyle)(component, 'height'), 10), 204);
-  }
-  self.select(self.options.defaultValue, false);
-
-  component.addEventListener('touchstart', function (e) {
-    if (e.target.tagName.match(/input|textarea|select/i)) {
-      return;
-    }
-    e.preventDefault();
-    self.__doTouchStart(e.touches, e.timeStamp);
-  }, false);
-
-  component.addEventListener('touchmove', function (e) {
-    self.__doTouchMove(e.touches, e.timeStamp);
-  }, false);
-
-  component.addEventListener('touchend', function (e) {
-    self.__doTouchEnd(e.timeStamp);
-  }, false);
-};
-
-var members = {
-  value: null,
-  __prevValue: null,
-  __isSingleTouch: false,
-  __isTracking: false,
-  __didDecelerationComplete: false,
-  __isGesturing: false,
-  __isDragging: false,
-  __isDecelerating: false,
-  __isAnimating: false,
-  __clientTop: 0,
-  __clientHeight: 0,
-  __contentHeight: 0,
-  __itemHeight: 0,
-  __scrollTop: 0,
-  __minScrollTop: 0,
-  __maxScrollTop: 0,
-  __scheduledTop: 0,
-  __lastTouchTop: null,
-  __lastTouchMove: null,
-  __positions: null,
-  __minDecelerationScrollTop: null,
-  __maxDecelerationScrollTop: null,
-  __decelerationVelocityY: null,
-
-  __setDimensions: function __setDimensions(clientHeight, contentHeight) {
-    var self = this;
-
-    self.__clientHeight = clientHeight;
-    self.__contentHeight = contentHeight;
-
-    var totalItemCount = self.options.data.length;
-    var clientItemCount = Math.round(self.__clientHeight / self.__itemHeight);
-
-    self.__minScrollTop = -self.__itemHeight * (clientItemCount / 2);
-    self.__maxScrollTop = self.__minScrollTop + totalItemCount * self.__itemHeight - 0.1;
-  },
-  selectByIndex: function selectByIndex(index, animate) {
-    var self = this;
-    if (index < 0 || index > self.__content.childElementCount - 1) {
-      return;
-    }
-    self.__scrollTop = self.__minScrollTop + index * self.__itemHeight;
-
-    self.scrollTo(self.__scrollTop, animate);
-
-    self.__selectItem(self.__content.children[index]);
-  },
-  select: function select(value, animate) {
-    var self = this;
-
-    var children = self.__content.children;
-    for (var i = 0, len = children.length; i < len; i++) {
-      if (children[i].dataset.value === value) {
-        self.selectByIndex(i, animate);
-        return;
-      }
-    }
-
-    self.selectByIndex(0, animate);
-  },
-  getValue: function getValue() {
-    return this.value;
-  },
-  scrollTo: function scrollTo(top, animate) {
-    var self = this;
-
-    animate = animate === undefined ? true : animate;
-
-    if (self.__isDecelerating) {
-      _animate2.default.stop(self.__isDecelerating);
-      self.__isDecelerating = false;
-    }
-
-    top = Math.round(top / self.__itemHeight) * self.__itemHeight;
-    top = Math.max(Math.min(self.__maxScrollTop, top), self.__minScrollTop);
-
-    if (top === self.__scrollTop || !animate) {
-      self.__publish(top);
-      self.__scrollingComplete();
-      return;
-    }
-    self.__publish(top, 250);
-  },
-  destroy: function destroy() {
-    this.__component.parentNode && this.__component.parentNode.removeChild(this.__component);
-  },
-  __selectItem: function __selectItem(selectedItem) {
-    var self = this;
-
-    var selectedItemClass = self.options.itemClass + '-selected';
-    var lastSelectedElem = self.__content.querySelector('.' + selectedItemClass);
-    if (lastSelectedElem) {
-      lastSelectedElem.classList.remove(selectedItemClass);
-    }
-    selectedItem.classList.add(selectedItemClass);
-
-    if (self.value !== null) {
-      self.__prevValue = self.value;
-    }
-
-    self.value = selectedItem.dataset.value;
-  },
-  __scrollingComplete: function __scrollingComplete() {
-    var self = this;
-
-    var index = Math.round((self.__scrollTop - self.__minScrollTop - self.__itemHeight / 2) / self.__itemHeight);
-
-    self.__selectItem(self.__content.children[index]);
-    if (self.__prevValue !== null && self.__prevValue !== self.value) {
-      self.options.onSelect(self.value);
-    }
-  },
-  __doTouchStart: function __doTouchStart(touches, timeStamp) {
-    var self = this;
-
-    if (touches.length == null) {
-      throw new Error('Invalid touch list: ' + touches);
-    }
-    if (timeStamp instanceof Date) {
-      timeStamp = timeStamp.valueOf();
-    }
-    if (typeof timeStamp !== 'number') {
-      throw new Error('Invalid timestamp value: ' + timeStamp);
-    }
-
-    self.__interruptedAnimation = true;
-
-    if (self.__isDecelerating) {
-      _animate2.default.stop(self.__isDecelerating);
-      self.__isDecelerating = false;
-      self.__interruptedAnimation = true;
-    }
-
-    if (self.__isAnimating) {
-      _animate2.default.stop(self.__isAnimating);
-      self.__isAnimating = false;
-      self.__interruptedAnimation = true;
-    }
-
-    // Use center point when dealing with two fingers
-    var currentTouchTop;
-    var isSingleTouch = touches.length === 1;
-    if (isSingleTouch) {
-      currentTouchTop = touches[0].pageY;
-    } else {
-      currentTouchTop = Math.abs(touches[0].pageY + touches[1].pageY) / 2;
-    }
-
-    self.__initialTouchTop = currentTouchTop;
-    self.__lastTouchTop = currentTouchTop;
-    self.__lastTouchMove = timeStamp;
-    self.__lastScale = 1;
-    self.__enableScrollY = !isSingleTouch;
-    self.__isTracking = true;
-    self.__didDecelerationComplete = false;
-    self.__isDragging = !isSingleTouch;
-    self.__isSingleTouch = isSingleTouch;
-    self.__positions = [];
-  },
-  __doTouchMove: function __doTouchMove(touches, timeStamp, scale) {
-    var self = this;
-
-    if (touches.length == null) {
-      throw new Error('Invalid touch list: ' + touches);
-    }
-    if (timeStamp instanceof Date) {
-      timeStamp = timeStamp.valueOf();
-    }
-    if (typeof timeStamp !== 'number') {
-      throw new Error('Invalid timestamp value: ' + timeStamp);
-    }
-
-    // Ignore event when tracking is not enabled (event might be outside of element)
-    if (!self.__isTracking) {
-      return;
-    }
-
-    var currentTouchTop;
-
-    // Compute move based around of center of fingers
-    if (touches.length === 2) {
-      currentTouchTop = Math.abs(touches[0].pageY + touches[1].pageY) / 2;
-    } else {
-      currentTouchTop = touches[0].pageY;
-    }
-
-    var positions = self.__positions;
-
-    // Are we already is dragging mode?
-    if (self.__isDragging) {
-      var moveY = currentTouchTop - self.__lastTouchTop;
-      var scrollTop = self.__scrollTop;
-
-      if (self.__enableScrollY) {
-        scrollTop -= moveY;
-
-        var minScrollTop = self.__minScrollTop;
-        var maxScrollTop = self.__maxScrollTop;
-
-        if (scrollTop > maxScrollTop || scrollTop < minScrollTop) {
-          // Slow down on the edges
-          if (scrollTop > maxScrollTop) {
-            scrollTop = maxScrollTop;
-          } else {
-            scrollTop = minScrollTop;
-          }
-        }
-      }
-
-      // Keep list from growing infinitely (holding min 10, max 20 measure points)
-      if (positions.length > 40) {
-        positions.splice(0, 20);
-      }
-
-      // Track scroll movement for decleration
-      positions.push(scrollTop, timeStamp);
-
-      // Sync scroll position
-      self.__publish(scrollTop);
-
-      // Otherwise figure out whether we are switching into dragging mode now.
-    } else {
-      var minimumTrackingForScroll = 0;
-      var minimumTrackingForDrag = 5;
-
-      var distanceY = Math.abs(currentTouchTop - self.__initialTouchTop);
-
-      self.__enableScrollY = distanceY >= minimumTrackingForScroll;
-
-      positions.push(self.__scrollTop, timeStamp);
-
-      self.__isDragging = self.__enableScrollY && distanceY >= minimumTrackingForDrag;
-
-      if (self.__isDragging) {
-        self.__interruptedAnimation = false;
-      }
-    }
-
-    // Update last touch positions and time stamp for next event
-    self.__lastTouchTop = currentTouchTop;
-    self.__lastTouchMove = timeStamp;
-    self.__lastScale = scale;
-  },
-  __doTouchEnd: function __doTouchEnd(timeStamp) {
-    var self = this;
-
-    if (timeStamp instanceof Date) {
-      timeStamp = timeStamp.valueOf();
-    }
-    if (typeof timeStamp !== 'number') {
-      throw new Error('Invalid timestamp value: ' + timeStamp);
-    }
-
-    // Ignore event when tracking is not enabled (no touchstart event on element)
-    // This is required as this listener ('touchmove') sits on the document and not on the element itself.
-    if (!self.__isTracking) {
-      return;
-    }
-
-    // Not touching anymore (when two finger hit the screen there are two touch end events)
-    self.__isTracking = false;
-
-    // Be sure to reset the dragging flag now. Here we also detect whether
-    // the finger has moved fast enough to switch into a deceleration animation.
-    if (self.__isDragging) {
-      // Reset dragging flag
-      self.__isDragging = false;
-
-      // Start deceleration
-      // Verify that the last move detected was in some relevant time frame
-      if (self.__isSingleTouch && timeStamp - self.__lastTouchMove <= 100) {
-        // Then figure out what the scroll position was about 100ms ago
-        var positions = self.__positions;
-        var endPos = positions.length - 1;
-        var startPos = endPos;
-
-        // Move pointer to position measured 100ms ago
-        for (var i = endPos; i > 0 && positions[i] > self.__lastTouchMove - 100; i -= 2) {
-          startPos = i;
-        }
-
-        // If start and stop position is identical in a 100ms timeframe,
-        // we cannot compute any useful deceleration.
-        if (startPos !== endPos) {
-          // Compute relative movement between these two points
-          var timeOffset = positions[endPos] - positions[startPos];
-          var movedTop = self.__scrollTop - positions[startPos - 1];
-
-          // Based on 50ms compute the movement to apply for each render step
-          self.__decelerationVelocityY = movedTop / timeOffset * (1000 / 60);
-
-          // How much velocity is required to start the deceleration
-          var minVelocityToStartDeceleration = 4;
-
-          // Verify that we have enough velocity to start deceleration
-          if (Math.abs(self.__decelerationVelocityY) > minVelocityToStartDeceleration) {
-            self.__startDeceleration(timeStamp);
-          }
-        }
-      }
-    }
-
-    if (!self.__isDecelerating) {
-      self.scrollTo(self.__scrollTop);
-    }
-
-    // Fully cleanup list
-    self.__positions.length = 0;
-  },
-
-
-  // Applies the scroll position to the content element
-  __publish: function __publish(top, animationDuration) {
-    var self = this;
-
-    // Remember whether we had an animation, then we try to continue based on the current "drive" of the animation
-    var wasAnimating = self.__isAnimating;
-    if (wasAnimating) {
-      _animate2.default.stop(wasAnimating);
-      self.__isAnimating = false;
-    }
-
-    if (animationDuration) {
-      // Keep scheduled positions for scrollBy functionality
-      self.__scheduledTop = top;
-
-      var oldTop = self.__scrollTop;
-      var diffTop = top - oldTop;
-
-      var step = function step(percent, now, render) {
-        self.__scrollTop = oldTop + diffTop * percent;
-        // Push values out
-        if (self.__callback) {
-          self.__callback(self.__scrollTop);
-        }
-      };
-
-      var verify = function verify(id) {
-        return self.__isAnimating === id;
-      };
-
-      var completed = function completed(renderedFramesPerSecond, animationId, wasFinished) {
-        if (animationId === self.__isAnimating) {
-          self.__isAnimating = false;
-        }
-        if (self.__didDecelerationComplete || wasFinished) {
-          self.__scrollingComplete();
-        }
-      };
-
-      // When continuing based on previous animation we choose an ease-out animation instead of ease-in-out
-      self.__isAnimating = _animate2.default.start(step, verify, completed, animationDuration, wasAnimating ? _util.easeOutCubic : _util.easeInOutCubic);
-    } else {
-      self.__scheduledTop = self.__scrollTop = top;
-      // Push values out
-      if (self.__callback) {
-        self.__callback(top);
-      }
-    }
-  },
-
-
-  // Called when a touch sequence end and the speed of the finger was high enough to switch into deceleration mode.
-  __startDeceleration: function __startDeceleration(timeStamp) {
-    var self = this;
-
-    self.__minDecelerationScrollTop = self.__minScrollTop;
-    self.__maxDecelerationScrollTop = self.__maxScrollTop;
-
-    // Wrap class method
-    var step = function step(percent, now, render) {
-      self.__stepThroughDeceleration(render);
-    };
-
-    // How much velocity is required to keep the deceleration running
-    var minVelocityToKeepDecelerating = 0.5;
-
-    // Detect whether it's still worth to continue animating steps
-    // If we are already slow enough to not being user perceivable anymore, we stop the whole process here.
-    var verify = function verify() {
-      var shouldContinue = Math.abs(self.__decelerationVelocityY) >= minVelocityToKeepDecelerating;
-      if (!shouldContinue) {
-        self.__didDecelerationComplete = true;
-      }
-      return shouldContinue;
-    };
-
-    var completed = function completed(renderedFramesPerSecond, animationId, wasFinished) {
-      self.__isDecelerating = false;
-      if (self.__scrollTop <= self.__minScrollTop || self.__scrollTop >= self.__maxScrollTop) {
-        self.scrollTo(self.__scrollTop);
-        return;
-      }
-      if (self.__didDecelerationComplete) {
-        self.__scrollingComplete();
-      }
-    };
-
-    // Start animation and switch on flag
-    self.__isDecelerating = _animate2.default.start(step, verify, completed);
-  },
-
-
-  // Called on every step of the animation
-  __stepThroughDeceleration: function __stepThroughDeceleration(render) {
-    var self = this;
-
-    var scrollTop = self.__scrollTop + self.__decelerationVelocityY;
-
-    var scrollTopFixed = Math.max(Math.min(self.__maxDecelerationScrollTop, scrollTop), self.__minDecelerationScrollTop);
-    if (scrollTopFixed !== scrollTop) {
-      scrollTop = scrollTopFixed;
-      self.__decelerationVelocityY = 0;
-    }
-
-    if (Math.abs(self.__decelerationVelocityY) <= 1) {
-      if (Math.abs(scrollTop % self.__itemHeight) < 1) {
-        self.__decelerationVelocityY = 0;
-      }
-    } else {
-      self.__decelerationVelocityY *= 0.95;
-    }
-
-    self.__publish(scrollTop);
-  }
-};
-
-// Copy over members to prototype
-for (var key in members) {
-  Scroller.prototype[key] = members[key];
-}
-
-module.exports = Scroller;
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getElement = getElement;
-exports.getComputedStyle = getComputedStyle;
-exports.easeOutCubic = easeOutCubic;
-exports.easeInOutCubic = easeInOutCubic;
-function getElement(expr) {
-  return typeof expr === 'string' ? document.querySelector(expr) : expr;
-}
-
-function getComputedStyle(el, key) {
-  var computedStyle = window.getComputedStyle(el);
-  return computedStyle[key] || '';
-}
-
-// Easing Equations (c) 2003 Robert Penner, all rights reserved.
-// Open source under the BSD License.
-function easeOutCubic(pos) {
-  return Math.pow(pos - 1, 3) + 1;
-}
-
-function easeInOutCubic(pos) {
-  if ((pos /= 0.5) < 1) {
-    return 0.5 * Math.pow(pos, 3);
-  }
-  return 0.5 * (Math.pow(pos - 2, 3) + 2);
-}
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.default = thememaker;
-function thememaker() {
-	var _this = this;
-	var theme = this.theme;
-	var options = {
-		pagination: '.pagination',
-		paginationClickable: true,
-		loop: true,
-		//autoplayDisableOnInteraction:false,
-		// lazyLoading         : true,
-		// updateOnImagesReady : true,
-		preloadImages: true
-	};
-	switch (theme) {
-		default:
-			break;
-		case 1:
-			options.effect = 'coverflow', options.grabCursor = true, options.centeredSlides = true, options.slidesPerView = 2, options.loop = false, options.coverflow = {
-				rotate: 50,
-				stretch: 0,
-				depth: 100,
-				modifier: 1,
-				slideShadows: true
-			};
-			break;
-		case 2:
-			options.pagination = false, options.direction = 'vertical';
-			break;
-		case 3:
-			options.paginationType = 'custom', options.paginationCustomRender = function (swiper, current, total) {
-				return '<span>' + current + '/' + total + '</span>';
-			};
-			break;
-		case 4:
-			options.pagination = false;
-			_this.col = 0;
-			_this.auto = 0;
-			options.loop = false;
-			break;
-		case 5:
-			options.effect = 'coverflow';
-			options.centeredSlides = true;
-			options.slidesPerView = 1.1;
-			options.loop = false;
-			options.spaceBetween = 45;
-			options.coverflow = {
-				rotate: 0,
-				stretch: 0,
-				depth: 200,
-				modifier: 1,
-				slideShadows: false
-			};
-			options.paginationType = 'custom';
-			options.paginationCustomRender = function (swiper, current, total) {
-				return '<span class="text-white fs-12 marginr40 text-right lh-20">' + current + '/' + total + '</span>';
-			};
-			break;
-	}
-	if (this.col === 0) {
-		options.slidesPerView = 'auto';
-		this.$children.forEach(function (item) {
-			item.$el.style.width = 'auto';
-		});
-	} else {
-		options.slidesPerView = this.col || options.slidesPerView || 1;
-	}
-	options.spaceBetween = this.space || options.spaceBetween || 0;
-	options.autoplay = function (_this) {
-		if (_this.auto == 0) {
-			return 0;
-		} else {
-			return options.autoplay || 3000;
-		}
-	}(this);
-	options.autoHeight = this.autoHeight;
-	options.slidesPerColumn = this.span || options.slidesPerColumn || 1;
-	options.loop = this.loop;
-	options.autoplayDisableOnInteraction = this.autoplayDisable;
-	return _.defaults(this.options, options);
-}
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * Created by chenqifeng on 2016/8/26.
- */
-
-function Maple(selector, options) {
-  return new Maple.prototype.init(selector, options);
-}
-Maple.prototype.init = function (selector, options) {};
-Maple.prototype.init.prototype = Maple.prototype;
-
-exports.default = Maple;
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-var alias = {
-    androidchrome: 'androidChrome',
-    guge: 'chrome',
-    webview: 'webView',
-    minimalui: 'minimalUi',
-    statusbar: 'statusBar',
-    pixelratio: 'pixelRatio',
-    wechat: 'weixin',
-    wx: 'weixin'
-};
-
-var device = function device() {
-    var l = arguments.length,
-        i = 0,
-        t,
-        result = true;
-
-    if (l === 0) {
-        result = false;
-    } else {
-        for (; i < l; i++) {
-            t = arguments[i];
-
-            if (t in device && device.hasOwnProperty(t)) {
-                result = result && device[t];
-            } else {
-                t = t.toLowerCase();
-
-                if (t in alias) {
-                    result = result && device[alias[t]];
-                } else {
-                    result = result && false;
-                }
-            }
-
-            if (!result) {
-                break;
-            }
-        }
-    }
-
-    return result;
-};
-var ua = navigator.userAgent;
-
-var android = ua.match(/(Android);?[\s\/]+([\d.]+)?/);
-var ipad = ua.match(/(iPad).*OS\s([\d_]+)/);
-var ipod = ua.match(/(iPod)(.*OS\s([\d_]+))?/);
-var iphone = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/);
-
-device.ios = device.android = device.iphone = device.ipad = device.androidChrome = false;
-
-// Chrome
-device.chrome = ua.toLowerCase().indexOf('chrome') >= 0;
-
-// Android
-if (android) {
-    device.os = 'android';
-    device.osVersion = android[2];
-    device.android = true;
-    device.androidChrome = device.android && device.chrome;
-}
-if (ipad || iphone || ipod) {
-    device.os = 'ios';
-    device.ios = true;
-}
-// iOS
-if (iphone && !ipod) {
-    device.osVersion = iphone[2].replace(/_/g, '.');
-    device.iphone = true;
-}
-if (ipad) {
-    device.osVersion = ipad[2].replace(/_/g, '.');
-    device.ipad = true;
-}
-if (ipod) {
-    device.osVersion = ipod[3] ? ipod[3].replace(/_/g, '.') : null;
-    device.iphone = true;
-}
-// iOS 8+ changed UA
-if (device.ios && device.osVersion && ua.indexOf('Version/') >= 0) {
-    if (device.osVersion.split('.')[0] === '10') {
-        device.osVersion = ua.toLowerCase().split('version/')[1].split(' ')[0];
-    }
-}
-
-// Webview
-device.webView = (iphone || ipad || ipod) && ua.match(/.*AppleWebKit(?!.*Safari)/i);
-
-// Minimal UI
-if (device.os && device.os === 'ios') {
-    var osVersionArr = device.osVersion.split('.');
-    device.minimalUi = !device.webView && (ipod || iphone) && (osVersionArr[0] * 1 === 7 ? osVersionArr[1] * 1 >= 1 : osVersionArr[0] * 1 > 7) && $('meta[name="viewport"]').length > 0 && $('meta[name="viewport"]').attr('content').indexOf('minimal-ui') >= 0;
-}
-
-// Check for status bar and fullscreen app mode
-var windowWidth = $(window).width();
-var windowHeight = $(window).height();
-
-device.statusBar = device.webView && windowWidth * windowHeight === screen.width * screen.height;
-
-// Classes
-var classNames = [];
-
-// Pixel Ratio
-device.pixelRatio = window.devicePixelRatio || 1;
-classNames.push('pixel-ratio-' + Math.floor(device.pixelRatio));
-if (device.pixelRatio >= 2) {
-    classNames.push('retina');
-}
-
-// OS classes
-if (device.os) {
-    classNames.push(device.os, device.os + '-' + device.osVersion.split('.')[0], device.os + '-' + device.osVersion.replace(/\./g, '-'));
-    if (device.os === 'ios') {
-        var major = parseInt(device.osVersion.split('.')[0], 10);
-        for (var i = major - 1; i >= 6; i--) {
-            classNames.push('ios-gt-' + i);
-        }
-    }
-}
-// Status bar classes
-if (device.statusBar) {
-    classNames.push('with-statusbar-overlay');
-} else {
-    $('html').removeClass('with-statusbar-overlay');
-}
-
-// Add html classes
-if (classNames.length > 0) $('html').addClass(classNames.join(' '));
-
-// keng..
-device.weixin = /MicroMessenger/i.test(ua);
-
-// UC ������
-device.uc = ua.indexOf('UCBrowser') > -1;
-
-exports.default = device;
-
-/***/ }),
-/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3396,7 +1791,1833 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 //# sourceMappingURL=maps/swiper.min.js.map
 
 /***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+exports.default = function (text, data) {
+    var styleString = '';
+    styleString += 'font-size:13px;';
+    styleString += 'font-family:"microsoft yahei";';
+    styleString += 'color:#125ce8;';
+    var line = '------------------';
+    if (arguments.length !== 1) {
+        console.log('%c' + line + text.toString() + line + '', styleString);
+        for (var i = 1; i < arguments.length; i++) {
+            console.log(arguments[i]);
+        }
+        console.log('%c' + line + text.toString() + line + '\n\n\n', styleString);
+    } else {
+        console.log('%c' + line + line + '', styleString);
+        console.log(text);
+        console.log('%c' + line + line + '\n\n\n', styleString);
+    }
+};
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _core = __webpack_require__(24);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _cookie = __webpack_require__(11);
+
+var _session = __webpack_require__(13);
+
+var _local = __webpack_require__(12);
+
+var _util = __webpack_require__(4);
+
+var util = _interopRequireWildcard(_util);
+
+var _support = __webpack_require__(5);
+
+var support = _interopRequireWildcard(_support);
+
+var _url = __webpack_require__(32);
+
+var _url2 = _interopRequireDefault(_url);
+
+var _log = __webpack_require__(8);
+
+var _log2 = _interopRequireDefault(_log);
+
+var _load = __webpack_require__(26);
+
+var _load2 = _interopRequireDefault(_load);
+
+var _scroll_bar = __webpack_require__(27);
+
+var _scroll_bar2 = _interopRequireDefault(_scroll_bar);
+
+var _device = __webpack_require__(25);
+
+var _device2 = _interopRequireDefault(_device);
+
+var _vm = __webpack_require__(3);
+
+var _vm2 = _interopRequireDefault(_vm);
+
+var _component = __webpack_require__(14);
+
+var _component2 = _interopRequireDefault(_component);
+
+var _index = __webpack_require__(29);
+
+var _index2 = _interopRequireDefault(_index);
+
+var _index3 = __webpack_require__(30);
+
+var _index4 = _interopRequireDefault(_index3);
+
+var _index5 = __webpack_require__(31);
+
+var _index6 = _interopRequireDefault(_index5);
+
+var _index7 = __webpack_require__(28);
+
+var _index8 = _interopRequireDefault(_index7);
+
+var _index9 = __webpack_require__(22);
+
+var _index10 = _interopRequireDefault(_index9);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//挂载工具方法
+_core2.default._ = util;
+_core2.default.util = util;
+//挂载支持
+_core2.default.support = support;
+//挂载cookie
+_core2.default.cookie = _cookie.cookie;
+//挂载localStorage
+_core2.default.localData = _local.localData;
+//挂载sessionStorage
+_core2.default.sessionData = _session.sessionData;
+//挂载url处理方法
+_core2.default.url = _url2.default;
+//挂载console.log
+_core2.default.log = _log2.default;
+//挂载load
+_core2.default.load = _load2.default;
+//挂载滚动事件
+_core2.default.scrollBar = _scroll_bar2.default;
+//挂载设备信息
+_core2.default.device = _device2.default;
+//挂载vm控制器
+_core2.default.vm = _vm2.default;
+
+_core2.default.notice = _index6.default;
+_core2.default.alert = _index2.default;
+_core2.default.confirm = _index4.default;
+_core2.default.actions = _index8.default;
+
+_core2.default.slider = _index10.default;
+// 初始化通用组件
+Object.keys(_component2.default).forEach(function (d) {
+  return Vue.component(d, _component2.default[d]);
+});
+exports.default = window.maple = _core2.default;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Translates the list format produced by css-loader into something
+ * easier to manipulate.
+ */
+module.exports = function listToStyles(parentId, list) {
+  var styles = [];
+  var newStyles = {};
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var id = item[0];
+    var css = item[1];
+    var media = item[2];
+    var sourceMap = item[3];
+    var part = {
+      id: parentId + ':' + i,
+      css: css,
+      media: media,
+      sourceMap: sourceMap
+    };
+    if (!newStyles[id]) {
+      styles.push(newStyles[id] = { id: id, parts: [part] });
+    } else {
+      newStyles[id].parts.push(part);
+    }
+  }
+  return styles;
+};
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.cookie = undefined;
+
+var _util = __webpack_require__(4);
+
+var pluses = /\+/g;
+
+function encode(s) {
+    return config.raw ? s : encodeURIComponent(s);
+}
+
+function decode(s) {
+    return config.raw ? s : decodeURIComponent(s);
+}
+
+function stringifyCookieValue(value) {
+    return encode(config.json ? JSON.stringify(value) : String(value));
+}
+
+function parseCookieValue(s) {
+    if (s.indexOf('"') === 0) {
+        // This is a quoted cookie as according to RFC2068, unescape...
+        s = s.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+    }
+
+    try {
+        // Replace server-side written pluses with spaces.
+        // If we can't decode the cookie, ignore it, it's unusable.
+        // If we can't parse the cookie, ignore it, it's unusable.
+        s = decodeURIComponent(s.replace(pluses, ' '));
+        return config.json ? JSON.parse(s) : s;
+    } catch (e) {}
+}
+
+function read(s, converter) {
+    var value = config.raw ? s : parseCookieValue(s);
+    return $.isFunction(converter) ? converter(value) : value;
+}
+
+var config = $.cookie = function (key, value, options) {
+
+    // Write
+
+    if (value !== undefined && !$.isFunction(value)) {
+        options = $.extend({}, config.defaults, options);
+
+        if (typeof options.expires === 'number') {
+            var days = options.expires,
+                t = options.expires = new Date();
+            t.setTime(+t + days * 864e+5);
+        }
+        return document.cookie = [encode(key), '=', stringifyCookieValue(value), options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+        options.path ? '; path=' + options.path : '', options.domain ? '; domain=' + options.domain : '', options.secure ? '; secure' : ''].join('');
+    }
+
+    // Read
+
+    var result = key ? undefined : {};
+
+    // To prevent the for loop in the first place assign an empty array
+    // in case there are no cookies at all. Also prevents odd result when
+    // calling $.cookie().
+    var cookies = document.cookie ? document.cookie.split('; ') : [];
+
+    for (var i = 0, l = cookies.length; i < l; i++) {
+
+        var parts = cookies[i].split('=');
+        var name = decode(parts.shift());
+        var _cookie = parts.join('=');
+
+        if (key && key === name) {
+            // If second argument (value) is a function it's a converter...
+            result = read(_cookie, value);
+            //break;
+        }
+
+        // Prevent storing a cookie that we couldn't decode.
+        if (!key && (_cookie = read(_cookie)) !== undefined) {
+            result[name] = _cookie;
+        }
+    }
+    return result;
+};
+
+config.defaults = {};
+
+$.removeCookie = function (key, options) {
+    if ($.cookie(key) === undefined) {
+        return false;
+    }
+
+    // Must not alter options, thus extending a fresh object...
+    $.cookie(key, '', $.extend({}, options, { expires: -1 }));
+    return !$.cookie(key);
+};
+/*---------- copy jquery.cookie end----------------*/
+
+var cookie = function cookie() {
+    if (arguments[2] && (0, _util.isObject)(arguments[2])) {
+        if ((0, _util.isTimeStr)(arguments[2]['expires'])) {
+            arguments[2]['expires'] = new Date(new Date().getTime() + (0, _util.formatTimeStr)(arguments[2]['expires']));
+        }
+    }
+    return $.cookie.apply(this, arguments);
+};
+cookie.remove = function () {
+    return $.removeCookie.apply(this, arguments);
+};
+
+exports.cookie = cookie;
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.localData = undefined;
+
+var _support = __webpack_require__(5);
+
+var _util = __webpack_require__(4);
+
+var sessionKey = 'tg_local_cache',
+    cache = _support.localStorage ? localStorage : false,
+    data = _support.localStorage ? JSON.parse(cache.getItem(sessionKey) || JSON.stringify({})) : {},
+    formatData = function formatData() {
+    var d = {},
+        t = new Date().getTime();
+    for (var i in data) {
+        if (t - data[i].t < data[i].time || !data[i].time) {
+            d[i] = data[i].value;
+        }
+    }
+    return d;
+},
+    localData = function localData() {
+    var length = arguments.length,
+        d = {},
+        t = new Date().getTime();
+    if (!length) {
+        return formatData();
+    } else if (length === 1) {
+        if ((0, _util.isObject)(arguments[0])) {
+            for (var i in arguments[0]) {
+                d[i] = { value: arguments[0][i], time: 0, t: t };
+            }
+            data = Object.assign({}, data, d);
+            cache && cache.setItem(sessionKey, JSON.stringify(data));
+        } else {
+            return formatData()[arguments[0]];
+        }
+    } else if (length === 2) {
+        if ((0, _util.isObject)(arguments[0]) && (0, _util.isTimeStr)(arguments[1])) {
+            for (var _i in arguments[0]) {
+                d[_i] = { value: arguments[0][_i], time: (0, _util.formatTimeStr)(arguments[1]), t: t };
+            }
+            data = Object.assign({}, data, d);
+        } else {
+            data[arguments[0]] = { value: arguments[1], time: 0, t: t };
+        }
+        cache && cache.setItem(sessionKey, JSON.stringify(data));
+    } else if (length === 3) {
+        d[arguments[0]] = { value: arguments[1], time: (0, _util.formatTimeStr)(arguments[2]), t: t };
+        data = Object.assign({}, data, d);
+        cache && cache.setItem(sessionKey, JSON.stringify(data));
+    }
+};
+
+localData.remove = function (key) {
+    var length = arguments.length;
+    if (!length) {
+        this.removeAll();
+    } else {
+        for (var i = 0; i < length; i++) {
+            data[arguments[i]] = undefined;
+            delete data[arguments[i]];
+        }
+        cache && cache.setItem(sessionKey, JSON.stringify(data));
+    }
+};
+localData.removeAll = function () {
+    data = {};
+    cache && cache.setItem(sessionKey, JSON.stringify(data));
+};
+
+exports.localData = localData;
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.sessionData = undefined;
+
+var _support = __webpack_require__(5);
+
+var _util = __webpack_require__(4);
+
+var sessionKey = 'tg_session_cache',
+    cache = _support.sessionStorage ? sessionStorage : false,
+    data = _support.sessionStorage ? JSON.parse(cache.getItem(sessionKey) || JSON.stringify({})) : {},
+    sessionData = function sessionData() {
+    var length = arguments.length;
+    if (!length) {
+        return data;
+    } else if (length === 1) {
+        if ((0, _util.isObject)(arguments[0])) {
+            data = $.extend({}, data, arguments[0]);
+            cache && cache.setItem(sessionKey, JSON.stringify(data));
+        } else {
+            return data[arguments[0]];
+        }
+    } else if (length === 2) {
+        data[arguments[0]] = arguments[1];
+        cache && cache.setItem(sessionKey, JSON.stringify(data));
+    }
+};
+sessionData.remove = function (key) {
+    var length = arguments.length;
+    if (!length) {
+        this.removeAll();
+    } else {
+        for (var i = 0; i < length; i++) {
+            data[arguments[i]] = undefined;
+            delete data[arguments[i]];
+        }
+        cache && cache.setItem(sessionKey, JSON.stringify(data));
+    }
+};
+sessionData.removeAll = function () {
+    data = {};
+    cache && cache.setItem(sessionKey, JSON.stringify(data));
+};
+
+exports.sessionData = sessionData;
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _number = __webpack_require__(70);
+
+var _number2 = _interopRequireDefault(_number);
+
+var _img = __webpack_require__(66);
+
+var _img2 = _interopRequireDefault(_img);
+
+var _list = __webpack_require__(69);
+
+var _list2 = _interopRequireDefault(_list);
+
+var _listItem = __webpack_require__(68);
+
+var _listItem2 = _interopRequireDefault(_listItem);
+
+var _input = __webpack_require__(67);
+
+var _input2 = _interopRequireDefault(_input);
+
+var _picker = __webpack_require__(71);
+
+var _picker2 = _interopRequireDefault(_picker);
+
+var _scrollbox = __webpack_require__(73);
+
+var _scrollbox2 = _interopRequireDefault(_scrollbox);
+
+var _scrollboxItem = __webpack_require__(72);
+
+var _scrollboxItem2 = _interopRequireDefault(_scrollboxItem);
+
+var _collapse = __webpack_require__(65);
+
+var _collapse2 = _interopRequireDefault(_collapse);
+
+var _collapseItem = __webpack_require__(64);
+
+var _collapseItem2 = _interopRequireDefault(_collapseItem);
+
+var _affix = __webpack_require__(63);
+
+var _affix2 = _interopRequireDefault(_affix);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// import time from './component/time/time.vue';
+exports.default = {
+	// 'cmui-slider': slider
+	// ,	'cmui-slider-item': sliderItem
+	'cmui-number': _number2.default,
+	'cmui-img': _img2.default,
+	'cmui-list': _list2.default,
+	'cmui-list-item': _listItem2.default,
+	'cmui-input': _input2.default,
+	'cmui-picker': _picker2.default,
+	'cmui-scrollbox': _scrollbox2.default,
+	'cmui-scrollbox-item': _scrollboxItem2.default,
+	'cmui-collapse': _collapse2.default,
+	'cmui-collapse-item': _collapseItem2.default,
+	'cmui-affix': _affix2.default
+	// ,	'cmui-time': time
+}; // import slider from './component/slider/slider.vue';
+// import sliderItem from './component/slider/slider-item.vue';
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = {
+  functional: true,
+  render: function render(h, context) {
+    var data = {
+      on: {
+        beforeEnter: function beforeEnter(el) {
+          el.classList.add('collapse-transition');
+          if (!el.dataset) el.dataset = {};
+          el.dataset.oldPaddingTop = el.style.paddingTop;
+          el.dataset.oldPaddingBottom = el.style.paddingBottom;
+          el.style.height = '0';
+          el.style.paddingTop = 0;
+          el.style.paddingBottom = 0;
+        },
+        enter: function enter(el) {
+          el.dataset.oldOverflow = el.style.overflow;
+          if (el.scrollHeight !== 0) {
+            el.style.height = el.scrollHeight + 'px';
+            el.style.paddingTop = el.dataset.oldPaddingTop;
+            el.style.paddingBottom = el.dataset.oldPaddingBottom;
+          } else {
+            el.style.height = '';
+            el.style.paddingTop = el.dataset.oldPaddingTop;
+            el.style.paddingBottom = el.dataset.oldPaddingBottom;
+          }
+
+          el.style.overflow = 'hidden';
+        },
+        afterEnter: function afterEnter(el) {
+          // for safari: remove class then reset height is necessary
+          el.classList.remove('collapse-transition');
+          el.style.height = '';
+          el.style.overflow = el.dataset.oldOverflow;
+        },
+        beforeLeave: function beforeLeave(el) {
+          if (!el.dataset) el.dataset = {};
+          el.dataset.oldPaddingTop = el.style.paddingTop;
+          el.dataset.oldPaddingBottom = el.style.paddingBottom;
+          el.dataset.oldOverflow = el.style.overflow;
+
+          el.style.height = el.scrollHeight + 'px';
+          el.style.overflow = 'hidden';
+        },
+        leave: function leave(el) {
+          if (el.scrollHeight !== 0) {
+            // for safari: add class after set height, or it will jump to zero height suddenly, weired
+            el.classList.add('collapse-transition');
+            el.style.height = 0;
+            el.style.paddingTop = 0;
+            el.style.paddingBottom = 0;
+          }
+        },
+        afterLeave: function afterLeave(el) {
+          el.classList.remove('collapse-transition');
+          el.style.height = '';
+          el.style.overflow = el.dataset.oldOverflow;
+          el.style.paddingTop = el.dataset.oldPaddingTop;
+          el.style.paddingBottom = el.dataset.oldPaddingBottom;
+        }
+      }
+    };
+    return h('transition', data, context.children);
+  }
+};
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = imageLazyLoad;
+function imageLazyLoad() {
+    if (this.lazyLoad) {
+        var el = this.$el;
+        var elTop = el.y;
+        var htmlBottomPosition = document.body.scrollTop + document.documentElement.clientHeight;
+        if (htmlBottomPosition > elTop) {
+            this.lazyLoad = false;
+        }
+    }
+}
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function _broadcast(componentName, eventName, params) {
+  this.$children.forEach(function (child) {
+    var name = child.$options.componentName;
+
+    if (name === componentName) {
+      child.$emit.apply(child, [eventName].concat(params));
+    } else {
+      _broadcast.apply(child, [componentName, eventName].concat([params]));
+    }
+  });
+}
+exports.default = {
+  methods: {
+    dispatch: function dispatch(componentName, eventName, params) {
+      var parent = this.$parent || this.$root;
+      var name = parent.$options.componentName;
+
+      while (parent && (!name || name !== componentName)) {
+        parent = parent.$parent;
+
+        if (parent) {
+          name = parent.$options.componentName;
+        }
+      }
+      if (parent) {
+        parent.$emit.apply(parent, [eventName].concat(params));
+      }
+    },
+    broadcast: function broadcast(componentName, eventName, params) {
+      _broadcast.call(this, componentName, eventName, params);
+    }
+  }
+};
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var time = Date.now || function () {
+  return +new Date();
+};
+
+var running = {};
+var counter = 1;
+var desiredFrames = 60;
+var millisecondsPerSecond = 1000;
+
+exports.default = {
+
+  // A requestAnimationFrame wrapper / polyfill.
+  requestAnimationFrame: function () {
+    var requestFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+    return function (callback, root) {
+      requestFrame(callback, root);
+    };
+  }(),
+
+  // Stops the given animation.
+  stop: function stop(id) {
+    var cleared = running[id] != null;
+    if (cleared) {
+      running[id] = null;
+    }
+    return cleared;
+  },
+
+
+  // Whether the given animation is still running.
+  isRunning: function isRunning(id) {
+    return running[id] != null;
+  },
+
+
+  // Start the animation.
+  start: function start(stepCallback, verifyCallback, completedCallback, duration, easingMethod, root) {
+    var _this = this;
+    var start = time();
+    var lastFrame = start;
+    var percent = 0;
+    var dropCounter = 0;
+    var id = counter++;
+
+    if (!root) {
+      root = document.body;
+    }
+
+    // Compacting running db automatically every few new animations
+    if (id % 20 === 0) {
+      var newRunning = {};
+      for (var usedId in running) {
+        newRunning[usedId] = true;
+      }
+      running = newRunning;
+    }
+
+    // This is the internal step method which is called every few milliseconds
+    var step = function step(virtual) {
+      // Normalize virtual value
+      var render = virtual !== true;
+      // Get current time
+      var now = time();
+
+      // Verification is executed before next animation step
+      if (!running[id] || verifyCallback && !verifyCallback(id)) {
+        running[id] = null;
+        completedCallback && completedCallback(desiredFrames - dropCounter / ((now - start) / millisecondsPerSecond), id, false);
+        return;
+      }
+
+      // For the current rendering to apply let's update omitted steps in memory.
+      // This is important to bring internal state variables up-to-date with progress in time.
+      if (render) {
+        var droppedFrames = Math.round((now - lastFrame) / (millisecondsPerSecond / desiredFrames)) - 1;
+        for (var j = 0; j < Math.min(droppedFrames, 4); j++) {
+          step(true);
+          dropCounter++;
+        }
+      }
+
+      // Compute percent value
+      if (duration) {
+        percent = (now - start) / duration;
+        if (percent > 1) {
+          percent = 1;
+        }
+      }
+
+      // Execute step callback, then...
+      var value = easingMethod ? easingMethod(percent) : percent;
+      if ((stepCallback(value, now, render) === false || percent === 1) && render) {
+        running[id] = null;
+        completedCallback && completedCallback(desiredFrames - dropCounter / ((now - start) / millisecondsPerSecond), id, percent === 1 || duration == null);
+      } else if (render) {
+        lastFrame = now;
+        _this.requestAnimationFrame(step, root);
+      }
+    };
+
+    // Mark as running
+    running[id] = true;
+    // Init first step
+    _this.requestAnimationFrame(step, root);
+    // Return unique animation ID
+    return id;
+  }
+};
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Manager = function () {
+  function Manager(data, count) {
+    _classCallCheck(this, Manager);
+
+    this.data = data;
+    this.count = count;
+  }
+
+  _createClass(Manager, [{
+    key: "getChildren",
+    value: function getChildren(value) {
+      return this.data.filter(function (one) {
+        return one.parent === value;
+      });
+    }
+  }, {
+    key: "getFirstColumn",
+    value: function getFirstColumn() {
+      return this.data.filter(function (one) {
+        return !one.parent || one.parent === 0;
+      });
+    }
+  }, {
+    key: "getColumns",
+    value: function getColumns(value) {
+      var datas = [];
+      for (var i = 0; i < this.count; i++) {
+        if (i === 0) {
+          datas.push(this.getFirstColumn());
+        } else {
+          // 没有数据时，取得上一级的第一个
+          if (!value[i]) {
+            var topValue = datas[i - 1][0].value;
+            datas.push(this.getChildren(topValue));
+          } else {
+            datas.push(this.getChildren(value[i - 1]));
+          }
+        }
+      }
+      return datas;
+    }
+  }]);
+
+  return Manager;
+}();
+
+exports.default = Manager;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _animate = __webpack_require__(18);
+
+var _animate2 = _interopRequireDefault(_animate);
+
+var _util = __webpack_require__(21);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/*
+ * Anima Scroller
+ * Based Zynga Scroller (http://github.com/zynga/scroller)
+ * Copyright 2011, Zynga Inc.
+ * Licensed under the MIT License.
+ * https://raw.github.com/zynga/scroller/master/MIT-LICENSE.txt
+ */
+var TEMPLATE = '\n<div class="scroller-component" data-role="component">\n  <div class="scroller-mask" data-role="mask"></div>\n  <div class="scroller-indicator" data-role="indicator"></div>\n  <div class="scroller-content" data-role="content"></div>\n</div>\n';
+
+var Scroller = function Scroller(container, options) {
+  var self = this;
+
+  options = options || {};
+
+  self.options = {
+    itemClass: 'scroller-item',
+    onSelect: function onSelect() {},
+
+    defaultValue: 0,
+    data: []
+  };
+
+  for (var key in options) {
+    if (options[key] !== undefined) {
+      self.options[key] = options[key];
+    }
+  }
+
+  self.__container = (0, _util.getElement)(container);
+
+  var tempContainer = document.createElement('div');
+  tempContainer.innerHTML = options.template || TEMPLATE;
+
+  var component = self.__component = tempContainer.querySelector('[data-role=component]');
+  var content = self.__content = component.querySelector('[data-role=content]');
+  var indicator = component.querySelector('[data-role=indicator]');
+
+  var data = self.options.data;
+  var html = '';
+  if (data.length && data[0].constructor === Object) {
+    data.forEach(function (row) {
+      html += '<div class="' + self.options.itemClass + '" data-value="' + row.value + '">' + row.name + '</div>';
+    });
+  } else {
+    data.forEach(function (val) {
+      html += '<div class="' + self.options.itemClass + '" data-value="' + val + '">' + val + '</div>';
+    });
+  }
+  content.innerHTML = html;
+  self.__container.appendChild(component);
+
+  self.__itemHeight = parseInt((0, _util.getComputedStyle)(indicator, 'height'), 10);
+
+  self.__callback = options.callback || function (top) {
+    content.style.webkitTransform = 'translate3d(0, ' + -top + 'px, 0)';
+  };
+
+  var rect = component.getBoundingClientRect();
+
+  self.__clientTop = rect.top + component.clientTop || 0;
+
+  self.__setDimensions(component.clientHeight, content.offsetHeight);
+
+  if (component.clientHeight === 0) {
+    self.__setDimensions(parseInt((0, _util.getComputedStyle)(component, 'height'), 10), 204);
+  }
+  self.select(self.options.defaultValue, false);
+
+  component.addEventListener('touchstart', function (e) {
+    if (e.target.tagName.match(/input|textarea|select/i)) {
+      return;
+    }
+    e.preventDefault();
+    self.__doTouchStart(e.touches, e.timeStamp);
+  }, false);
+
+  component.addEventListener('touchmove', function (e) {
+    self.__doTouchMove(e.touches, e.timeStamp);
+  }, false);
+
+  component.addEventListener('touchend', function (e) {
+    self.__doTouchEnd(e.timeStamp);
+  }, false);
+};
+
+var members = {
+  value: null,
+  __prevValue: null,
+  __isSingleTouch: false,
+  __isTracking: false,
+  __didDecelerationComplete: false,
+  __isGesturing: false,
+  __isDragging: false,
+  __isDecelerating: false,
+  __isAnimating: false,
+  __clientTop: 0,
+  __clientHeight: 0,
+  __contentHeight: 0,
+  __itemHeight: 0,
+  __scrollTop: 0,
+  __minScrollTop: 0,
+  __maxScrollTop: 0,
+  __scheduledTop: 0,
+  __lastTouchTop: null,
+  __lastTouchMove: null,
+  __positions: null,
+  __minDecelerationScrollTop: null,
+  __maxDecelerationScrollTop: null,
+  __decelerationVelocityY: null,
+
+  __setDimensions: function __setDimensions(clientHeight, contentHeight) {
+    var self = this;
+
+    self.__clientHeight = clientHeight;
+    self.__contentHeight = contentHeight;
+
+    var totalItemCount = self.options.data.length;
+    var clientItemCount = Math.round(self.__clientHeight / self.__itemHeight);
+
+    self.__minScrollTop = -self.__itemHeight * (clientItemCount / 2);
+    self.__maxScrollTop = self.__minScrollTop + totalItemCount * self.__itemHeight - 0.1;
+  },
+  selectByIndex: function selectByIndex(index, animate) {
+    var self = this;
+    if (index < 0 || index > self.__content.childElementCount - 1) {
+      return;
+    }
+    self.__scrollTop = self.__minScrollTop + index * self.__itemHeight;
+
+    self.scrollTo(self.__scrollTop, animate);
+
+    self.__selectItem(self.__content.children[index]);
+  },
+  select: function select(value, animate) {
+    var self = this;
+
+    var children = self.__content.children;
+    for (var i = 0, len = children.length; i < len; i++) {
+      if (children[i].dataset.value === value) {
+        self.selectByIndex(i, animate);
+        return;
+      }
+    }
+
+    self.selectByIndex(0, animate);
+  },
+  getValue: function getValue() {
+    return this.value;
+  },
+  scrollTo: function scrollTo(top, animate) {
+    var self = this;
+
+    animate = animate === undefined ? true : animate;
+
+    if (self.__isDecelerating) {
+      _animate2.default.stop(self.__isDecelerating);
+      self.__isDecelerating = false;
+    }
+
+    top = Math.round(top / self.__itemHeight) * self.__itemHeight;
+    top = Math.max(Math.min(self.__maxScrollTop, top), self.__minScrollTop);
+
+    if (top === self.__scrollTop || !animate) {
+      self.__publish(top);
+      self.__scrollingComplete();
+      return;
+    }
+    self.__publish(top, 250);
+  },
+  destroy: function destroy() {
+    this.__component.parentNode && this.__component.parentNode.removeChild(this.__component);
+  },
+  __selectItem: function __selectItem(selectedItem) {
+    var self = this;
+
+    var selectedItemClass = self.options.itemClass + '-selected';
+    var lastSelectedElem = self.__content.querySelector('.' + selectedItemClass);
+    if (lastSelectedElem) {
+      lastSelectedElem.classList.remove(selectedItemClass);
+    }
+    selectedItem.classList.add(selectedItemClass);
+
+    if (self.value !== null) {
+      self.__prevValue = self.value;
+    }
+
+    self.value = selectedItem.dataset.value;
+  },
+  __scrollingComplete: function __scrollingComplete() {
+    var self = this;
+
+    var index = Math.round((self.__scrollTop - self.__minScrollTop - self.__itemHeight / 2) / self.__itemHeight);
+
+    self.__selectItem(self.__content.children[index]);
+    if (self.__prevValue !== null && self.__prevValue !== self.value) {
+      self.options.onSelect(self.value);
+    }
+  },
+  __doTouchStart: function __doTouchStart(touches, timeStamp) {
+    var self = this;
+
+    if (touches.length == null) {
+      throw new Error('Invalid touch list: ' + touches);
+    }
+    if (timeStamp instanceof Date) {
+      timeStamp = timeStamp.valueOf();
+    }
+    if (typeof timeStamp !== 'number') {
+      throw new Error('Invalid timestamp value: ' + timeStamp);
+    }
+
+    self.__interruptedAnimation = true;
+
+    if (self.__isDecelerating) {
+      _animate2.default.stop(self.__isDecelerating);
+      self.__isDecelerating = false;
+      self.__interruptedAnimation = true;
+    }
+
+    if (self.__isAnimating) {
+      _animate2.default.stop(self.__isAnimating);
+      self.__isAnimating = false;
+      self.__interruptedAnimation = true;
+    }
+
+    // Use center point when dealing with two fingers
+    var currentTouchTop;
+    var isSingleTouch = touches.length === 1;
+    if (isSingleTouch) {
+      currentTouchTop = touches[0].pageY;
+    } else {
+      currentTouchTop = Math.abs(touches[0].pageY + touches[1].pageY) / 2;
+    }
+
+    self.__initialTouchTop = currentTouchTop;
+    self.__lastTouchTop = currentTouchTop;
+    self.__lastTouchMove = timeStamp;
+    self.__lastScale = 1;
+    self.__enableScrollY = !isSingleTouch;
+    self.__isTracking = true;
+    self.__didDecelerationComplete = false;
+    self.__isDragging = !isSingleTouch;
+    self.__isSingleTouch = isSingleTouch;
+    self.__positions = [];
+  },
+  __doTouchMove: function __doTouchMove(touches, timeStamp, scale) {
+    var self = this;
+
+    if (touches.length == null) {
+      throw new Error('Invalid touch list: ' + touches);
+    }
+    if (timeStamp instanceof Date) {
+      timeStamp = timeStamp.valueOf();
+    }
+    if (typeof timeStamp !== 'number') {
+      throw new Error('Invalid timestamp value: ' + timeStamp);
+    }
+
+    // Ignore event when tracking is not enabled (event might be outside of element)
+    if (!self.__isTracking) {
+      return;
+    }
+
+    var currentTouchTop;
+
+    // Compute move based around of center of fingers
+    if (touches.length === 2) {
+      currentTouchTop = Math.abs(touches[0].pageY + touches[1].pageY) / 2;
+    } else {
+      currentTouchTop = touches[0].pageY;
+    }
+
+    var positions = self.__positions;
+
+    // Are we already is dragging mode?
+    if (self.__isDragging) {
+      var moveY = currentTouchTop - self.__lastTouchTop;
+      var scrollTop = self.__scrollTop;
+
+      if (self.__enableScrollY) {
+        scrollTop -= moveY;
+
+        var minScrollTop = self.__minScrollTop;
+        var maxScrollTop = self.__maxScrollTop;
+
+        if (scrollTop > maxScrollTop || scrollTop < minScrollTop) {
+          // Slow down on the edges
+          if (scrollTop > maxScrollTop) {
+            scrollTop = maxScrollTop;
+          } else {
+            scrollTop = minScrollTop;
+          }
+        }
+      }
+
+      // Keep list from growing infinitely (holding min 10, max 20 measure points)
+      if (positions.length > 40) {
+        positions.splice(0, 20);
+      }
+
+      // Track scroll movement for decleration
+      positions.push(scrollTop, timeStamp);
+
+      // Sync scroll position
+      self.__publish(scrollTop);
+
+      // Otherwise figure out whether we are switching into dragging mode now.
+    } else {
+      var minimumTrackingForScroll = 0;
+      var minimumTrackingForDrag = 5;
+
+      var distanceY = Math.abs(currentTouchTop - self.__initialTouchTop);
+
+      self.__enableScrollY = distanceY >= minimumTrackingForScroll;
+
+      positions.push(self.__scrollTop, timeStamp);
+
+      self.__isDragging = self.__enableScrollY && distanceY >= minimumTrackingForDrag;
+
+      if (self.__isDragging) {
+        self.__interruptedAnimation = false;
+      }
+    }
+
+    // Update last touch positions and time stamp for next event
+    self.__lastTouchTop = currentTouchTop;
+    self.__lastTouchMove = timeStamp;
+    self.__lastScale = scale;
+  },
+  __doTouchEnd: function __doTouchEnd(timeStamp) {
+    var self = this;
+
+    if (timeStamp instanceof Date) {
+      timeStamp = timeStamp.valueOf();
+    }
+    if (typeof timeStamp !== 'number') {
+      throw new Error('Invalid timestamp value: ' + timeStamp);
+    }
+
+    // Ignore event when tracking is not enabled (no touchstart event on element)
+    // This is required as this listener ('touchmove') sits on the document and not on the element itself.
+    if (!self.__isTracking) {
+      return;
+    }
+
+    // Not touching anymore (when two finger hit the screen there are two touch end events)
+    self.__isTracking = false;
+
+    // Be sure to reset the dragging flag now. Here we also detect whether
+    // the finger has moved fast enough to switch into a deceleration animation.
+    if (self.__isDragging) {
+      // Reset dragging flag
+      self.__isDragging = false;
+
+      // Start deceleration
+      // Verify that the last move detected was in some relevant time frame
+      if (self.__isSingleTouch && timeStamp - self.__lastTouchMove <= 100) {
+        // Then figure out what the scroll position was about 100ms ago
+        var positions = self.__positions;
+        var endPos = positions.length - 1;
+        var startPos = endPos;
+
+        // Move pointer to position measured 100ms ago
+        for (var i = endPos; i > 0 && positions[i] > self.__lastTouchMove - 100; i -= 2) {
+          startPos = i;
+        }
+
+        // If start and stop position is identical in a 100ms timeframe,
+        // we cannot compute any useful deceleration.
+        if (startPos !== endPos) {
+          // Compute relative movement between these two points
+          var timeOffset = positions[endPos] - positions[startPos];
+          var movedTop = self.__scrollTop - positions[startPos - 1];
+
+          // Based on 50ms compute the movement to apply for each render step
+          self.__decelerationVelocityY = movedTop / timeOffset * (1000 / 60);
+
+          // How much velocity is required to start the deceleration
+          var minVelocityToStartDeceleration = 4;
+
+          // Verify that we have enough velocity to start deceleration
+          if (Math.abs(self.__decelerationVelocityY) > minVelocityToStartDeceleration) {
+            self.__startDeceleration(timeStamp);
+          }
+        }
+      }
+    }
+
+    if (!self.__isDecelerating) {
+      self.scrollTo(self.__scrollTop);
+    }
+
+    // Fully cleanup list
+    self.__positions.length = 0;
+  },
+
+
+  // Applies the scroll position to the content element
+  __publish: function __publish(top, animationDuration) {
+    var self = this;
+
+    // Remember whether we had an animation, then we try to continue based on the current "drive" of the animation
+    var wasAnimating = self.__isAnimating;
+    if (wasAnimating) {
+      _animate2.default.stop(wasAnimating);
+      self.__isAnimating = false;
+    }
+
+    if (animationDuration) {
+      // Keep scheduled positions for scrollBy functionality
+      self.__scheduledTop = top;
+
+      var oldTop = self.__scrollTop;
+      var diffTop = top - oldTop;
+
+      var step = function step(percent, now, render) {
+        self.__scrollTop = oldTop + diffTop * percent;
+        // Push values out
+        if (self.__callback) {
+          self.__callback(self.__scrollTop);
+        }
+      };
+
+      var verify = function verify(id) {
+        return self.__isAnimating === id;
+      };
+
+      var completed = function completed(renderedFramesPerSecond, animationId, wasFinished) {
+        if (animationId === self.__isAnimating) {
+          self.__isAnimating = false;
+        }
+        if (self.__didDecelerationComplete || wasFinished) {
+          self.__scrollingComplete();
+        }
+      };
+
+      // When continuing based on previous animation we choose an ease-out animation instead of ease-in-out
+      self.__isAnimating = _animate2.default.start(step, verify, completed, animationDuration, wasAnimating ? _util.easeOutCubic : _util.easeInOutCubic);
+    } else {
+      self.__scheduledTop = self.__scrollTop = top;
+      // Push values out
+      if (self.__callback) {
+        self.__callback(top);
+      }
+    }
+  },
+
+
+  // Called when a touch sequence end and the speed of the finger was high enough to switch into deceleration mode.
+  __startDeceleration: function __startDeceleration(timeStamp) {
+    var self = this;
+
+    self.__minDecelerationScrollTop = self.__minScrollTop;
+    self.__maxDecelerationScrollTop = self.__maxScrollTop;
+
+    // Wrap class method
+    var step = function step(percent, now, render) {
+      self.__stepThroughDeceleration(render);
+    };
+
+    // How much velocity is required to keep the deceleration running
+    var minVelocityToKeepDecelerating = 0.5;
+
+    // Detect whether it's still worth to continue animating steps
+    // If we are already slow enough to not being user perceivable anymore, we stop the whole process here.
+    var verify = function verify() {
+      var shouldContinue = Math.abs(self.__decelerationVelocityY) >= minVelocityToKeepDecelerating;
+      if (!shouldContinue) {
+        self.__didDecelerationComplete = true;
+      }
+      return shouldContinue;
+    };
+
+    var completed = function completed(renderedFramesPerSecond, animationId, wasFinished) {
+      self.__isDecelerating = false;
+      if (self.__scrollTop <= self.__minScrollTop || self.__scrollTop >= self.__maxScrollTop) {
+        self.scrollTo(self.__scrollTop);
+        return;
+      }
+      if (self.__didDecelerationComplete) {
+        self.__scrollingComplete();
+      }
+    };
+
+    // Start animation and switch on flag
+    self.__isDecelerating = _animate2.default.start(step, verify, completed);
+  },
+
+
+  // Called on every step of the animation
+  __stepThroughDeceleration: function __stepThroughDeceleration(render) {
+    var self = this;
+
+    var scrollTop = self.__scrollTop + self.__decelerationVelocityY;
+
+    var scrollTopFixed = Math.max(Math.min(self.__maxDecelerationScrollTop, scrollTop), self.__minDecelerationScrollTop);
+    if (scrollTopFixed !== scrollTop) {
+      scrollTop = scrollTopFixed;
+      self.__decelerationVelocityY = 0;
+    }
+
+    if (Math.abs(self.__decelerationVelocityY) <= 1) {
+      if (Math.abs(scrollTop % self.__itemHeight) < 1) {
+        self.__decelerationVelocityY = 0;
+      }
+    } else {
+      self.__decelerationVelocityY *= 0.95;
+    }
+
+    self.__publish(scrollTop);
+  }
+};
+
+// Copy over members to prototype
+for (var key in members) {
+  Scroller.prototype[key] = members[key];
+}
+
+module.exports = Scroller;
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getElement = getElement;
+exports.getComputedStyle = getComputedStyle;
+exports.easeOutCubic = easeOutCubic;
+exports.easeInOutCubic = easeInOutCubic;
+function getElement(expr) {
+  return typeof expr === 'string' ? document.querySelector(expr) : expr;
+}
+
+function getComputedStyle(el, key) {
+  var computedStyle = window.getComputedStyle(el);
+  return computedStyle[key] || '';
+}
+
+// Easing Equations (c) 2003 Robert Penner, all rights reserved.
+// Open source under the BSD License.
+function easeOutCubic(pos) {
+  return Math.pow(pos - 1, 3) + 1;
+}
+
+function easeInOutCubic(pos) {
+  if ((pos /= 0.5) < 1) {
+    return 0.5 * Math.pow(pos, 3);
+  }
+  return 0.5 * (Math.pow(pos - 2, 3) + 2);
+}
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _slider = __webpack_require__(75);
+
+var _slider2 = _interopRequireDefault(_slider);
+
+var _sliderItem = __webpack_require__(74);
+
+var _sliderItem2 = _interopRequireDefault(_sliderItem);
+
+var _swiper = __webpack_require__(7);
+
+var _swiper2 = _interopRequireDefault(_swiper);
+
+var _sliderList = __webpack_require__(6);
+
+var _sliderList2 = _interopRequireDefault(_sliderList);
+
+var _sliderThemeList = __webpack_require__(106);
+
+var _sliderThemeList2 = _interopRequireDefault(_sliderThemeList);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+Vue.component('cmui-slider', _slider2.default);
+Vue.component('cmui-slider-item', _sliderItem2.default);
+function Slider() {
+	if (arguments.length) {
+		var argParent;
+		var argStrings = _.filter(arguments, function (item) {
+			if (_.isString(item)) {
+				if (item[0] != '.' || item[0] != '#') {
+					argParent = item;
+					return false;
+				}
+				return true;
+			}
+			return _.isNumber(item);
+		});
+		var argObject = _.filter(arguments, _.isPlainObject)[0];
+		var argFunction = _.filter(arguments, _.isFunction)[0];
+		var tempSliderList = new _sliderList.CMUI_SliderList();
+		//只有一个选择器的情况
+		if (argParent && arguments.length == 1) {
+			_.filter(_sliderList2.default, function (value, key) {
+				var container = _.get(value, 'container');
+				if (!container) {
+					return false;
+				} else if (argParent[0] == '#') {
+					return container[0].id == argParent.slice(1);
+				} else {
+					return container.hasClass(argParent.slice(1));
+				}
+			}).forEach(function (item) {
+				return tempSliderList.add(item);
+			});
+			return tempSliderList;
+		}
+		var defaultOptions = {
+			parent: argParent || 'body',
+			items: function () {
+				if (argFunction) {
+					var rs = argFunction();
+					if (_.isArray(rs)) {
+						return rs;
+					} else {
+						return [];
+					}
+				} else {
+					return argStrings.length ? argStrings : [];
+				}
+			}(),
+			id: _.uniqueId('cmui-slider_'),
+			options: null,
+			theme: ''
+		};
+
+		var options = _.assign(defaultOptions, argObject);
+		var parent = $(options.parent).eq(0);
+		if (!parent.length) {
+			return _sliderList2.default;
+		}
+		var tpl = '';
+		debugger;
+		tpl += '<div class="cmui-slider" id="' + options.id + '">';
+		tpl += '	<div class="swiper-container" >';
+		tpl += '		<div class="swiper-wrapper">';
+		options.items.forEach(function (item) {
+			tpl += '<div class="swiper-slide">';
+			tpl += item.toString();
+			tpl += '</div>';
+		});
+		tpl += '		</div>';
+		tpl += '	    <div class="pagination"></div>';
+		tpl += '	</div>';
+		tpl += '</div>';
+		var dom = $(tpl);
+		parent.append(dom);
+		//主题拓展
+		if (options.theme) {
+			_.defaults(options.options, _sliderThemeList2.default[options.theme]);
+		}
+		var swiper = new _swiper2.default($('.swiper-container', dom), options.options);
+		_sliderList2.default.add(swiper);
+		return tempSliderList.add(swiper);
+	} else {
+		return _sliderList2.default;
+	}
+	// if(typeof arg=='string'){
+	// 	return _.filter(sliderList,(value,key)=>{
+	// 		value.container=arg//error
+	// 	})
+	// }else if(typeof arg=='object'){
+	// 	var options=_.assign({
+	// 		parent:'body',
+	// 		items:null,
+	// 		options:null,
+	// 		id:_.uniqueId('cmui-slider_')
+	// 	},arg)
+	// 	var parent=$(options.parent);
+	// 	if(parent.length&&(_.isArray(options.items)||_.isFunction(options.items))){
+	// 		var tpl='';
+	// 		tpl+='<div class="cmui-slider" id="'+options.id+'">';
+	// 		tpl+='	<div class="swiper-container" >';
+	// 		tpl+='		<div class="swiper-wrapper">';
+	// 		if(_.isArray(options.items)){
+	// 			options.items.forEach(item=>{
+	// 				tpl+='<div class="swiper-slide">'
+	// 				tpl+=item.toString();
+	// 				tpl+='</div>'
+	// 			})
+	// 		}
+	// 		tpl+='		</div>';
+	// 		tpl+='	    <div class="pagination"></div>';
+	// 		tpl+='	</div>';
+	// 		tpl+='</div>';
+	// 		var dom =$(tpl)
+	// 		parent.append(dom);
+	// 		sliderList.add(new Swiper($('.swiper-container',dom),options.options));
+	// 	}
+	// }else if(typeof arg=='number'){
+	// 	return arg>=sliderList.length?undefined:sliderList[arg]
+	// }else{
+	// 	return sliderList;
+	// }
+}
+exports.default = Slider;
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = thememaker;
+function thememaker() {
+	var _this = this;
+	var theme = this.theme;
+	var options = {
+		pagination: '.pagination',
+		paginationClickable: true,
+		loop: true,
+		//autoplayDisableOnInteraction:false,
+		// lazyLoading         : true,
+		// updateOnImagesReady : true,
+		preloadImages: true
+	};
+	switch (theme) {
+		default:
+			break;
+		case 1:
+			options.effect = 'coverflow', options.grabCursor = true, options.centeredSlides = true, options.slidesPerView = 2, options.loop = false, options.coverflow = {
+				rotate: 50,
+				stretch: 0,
+				depth: 100,
+				modifier: 1,
+				slideShadows: true
+			};
+			break;
+		case 2:
+			options.pagination = false, options.direction = 'vertical';
+			break;
+		case 3:
+			options.paginationType = 'custom', options.paginationCustomRender = function (swiper, current, total) {
+				return '<span>' + current + '/' + total + '</span>';
+			};
+			break;
+		case 4:
+			options.pagination = false;
+			_this.col = 0;
+			_this.auto = 0;
+			options.loop = false;
+			break;
+		case 5:
+			options.effect = 'coverflow';
+			options.centeredSlides = true;
+			options.slidesPerView = 1.1;
+			options.loop = false;
+			options.spaceBetween = 45;
+			options.coverflow = {
+				rotate: 0,
+				stretch: 0,
+				depth: 200,
+				modifier: 1,
+				slideShadows: false
+			};
+			options.paginationType = 'custom';
+			options.paginationCustomRender = function (swiper, current, total) {
+				return '<span class="text-white fs-12 marginr40 text-right lh-20">' + current + '/' + total + '</span>';
+			};
+			break;
+	}
+	if (this.col === 0) {
+		options.slidesPerView = 'auto';
+		this.$children.forEach(function (item) {
+			item.$el.style.width = 'auto';
+		});
+	} else {
+		options.slidesPerView = this.col || options.slidesPerView || 1;
+	}
+	options.spaceBetween = this.space || options.spaceBetween || 0;
+	options.autoplay = function (_this) {
+		if (_this.auto == 0) {
+			return 0;
+		} else {
+			return options.autoplay || 3000;
+		}
+	}(this);
+	options.autoHeight = this.autoHeight;
+	options.slidesPerColumn = this.span || options.slidesPerColumn || 1;
+	options.loop = this.loop;
+	options.autoplayDisableOnInteraction = this.autoplayDisable;
+	return _.defaults(this.options, options);
+}
+
+/***/ }),
 /* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * Created by chenqifeng on 2016/8/26.
+ */
+
+function Maple(selector, options) {
+  return new Maple.prototype.init(selector, options);
+}
+Maple.prototype.init = function (selector, options) {};
+Maple.prototype.init.prototype = Maple.prototype;
+
+exports.default = Maple;
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var alias = {
+    androidchrome: 'androidChrome',
+    guge: 'chrome',
+    webview: 'webView',
+    minimalui: 'minimalUi',
+    statusbar: 'statusBar',
+    pixelratio: 'pixelRatio',
+    wechat: 'weixin',
+    wx: 'weixin'
+};
+
+var device = function device() {
+    var l = arguments.length,
+        i = 0,
+        t,
+        result = true;
+
+    if (l === 0) {
+        result = false;
+    } else {
+        for (; i < l; i++) {
+            t = arguments[i];
+
+            if (t in device && device.hasOwnProperty(t)) {
+                result = result && device[t];
+            } else {
+                t = t.toLowerCase();
+
+                if (t in alias) {
+                    result = result && device[alias[t]];
+                } else {
+                    result = result && false;
+                }
+            }
+
+            if (!result) {
+                break;
+            }
+        }
+    }
+
+    return result;
+};
+var ua = navigator.userAgent;
+
+var android = ua.match(/(Android);?[\s\/]+([\d.]+)?/);
+var ipad = ua.match(/(iPad).*OS\s([\d_]+)/);
+var ipod = ua.match(/(iPod)(.*OS\s([\d_]+))?/);
+var iphone = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/);
+
+device.ios = device.android = device.iphone = device.ipad = device.androidChrome = false;
+
+// Chrome
+device.chrome = ua.toLowerCase().indexOf('chrome') >= 0;
+
+// Android
+if (android) {
+    device.os = 'android';
+    device.osVersion = android[2];
+    device.android = true;
+    device.androidChrome = device.android && device.chrome;
+}
+if (ipad || iphone || ipod) {
+    device.os = 'ios';
+    device.ios = true;
+}
+// iOS
+if (iphone && !ipod) {
+    device.osVersion = iphone[2].replace(/_/g, '.');
+    device.iphone = true;
+}
+if (ipad) {
+    device.osVersion = ipad[2].replace(/_/g, '.');
+    device.ipad = true;
+}
+if (ipod) {
+    device.osVersion = ipod[3] ? ipod[3].replace(/_/g, '.') : null;
+    device.iphone = true;
+}
+// iOS 8+ changed UA
+if (device.ios && device.osVersion && ua.indexOf('Version/') >= 0) {
+    if (device.osVersion.split('.')[0] === '10') {
+        device.osVersion = ua.toLowerCase().split('version/')[1].split(' ')[0];
+    }
+}
+
+// Webview
+device.webView = (iphone || ipad || ipod) && ua.match(/.*AppleWebKit(?!.*Safari)/i);
+
+// Minimal UI
+if (device.os && device.os === 'ios') {
+    var osVersionArr = device.osVersion.split('.');
+    device.minimalUi = !device.webView && (ipod || iphone) && (osVersionArr[0] * 1 === 7 ? osVersionArr[1] * 1 >= 1 : osVersionArr[0] * 1 > 7) && $('meta[name="viewport"]').length > 0 && $('meta[name="viewport"]').attr('content').indexOf('minimal-ui') >= 0;
+}
+
+// Check for status bar and fullscreen app mode
+var windowWidth = $(window).width();
+var windowHeight = $(window).height();
+
+device.statusBar = device.webView && windowWidth * windowHeight === screen.width * screen.height;
+
+// Classes
+var classNames = [];
+
+// Pixel Ratio
+device.pixelRatio = window.devicePixelRatio || 1;
+classNames.push('pixel-ratio-' + Math.floor(device.pixelRatio));
+if (device.pixelRatio >= 2) {
+    classNames.push('retina');
+}
+
+// OS classes
+if (device.os) {
+    classNames.push(device.os, device.os + '-' + device.osVersion.split('.')[0], device.os + '-' + device.osVersion.replace(/\./g, '-'));
+    if (device.os === 'ios') {
+        var major = parseInt(device.osVersion.split('.')[0], 10);
+        for (var i = major - 1; i >= 6; i--) {
+            classNames.push('ios-gt-' + i);
+        }
+    }
+}
+// Status bar classes
+if (device.statusBar) {
+    classNames.push('with-statusbar-overlay');
+} else {
+    $('html').removeClass('with-statusbar-overlay');
+}
+
+// Add html classes
+if (classNames.length > 0) $('html').addClass(classNames.join(' '));
+
+// keng..
+device.weixin = /MicroMessenger/i.test(ua);
+
+// UC ������
+device.uc = ua.indexOf('UCBrowser') > -1;
+
+exports.default = device;
+
+/***/ }),
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3553,7 +3774,7 @@ function loadImg(src) {
 }
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3689,14 +3910,14 @@ exports.default = function () {
 	}
 };
 
-var _log = __webpack_require__(6);
+var _log = __webpack_require__(8);
 
 var _log2 = _interopRequireDefault(_log);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3708,7 +3929,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _index = __webpack_require__(73);
+var _index = __webpack_require__(76);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -3774,7 +3995,7 @@ function actions() {
 exports.default = actions;
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3786,7 +4007,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _index = __webpack_require__(74);
+var _index = __webpack_require__(77);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -3846,7 +4067,7 @@ function Alert() {
 exports.default = Alert;
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3858,7 +4079,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _index = __webpack_require__(75);
+var _index = __webpack_require__(78);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -3927,7 +4148,7 @@ function Alert() {
 exports.default = Alert;
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3939,7 +4160,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _index = __webpack_require__(76);
+var _index = __webpack_require__(79);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -4060,7 +4281,7 @@ function Notice() {
 exports.default = Notice;
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4197,7 +4418,7 @@ Url.prototype.init.call(Url);
 exports.default = Url;
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4323,7 +4544,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4333,11 +4554,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _mixin = __webpack_require__(15);
+var _mixin = __webpack_require__(17);
 
 var _mixin2 = _interopRequireDefault(_mixin);
 
-var _collapseTransition = __webpack_require__(13);
+var _collapseTransition = __webpack_require__(15);
 
 var _collapseTransition2 = _interopRequireDefault(_collapseTransition);
 
@@ -4406,7 +4627,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4484,7 +4705,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4494,7 +4715,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _imageLazyLoad = __webpack_require__(14);
+var _imageLazyLoad = __webpack_require__(16);
 
 var _imageLazyLoad2 = _interopRequireDefault(_imageLazyLoad);
 
@@ -4566,7 +4787,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4626,7 +4847,7 @@ exports.default = {
 //
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4702,7 +4923,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4737,7 +4958,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4808,7 +5029,7 @@ exports.default = {
 //
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4818,11 +5039,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _scroller = __webpack_require__(18);
+var _scroller = __webpack_require__(20);
 
 var _scroller2 = _interopRequireDefault(_scroller);
 
-var _chain = __webpack_require__(17);
+var _chain = __webpack_require__(19);
 
 var _chain2 = _interopRequireDefault(_chain);
 
@@ -5013,7 +5234,7 @@ exports.default = {
 //
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5041,7 +5262,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5088,7 +5309,31 @@ exports.default = {
 };
 
 /***/ }),
-/* 42 */
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+//
+//
+//
+//
+//
+
+exports.default = {
+	data: function data() {
+		return {
+			name: 'cmui-slider-item'
+		};
+	}
+};
+
+/***/ }),
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5098,35 +5343,27 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _swiper = __webpack_require__(23);
+var _swiper = __webpack_require__(7);
 
 var _swiper2 = _interopRequireDefault(_swiper);
 
-var _themeMaker = __webpack_require__(20);
+var _sliderList = __webpack_require__(6);
+
+var _sliderList2 = _interopRequireDefault(_sliderList);
+
+var _themeMaker = __webpack_require__(23);
 
 var _themeMaker2 = _interopRequireDefault(_themeMaker);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
 exports.default = {
 	created: function created() {
 		var _this = this;
 		setTimeout(function () {
-			if (_this.items && _this.items.length > 1) {
-				_this.swiper = new _swiper2.default($('.swiper-container', _this.$el), _themeMaker2.default.call(_this));
-			}
+			_this.swiper = new _swiper2.default($('.swiper-container', _this.$el), _themeMaker2.default.call(_this));
+			_this.swiperIndex = _sliderList2.default.length;
+			_sliderList2.default.add(_this.swiper);
 		}, 0);
 	},
 	watch: {
@@ -5137,18 +5374,15 @@ exports.default = {
 				$(_this.$el).find('.pagination').empty();
 			}
 			setTimeout(function () {
-				if (_this.items && _this.items.length > 1) {
+				if (_this.items) {
 					_this.swiper = new _swiper2.default($('.swiper-container', _this.$el), _themeMaker2.default.call(_this));
+					_sliderList2.default[_this.swiperIndex] = _this.swiper;
 				}
 			}, 0);
 		}
 	},
-	methods: {
-		itemEvent: function itemEvent(index, data) {
-			this.$dispatch('itemEvent', this, index, data);
-		}
-	},
 	props: {
+		id: { type: String, default: _.uniqueId('cmui-slider_') },
 		items: { type: Array },
 		theme: { type: Number },
 		col: { type: Number },
@@ -5161,10 +5395,19 @@ exports.default = {
 		autoHeight: { type: Boolean, default: false },
 		options: { type: Object }
 	}
-};
+}; //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /***/ }),
-/* 43 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5244,7 +5487,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 44 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5335,7 +5578,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 45 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5406,7 +5649,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 46 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5467,57 +5710,15 @@ exports.default = {
 };
 
 /***/ }),
-/* 47 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(1)();
-// imports
-exports.i(__webpack_require__(56), "");
-
-// module
-exports.push([module.i, "\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 48 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(1)();
-// imports
-
-
-// module
-exports.push([module.i, "\n.cmui-scrollbox {\n  overflow-x: scroll;\n  -webkit-overflow-scrolling: touch;\n}\n.cmui-scrollbox::-webkit-scrollbar {\n  height: 0px;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(1)();
-// imports
-exports.i(__webpack_require__(57), "");
-
-// module
-exports.push([module.i, "\n.swiper-pagination-bullet {\n\tborder:0;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
 /* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)();
 // imports
-
+exports.i(__webpack_require__(59), "");
 
 // module
-exports.push([module.i, "\n.cmui-dialogContainer{\n\tborder-radius: 4px;\n\tposition: relative;\n\toverflow: hidden;\n\tmin-width: 270px;\n\twidth: 72%;\n\tpadding-bottom: 44px;\n\tbackground: #fff;\n}\n.cmui-dialogTitle{\n\ttext-align: center;\n\tfont-size: 18px;\n\tpadding:0 .53333333rem;\n\tmargin:.66666667rem 0 .26666667rem;\n}\n.cmui-dialogBody{\n\tcolor: #666;\n\tfont-size: 15px;\n\tmargin-bottom: .66666667rem;\n\tpadding:0 .53333333rem;\n\tmax-height: 10.2rem;\n\toverflow: auto;\n}\n.cmui-dialogButtons{\n\tposition: absolute;\n\tbottom: 0;\n\twidth: 100%;\n\tborder-top:1px solid #e0e0e0;\n}\n.cmui-dialogButton{\n}\n.cmui-alertContainer{\n}\n.cmui-alertTitle{\n}\n.cmui-alertBody{\n}\n.cmui-alertButtons{\n}\n.cmui-alertButton{\n\tborder:none;\n\tbackground-color: transparent;\n}\n", ""]);
+exports.push([module.i, "\n", ""]);
 
 // exports
 
@@ -5531,7 +5732,7 @@ exports = module.exports = __webpack_require__(1)();
 
 
 // module
-exports.push([module.i, "\n.cmui-actionsContainer {\n  padding: 0.13333rem;\n  width: 100%;\n}\n.cmui-actionsGroup {\n  background-color: white;\n  border-radius: 4px;\n}\n.cmui-actionsGroup .cmui-actionsButton {\n    border-bottom: 1px solid #eeeeee;\n}\n.cmui-actionsGroup .cmui-actionsButton:last-child {\n      border-bottom: none;\n}\n.cmui-actionsCancel {\n  background-color: white;\n  border-radius: 4px;\n}\n.cmui-actionsCancel .cmui-actionsButton {\n    margin-top: 0.26667rem;\n    color: #ff6565;\n}\n.cmui-actionsButton {\n  padding: 0.26667rem;\n  text-align: center;\n}\n", ""]);
+exports.push([module.i, "\n.cmui-scrollbox {\n  overflow-x: scroll;\n  -webkit-overflow-scrolling: touch;\n}\n.cmui-scrollbox::-webkit-scrollbar {\n  height: 0px;\n}\n", ""]);
 
 // exports
 
@@ -5542,10 +5743,10 @@ exports.push([module.i, "\n.cmui-actionsContainer {\n  padding: 0.13333rem;\n  w
 
 exports = module.exports = __webpack_require__(1)();
 // imports
-
+exports.i(__webpack_require__(60), "");
 
 // module
-exports.push([module.i, "\n.cmui-noticeContainer{\n\tbackground: rgba(0,0,0,0.7);\n\ttext-align: center;\n\tmin-width: initial;\n\twidth: initial;\n\tpadding-bottom: initial;\n\tmax-width: 72%;\n}\n.cmui-noticeBody{\n\tcolor:white;\n\tmargin:0.26666667rem 0;\n}\n", ""]);
+exports.push([module.i, "\n", ""]);
 
 // exports
 
@@ -5559,7 +5760,7 @@ exports = module.exports = __webpack_require__(1)();
 
 
 // module
-exports.push([module.i, "\n.cmui-collapse-item__body,.cmui-collapse-item__header{\n  padding:0.26666667rem;\n  border: 1px solid #dfe6ec;\n  margin-bottom: -1px;\n}\n.cmui-collapse-item__bodyWarp{\n  will-change: height;\n  overflow: hidden;\n}\n.collapse-transition {\n    transition: height .3s ease-in-out;\n}\n", ""]);
+exports.push([module.i, "\n.cmui-dialogContainer{\n\tborder-radius: 4px;\n\tposition: relative;\n\toverflow: hidden;\n\tmin-width: 270px;\n\twidth: 72%;\n\tpadding-bottom: 44px;\n\tbackground: #fff;\n}\n.cmui-dialogTitle{\n\ttext-align: center;\n\tfont-size: 18px;\n\tpadding:0 .53333333rem;\n\tmargin:.66666667rem 0 .26666667rem;\n}\n.cmui-dialogBody{\n\tcolor: #666;\n\tfont-size: 15px;\n\tmargin-bottom: .66666667rem;\n\tpadding:0 .53333333rem;\n\tmax-height: 10.2rem;\n\toverflow: auto;\n}\n.cmui-dialogButtons{\n\tposition: absolute;\n\tbottom: 0;\n\twidth: 100%;\n\tborder-top:1px solid #e0e0e0;\n}\n.cmui-dialogButton{\n}\n.cmui-alertContainer{\n}\n.cmui-alertTitle{\n}\n.cmui-alertBody{\n}\n.cmui-alertButtons{\n}\n.cmui-alertButton{\n\tborder:none;\n\tbackground-color: transparent;\n}\n", ""]);
 
 // exports
 
@@ -5573,7 +5774,7 @@ exports = module.exports = __webpack_require__(1)();
 
 
 // module
-exports.push([module.i, "\n.cmui-confirmContainer{\n}\n.cmui-confirmTitle{\n}\n.cmui-confirmBody{\n}\n.cmui-confirmButtons{\n}\n.cmui-confirmButton{\n\tborder:none;\n\tbackground-color: transparent;\n}\n", ""]);
+exports.push([module.i, "\n.cmui-actionsContainer {\n  padding: 0.13333rem;\n  width: 100%;\n}\n.cmui-actionsGroup {\n  background-color: white;\n  border-radius: 4px;\n}\n.cmui-actionsGroup .cmui-actionsButton {\n    border-bottom: 1px solid #eeeeee;\n}\n.cmui-actionsGroup .cmui-actionsButton:last-child {\n      border-bottom: none;\n}\n.cmui-actionsCancel {\n  background-color: white;\n  border-radius: 4px;\n}\n.cmui-actionsCancel .cmui-actionsButton {\n    margin-top: 0.26667rem;\n    color: #ff6565;\n}\n.cmui-actionsButton {\n  padding: 0.26667rem;\n  text-align: center;\n}\n", ""]);
 
 // exports
 
@@ -5587,7 +5788,7 @@ exports = module.exports = __webpack_require__(1)();
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n.cmui-noticeContainer{\n\tbackground: rgba(0,0,0,0.7);\n\ttext-align: center;\n\tmin-width: initial;\n\twidth: initial;\n\tpadding-bottom: initial;\n\tmax-width: 72%;\n}\n.cmui-noticeBody{\n\tcolor:white;\n\tmargin:0.26666667rem 0;\n}\n", ""]);
 
 // exports
 
@@ -5601,7 +5802,7 @@ exports = module.exports = __webpack_require__(1)();
 
 
 // module
-exports.push([module.i, ".scroller-component {\n  display: block;\n  position: relative;\n  height: 238px;\n  overflow: hidden;\n  width: 100%;\n}\n\n.scroller-content {\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 100%;\n  z-index: 1;\n}\n\n.scroller-mask {\n  position: absolute;\n  left: 0;\n  top: 0;\n  height: 100%;\n  margin: 0 auto;\n  width: 100%;\n  z-index: 3;\n  background-image:\n    -webkit-linear-gradient(top, rgba(255,255,255,0.95), rgba(255,255,255,0.6)),\n    -webkit-linear-gradient(bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.6));\n  background-image:\n    linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.6)),\n    linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.6));\n  background-position: top, bottom;\n  background-size: 100% 102px;\n  background-repeat: no-repeat;\n}\n\n.scroller-item {\n  text-align: center;\n  font-size: 16px;\n  height: 34px;\n  line-height: 34px;\n  color: #000;\n}\n\n.scroller-indicator {\n  width: 100%;\n  height: 34px;\n  position: absolute;\n  left: 0;\n  top: 102px;\n  z-index: 3;\n  background-image:\n    -webkit-linear-gradient(top, #d0d0d0, #d0d0d0, transparent, transparent),\n    -webkit-linear-gradient(bottom, #d0d0d0, #d0d0d0, transparent, transparent);\n  background-image:\n    linear-gradient(to bottom, #d0d0d0, #d0d0d0, transparent, transparent),\n    linear-gradient(to top, #d0d0d0, #d0d0d0, transparent, transparent);\n  background-position: top, bottom;\n  background-size: 100% 1px;\n  background-repeat: no-repeat;\n}\n.scroller-item {\n  line-clamp: 1;\n  -webkit-line-clamp: 1;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}", ""]);
+exports.push([module.i, "\n.cmui-collapse-item__body,.cmui-collapse-item__header{\n  padding:0.26666667rem;\n  border: 1px solid #dfe6ec;\n  margin-bottom: -1px;\n}\n.cmui-collapse-item__bodyWarp{\n  will-change: height;\n  overflow: hidden;\n}\n.collapse-transition {\n    transition: height .3s ease-in-out;\n}\n", ""]);
 
 // exports
 
@@ -5615,13 +5816,55 @@ exports = module.exports = __webpack_require__(1)();
 
 
 // module
-exports.push([module.i, "/**\n * Swiper 3.3.1\n * Most modern mobile touch slider and framework with hardware accelerated transitions\n * \n * http://www.idangero.us/swiper/\n * \n * Copyright 2016, Vladimir Kharlampidi\n * The iDangero.us\n * http://www.idangero.us/\n * \n * Licensed under MIT\n * \n * Released on: February 7, 2016\n */\n.swiper-container{margin:0 auto;position:relative;overflow:hidden;z-index:1}.swiper-container-no-flexbox .swiper-slide{float:left}.swiper-container-vertical>.swiper-wrapper{-webkit-box-orient:vertical;-moz-box-orient:vertical;-ms-flex-direction:column;-webkit-flex-direction:column;flex-direction:column}.swiper-wrapper{position:relative;width:100%;height:100%;z-index:1;display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex;-webkit-transition-property:-webkit-transform;-moz-transition-property:-moz-transform;-o-transition-property:-o-transform;-ms-transition-property:-ms-transform;transition-property:transform;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}.swiper-container-android .swiper-slide,.swiper-wrapper{-webkit-transform:translate3d(0,0,0);-moz-transform:translate3d(0,0,0);-o-transform:translate(0,0);-ms-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}.swiper-container-multirow>.swiper-wrapper{-webkit-box-lines:multiple;-moz-box-lines:multiple;-ms-flex-wrap:wrap;-webkit-flex-wrap:wrap;flex-wrap:wrap}.swiper-container-free-mode>.swiper-wrapper{-webkit-transition-timing-function:ease-out;-moz-transition-timing-function:ease-out;-ms-transition-timing-function:ease-out;-o-transition-timing-function:ease-out;transition-timing-function:ease-out;margin:0 auto}.swiper-slide{-webkit-flex-shrink:0;-ms-flex:0 0 auto;flex-shrink:0;width:100%;height:100%;position:relative}.swiper-container-autoheight,.swiper-container-autoheight .swiper-slide{height:auto}.swiper-container-autoheight .swiper-wrapper{-webkit-box-align:start;-ms-flex-align:start;-webkit-align-items:flex-start;align-items:flex-start;-webkit-transition-property:-webkit-transform,height;-moz-transition-property:-moz-transform;-o-transition-property:-o-transform;-ms-transition-property:-ms-transform;transition-property:transform,height}.swiper-container .swiper-notification{position:absolute;left:0;top:0;pointer-events:none;opacity:0;z-index:-1000}.swiper-wp8-horizontal{-ms-touch-action:pan-y;touch-action:pan-y}.swiper-wp8-vertical{-ms-touch-action:pan-x;touch-action:pan-x}.swiper-button-next,.swiper-button-prev{position:absolute;top:50%;width:27px;height:44px;margin-top:-22px;z-index:10;cursor:pointer;-moz-background-size:27px 44px;-webkit-background-size:27px 44px;background-size:27px 44px;background-position:center;background-repeat:no-repeat}.swiper-button-next.swiper-button-disabled,.swiper-button-prev.swiper-button-disabled{opacity:.35;cursor:auto;pointer-events:none}.swiper-button-prev,.swiper-container-rtl .swiper-button-next{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M0%2C22L22%2C0l2.1%2C2.1L4.2%2C22l19.9%2C19.9L22%2C44L0%2C22L0%2C22L0%2C22z'%20fill%3D'%23007aff'%2F%3E%3C%2Fsvg%3E\");left:10px;right:auto}.swiper-button-prev.swiper-button-black,.swiper-container-rtl .swiper-button-next.swiper-button-black{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M0%2C22L22%2C0l2.1%2C2.1L4.2%2C22l19.9%2C19.9L22%2C44L0%2C22L0%2C22L0%2C22z'%20fill%3D'%23000000'%2F%3E%3C%2Fsvg%3E\")}.swiper-button-prev.swiper-button-white,.swiper-container-rtl .swiper-button-next.swiper-button-white{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M0%2C22L22%2C0l2.1%2C2.1L4.2%2C22l19.9%2C19.9L22%2C44L0%2C22L0%2C22L0%2C22z'%20fill%3D'%23ffffff'%2F%3E%3C%2Fsvg%3E\")}.swiper-button-next,.swiper-container-rtl .swiper-button-prev{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M27%2C22L27%2C22L5%2C44l-2.1-2.1L22.8%2C22L2.9%2C2.1L5%2C0L27%2C22L27%2C22z'%20fill%3D'%23007aff'%2F%3E%3C%2Fsvg%3E\");right:10px;left:auto}.swiper-button-next.swiper-button-black,.swiper-container-rtl .swiper-button-prev.swiper-button-black{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M27%2C22L27%2C22L5%2C44l-2.1-2.1L22.8%2C22L2.9%2C2.1L5%2C0L27%2C22L27%2C22z'%20fill%3D'%23000000'%2F%3E%3C%2Fsvg%3E\")}.swiper-button-next.swiper-button-white,.swiper-container-rtl .swiper-button-prev.swiper-button-white{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M27%2C22L27%2C22L5%2C44l-2.1-2.1L22.8%2C22L2.9%2C2.1L5%2C0L27%2C22L27%2C22z'%20fill%3D'%23ffffff'%2F%3E%3C%2Fsvg%3E\")}.swiper-pagination{position:absolute;text-align:center;-webkit-transition:.3s;-moz-transition:.3s;-o-transition:.3s;transition:.3s;-webkit-transform:translate3d(0,0,0);-ms-transform:translate3d(0,0,0);-o-transform:translate3d(0,0,0);transform:translate3d(0,0,0);z-index:10}.swiper-pagination.swiper-pagination-hidden{opacity:0}.swiper-container-horizontal>.swiper-pagination-bullets,.swiper-pagination-custom,.swiper-pagination-fraction{bottom:10px;left:0;width:100%;position: absolute; z-index: 1; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-align: center; -webkit-align-items: center; -ms-flex-align: center; align-items: center; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center;}.swiper-pagination-bullet{width:8px;height:8px;display:inline-block;border-radius:100%;background:#cccccc;border:1px solid white;}button.swiper-pagination-bullet{border:none;margin:0;padding:0;box-shadow:none;-moz-appearance:none;-ms-appearance:none;-webkit-appearance:none;appearance:none}.swiper-pagination-clickable .swiper-pagination-bullet{cursor:pointer}.swiper-pagination-white .swiper-pagination-bullet{background:#fff}.swiper-pagination-bullet-active{opacity:1;background:#36b156}.swiper-pagination-white .swiper-pagination-bullet-active{background:#fff}.swiper-pagination-black .swiper-pagination-bullet-active{background:#000}.swiper-container-vertical>.swiper-pagination-bullets{right:10px;top:50%;-webkit-transform:translate3d(0,-50%,0);-moz-transform:translate3d(0,-50%,0);-o-transform:translate(0,-50%);-ms-transform:translate3d(0,-50%,0);transform:translate3d(0,-50%,0)}.swiper-container-vertical>.swiper-pagination-bullets .swiper-pagination-bullet{margin:5px 0;display:block}.swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet{margin:0 5px}.swiper-pagination-progress{background:rgba(0,0,0,.25);position:absolute}.swiper-pagination-progress .swiper-pagination-progressbar{background:#007aff;position:absolute;left:0;top:0;width:100%;height:100%;-webkit-transform:scale(0);-ms-transform:scale(0);-o-transform:scale(0);transform:scale(0);-webkit-transform-origin:left top;-moz-transform-origin:left top;-ms-transform-origin:left top;-o-transform-origin:left top;transform-origin:left top}.swiper-container-rtl .swiper-pagination-progress .swiper-pagination-progressbar{-webkit-transform-origin:right top;-moz-transform-origin:right top;-ms-transform-origin:right top;-o-transform-origin:right top;transform-origin:right top}.swiper-container-horizontal>.swiper-pagination-progress{width:100%;height:4px;left:0;top:0}.swiper-container-vertical>.swiper-pagination-progress{width:4px;height:100%;left:0;top:0}.swiper-pagination-progress.swiper-pagination-white{background:rgba(255,255,255,.5)}.swiper-pagination-progress.swiper-pagination-white .swiper-pagination-progressbar{background:#fff}.swiper-pagination-progress.swiper-pagination-black .swiper-pagination-progressbar{background:#000}.swiper-container-3d{-webkit-perspective:1200px;-moz-perspective:1200px;-o-perspective:1200px;perspective:1200px}.swiper-container-3d .swiper-cube-shadow,.swiper-container-3d .swiper-slide,.swiper-container-3d .swiper-slide-shadow-bottom,.swiper-container-3d .swiper-slide-shadow-left,.swiper-container-3d .swiper-slide-shadow-right,.swiper-container-3d .swiper-slide-shadow-top,.swiper-container-3d .swiper-wrapper{-webkit-transform-style:preserve-3d;-moz-transform-style:preserve-3d;-ms-transform-style:preserve-3d;transform-style:preserve-3d}.swiper-container-3d .swiper-slide-shadow-bottom,.swiper-container-3d .swiper-slide-shadow-left,.swiper-container-3d .swiper-slide-shadow-right,.swiper-container-3d .swiper-slide-shadow-top{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:10}.swiper-container-3d .swiper-slide-shadow-left{background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,0)));background-image:-webkit-linear-gradient(right,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-moz-linear-gradient(right,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-o-linear-gradient(right,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:linear-gradient(to left,rgba(0,0,0,.5),rgba(0,0,0,0))}.swiper-container-3d .swiper-slide-shadow-right{background-image:-webkit-gradient(linear,right top,left top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,0)));background-image:-webkit-linear-gradient(left,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-moz-linear-gradient(left,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-o-linear-gradient(left,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:linear-gradient(to right,rgba(0,0,0,.5),rgba(0,0,0,0))}.swiper-container-3d .swiper-slide-shadow-top{background-image:-webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,.5)),to(rgba(0,0,0,0)));background-image:-webkit-linear-gradient(bottom,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-moz-linear-gradient(bottom,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-o-linear-gradient(bottom,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:linear-gradient(to top,rgba(0,0,0,.5),rgba(0,0,0,0))}.swiper-container-3d .swiper-slide-shadow-bottom{background-image:-webkit-gradient(linear,left bottom,left top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,0)));background-image:-webkit-linear-gradient(top,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-moz-linear-gradient(top,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-o-linear-gradient(top,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:linear-gradient(to bottom,rgba(0,0,0,.5),rgba(0,0,0,0))}.swiper-container-coverflow .swiper-wrapper,.swiper-container-flip .swiper-wrapper{-ms-perspective:1200px}.swiper-container-cube,.swiper-container-flip{overflow:visible}.swiper-container-cube .swiper-slide,.swiper-container-flip .swiper-slide{pointer-events:none;-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-ms-backface-visibility:hidden;backface-visibility:hidden;z-index:1}.swiper-container-cube .swiper-slide .swiper-slide,.swiper-container-flip .swiper-slide .swiper-slide{pointer-events:none}.swiper-container-cube .swiper-slide-active,.swiper-container-cube .swiper-slide-active .swiper-slide-active,.swiper-container-flip .swiper-slide-active,.swiper-container-flip .swiper-slide-active .swiper-slide-active{pointer-events:auto}.swiper-container-cube .swiper-slide-shadow-bottom,.swiper-container-cube .swiper-slide-shadow-left,.swiper-container-cube .swiper-slide-shadow-right,.swiper-container-cube .swiper-slide-shadow-top,.swiper-container-flip .swiper-slide-shadow-bottom,.swiper-container-flip .swiper-slide-shadow-left,.swiper-container-flip .swiper-slide-shadow-right,.swiper-container-flip .swiper-slide-shadow-top{z-index:0;-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-ms-backface-visibility:hidden;backface-visibility:hidden}.swiper-container-cube .swiper-slide{visibility:hidden;-webkit-transform-origin:0 0;-moz-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0;width:100%;height:100%}.swiper-container-cube.swiper-container-rtl .swiper-slide{-webkit-transform-origin:100% 0;-moz-transform-origin:100% 0;-ms-transform-origin:100% 0;transform-origin:100% 0}.swiper-container-cube .swiper-slide-active,.swiper-container-cube .swiper-slide-next,.swiper-container-cube .swiper-slide-next+.swiper-slide,.swiper-container-cube .swiper-slide-prev{pointer-events:auto;visibility:visible}.swiper-container-cube .swiper-cube-shadow{position:absolute;left:0;bottom:0;width:100%;height:100%;background:#000;opacity:.6;-webkit-filter:blur(50px);filter:blur(50px);z-index:0}.swiper-container-fade.swiper-container-free-mode .swiper-slide{-webkit-transition-timing-function:ease-out;-moz-transition-timing-function:ease-out;-ms-transition-timing-function:ease-out;-o-transition-timing-function:ease-out;transition-timing-function:ease-out}.swiper-container-fade .swiper-slide{pointer-events:none;-webkit-transition-property:opacity;-moz-transition-property:opacity;-o-transition-property:opacity;transition-property:opacity}.swiper-container-fade .swiper-slide .swiper-slide{pointer-events:none}.swiper-container-fade .swiper-slide-active,.swiper-container-fade .swiper-slide-active .swiper-slide-active{pointer-events:auto}.swiper-scrollbar{border-radius:10px;position:relative;-ms-touch-action:none;background:rgba(0,0,0,.1)}.swiper-container-horizontal>.swiper-scrollbar{position:absolute;left:1%;bottom:3px;z-index:50;height:5px;width:98%}.swiper-container-vertical>.swiper-scrollbar{position:absolute;right:3px;top:1%;z-index:50;width:5px;height:98%}.swiper-scrollbar-drag{height:100%;width:100%;position:relative;background:rgba(0,0,0,.5);border-radius:10px;left:0;top:0}.swiper-scrollbar-cursor-drag{cursor:move}.swiper-lazy-preloader{width:42px;height:42px;position:absolute;left:50%;top:50%;margin-left:-21px;margin-top:-21px;z-index:10;-webkit-transform-origin:50%;-moz-transform-origin:50%;transform-origin:50%;-webkit-animation:swiper-preloader-spin 1s steps(12,end) infinite;-moz-animation:swiper-preloader-spin 1s steps(12,end) infinite;animation:swiper-preloader-spin 1s steps(12,end) infinite}.swiper-lazy-preloader:after{display:block;content:\"\";width:100%;height:100%;background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D'0%200%20120%20120'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20xmlns%3Axlink%3D'http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink'%3E%3Cdefs%3E%3Cline%20id%3D'l'%20x1%3D'60'%20x2%3D'60'%20y1%3D'7'%20y2%3D'27'%20stroke%3D'%236c6c6c'%20stroke-width%3D'11'%20stroke-linecap%3D'round'%2F%3E%3C%2Fdefs%3E%3Cg%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(30%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(60%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(90%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(120%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(150%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.37'%20transform%3D'rotate(180%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.46'%20transform%3D'rotate(210%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.56'%20transform%3D'rotate(240%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.66'%20transform%3D'rotate(270%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.75'%20transform%3D'rotate(300%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.85'%20transform%3D'rotate(330%2060%2C60)'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E\");background-position:50%;-webkit-background-size:100%;background-size:100%;background-repeat:no-repeat}.swiper-lazy-preloader-white:after{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D'0%200%20120%20120'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20xmlns%3Axlink%3D'http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink'%3E%3Cdefs%3E%3Cline%20id%3D'l'%20x1%3D'60'%20x2%3D'60'%20y1%3D'7'%20y2%3D'27'%20stroke%3D'%23fff'%20stroke-width%3D'11'%20stroke-linecap%3D'round'%2F%3E%3C%2Fdefs%3E%3Cg%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(30%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(60%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(90%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(120%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(150%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.37'%20transform%3D'rotate(180%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.46'%20transform%3D'rotate(210%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.56'%20transform%3D'rotate(240%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.66'%20transform%3D'rotate(270%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.75'%20transform%3D'rotate(300%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.85'%20transform%3D'rotate(330%2060%2C60)'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E\")}@-webkit-keyframes swiper-preloader-spin{100%{-webkit-transform:rotate(360deg)}}@keyframes swiper-preloader-spin{100%{transform:rotate(360deg)}}", ""]);
+exports.push([module.i, "\n.cmui-confirmContainer{\n}\n.cmui-confirmTitle{\n}\n.cmui-confirmBody{\n}\n.cmui-confirmButtons{\n}\n.cmui-confirmButton{\n\tborder:none;\n\tbackground-color: transparent;\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
 /* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(1)();
+// imports
+
+
+// module
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(1)();
+// imports
+
+
+// module
+exports.push([module.i, ".scroller-component {\n  display: block;\n  position: relative;\n  height: 238px;\n  overflow: hidden;\n  width: 100%;\n}\n\n.scroller-content {\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 100%;\n  z-index: 1;\n}\n\n.scroller-mask {\n  position: absolute;\n  left: 0;\n  top: 0;\n  height: 100%;\n  margin: 0 auto;\n  width: 100%;\n  z-index: 3;\n  background-image:\n    -webkit-linear-gradient(top, rgba(255,255,255,0.95), rgba(255,255,255,0.6)),\n    -webkit-linear-gradient(bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.6));\n  background-image:\n    linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.6)),\n    linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.6));\n  background-position: top, bottom;\n  background-size: 100% 102px;\n  background-repeat: no-repeat;\n}\n\n.scroller-item {\n  text-align: center;\n  font-size: 16px;\n  height: 34px;\n  line-height: 34px;\n  color: #000;\n}\n\n.scroller-indicator {\n  width: 100%;\n  height: 34px;\n  position: absolute;\n  left: 0;\n  top: 102px;\n  z-index: 3;\n  background-image:\n    -webkit-linear-gradient(top, #d0d0d0, #d0d0d0, transparent, transparent),\n    -webkit-linear-gradient(bottom, #d0d0d0, #d0d0d0, transparent, transparent);\n  background-image:\n    linear-gradient(to bottom, #d0d0d0, #d0d0d0, transparent, transparent),\n    linear-gradient(to top, #d0d0d0, #d0d0d0, transparent, transparent);\n  background-position: top, bottom;\n  background-size: 100% 1px;\n  background-repeat: no-repeat;\n}\n.scroller-item {\n  line-clamp: 1;\n  -webkit-line-clamp: 1;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}", ""]);
+
+// exports
+
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(1)();
+// imports
+
+
+// module
+exports.push([module.i, "/**\n * Swiper 3.3.1\n * Most modern mobile touch slider and framework with hardware accelerated transitions\n * \n * http://www.idangero.us/swiper/\n * \n * Copyright 2016, Vladimir Kharlampidi\n * The iDangero.us\n * http://www.idangero.us/\n * \n * Licensed under MIT\n * \n * Released on: February 7, 2016\n */\n.swiper-container{margin:0 auto;position:relative;overflow:hidden;z-index:1}.swiper-container-no-flexbox .swiper-slide{float:left}.swiper-container-vertical>.swiper-wrapper{-webkit-box-orient:vertical;-moz-box-orient:vertical;-ms-flex-direction:column;-webkit-flex-direction:column;flex-direction:column}.swiper-wrapper{position:relative;width:100%;height:100%;z-index:1;display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex;-webkit-transition-property:-webkit-transform;-moz-transition-property:-moz-transform;-o-transition-property:-o-transform;-ms-transition-property:-ms-transform;transition-property:transform;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}.swiper-container-android .swiper-slide,.swiper-wrapper{-webkit-transform:translate3d(0,0,0);-moz-transform:translate3d(0,0,0);-o-transform:translate(0,0);-ms-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}.swiper-container-multirow>.swiper-wrapper{-webkit-box-lines:multiple;-moz-box-lines:multiple;-ms-flex-wrap:wrap;-webkit-flex-wrap:wrap;flex-wrap:wrap}.swiper-container-free-mode>.swiper-wrapper{-webkit-transition-timing-function:ease-out;-moz-transition-timing-function:ease-out;-ms-transition-timing-function:ease-out;-o-transition-timing-function:ease-out;transition-timing-function:ease-out;margin:0 auto}.swiper-slide{-webkit-flex-shrink:0;-ms-flex:0 0 auto;flex-shrink:0;width:100%;height:100%;position:relative}.swiper-container-autoheight,.swiper-container-autoheight .swiper-slide{height:auto}.swiper-container-autoheight .swiper-wrapper{-webkit-box-align:start;-ms-flex-align:start;-webkit-align-items:flex-start;align-items:flex-start;-webkit-transition-property:-webkit-transform,height;-moz-transition-property:-moz-transform;-o-transition-property:-o-transform;-ms-transition-property:-ms-transform;transition-property:transform,height}.swiper-container .swiper-notification{position:absolute;left:0;top:0;pointer-events:none;opacity:0;z-index:-1000}.swiper-wp8-horizontal{-ms-touch-action:pan-y;touch-action:pan-y}.swiper-wp8-vertical{-ms-touch-action:pan-x;touch-action:pan-x}.swiper-button-next,.swiper-button-prev{position:absolute;top:50%;width:27px;height:44px;margin-top:-22px;z-index:10;cursor:pointer;-moz-background-size:27px 44px;-webkit-background-size:27px 44px;background-size:27px 44px;background-position:center;background-repeat:no-repeat}.swiper-button-next.swiper-button-disabled,.swiper-button-prev.swiper-button-disabled{opacity:.35;cursor:auto;pointer-events:none}.swiper-button-prev,.swiper-container-rtl .swiper-button-next{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M0%2C22L22%2C0l2.1%2C2.1L4.2%2C22l19.9%2C19.9L22%2C44L0%2C22L0%2C22L0%2C22z'%20fill%3D'%23007aff'%2F%3E%3C%2Fsvg%3E\");left:10px;right:auto}.swiper-button-prev.swiper-button-black,.swiper-container-rtl .swiper-button-next.swiper-button-black{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M0%2C22L22%2C0l2.1%2C2.1L4.2%2C22l19.9%2C19.9L22%2C44L0%2C22L0%2C22L0%2C22z'%20fill%3D'%23000000'%2F%3E%3C%2Fsvg%3E\")}.swiper-button-prev.swiper-button-white,.swiper-container-rtl .swiper-button-next.swiper-button-white{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M0%2C22L22%2C0l2.1%2C2.1L4.2%2C22l19.9%2C19.9L22%2C44L0%2C22L0%2C22L0%2C22z'%20fill%3D'%23ffffff'%2F%3E%3C%2Fsvg%3E\")}.swiper-button-next,.swiper-container-rtl .swiper-button-prev{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M27%2C22L27%2C22L5%2C44l-2.1-2.1L22.8%2C22L2.9%2C2.1L5%2C0L27%2C22L27%2C22z'%20fill%3D'%23007aff'%2F%3E%3C%2Fsvg%3E\");right:10px;left:auto}.swiper-button-next.swiper-button-black,.swiper-container-rtl .swiper-button-prev.swiper-button-black{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M27%2C22L27%2C22L5%2C44l-2.1-2.1L22.8%2C22L2.9%2C2.1L5%2C0L27%2C22L27%2C22z'%20fill%3D'%23000000'%2F%3E%3C%2Fsvg%3E\")}.swiper-button-next.swiper-button-white,.swiper-container-rtl .swiper-button-prev.swiper-button-white{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M27%2C22L27%2C22L5%2C44l-2.1-2.1L22.8%2C22L2.9%2C2.1L5%2C0L27%2C22L27%2C22z'%20fill%3D'%23ffffff'%2F%3E%3C%2Fsvg%3E\")}.swiper-pagination{position:absolute;text-align:center;-webkit-transition:.3s;-moz-transition:.3s;-o-transition:.3s;transition:.3s;-webkit-transform:translate3d(0,0,0);-ms-transform:translate3d(0,0,0);-o-transform:translate3d(0,0,0);transform:translate3d(0,0,0);z-index:10}.swiper-pagination.swiper-pagination-hidden{opacity:0}.swiper-container-horizontal>.swiper-pagination-bullets,.swiper-pagination-custom,.swiper-pagination-fraction{bottom:10px;left:0;width:100%;position: absolute; z-index: 1; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-align: center; -webkit-align-items: center; -ms-flex-align: center; align-items: center; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center;}.swiper-pagination-bullet{width:8px;height:8px;display:inline-block;border-radius:100%;background:#cccccc;border:1px solid white;}button.swiper-pagination-bullet{border:none;margin:0;padding:0;box-shadow:none;-moz-appearance:none;-ms-appearance:none;-webkit-appearance:none;appearance:none}.swiper-pagination-clickable .swiper-pagination-bullet{cursor:pointer}.swiper-pagination-white .swiper-pagination-bullet{background:#fff}.swiper-pagination-bullet-active{opacity:1;background:#36b156}.swiper-pagination-white .swiper-pagination-bullet-active{background:#fff}.swiper-pagination-black .swiper-pagination-bullet-active{background:#000}.swiper-container-vertical>.swiper-pagination-bullets{right:10px;top:50%;-webkit-transform:translate3d(0,-50%,0);-moz-transform:translate3d(0,-50%,0);-o-transform:translate(0,-50%);-ms-transform:translate3d(0,-50%,0);transform:translate3d(0,-50%,0)}.swiper-container-vertical>.swiper-pagination-bullets .swiper-pagination-bullet{margin:5px 0;display:block}.swiper-container-horizontal>.swiper-pagination-bullets .swiper-pagination-bullet{margin:0 5px}.swiper-pagination-progress{background:rgba(0,0,0,.25);position:absolute}.swiper-pagination-progress .swiper-pagination-progressbar{background:#007aff;position:absolute;left:0;top:0;width:100%;height:100%;-webkit-transform:scale(0);-ms-transform:scale(0);-o-transform:scale(0);transform:scale(0);-webkit-transform-origin:left top;-moz-transform-origin:left top;-ms-transform-origin:left top;-o-transform-origin:left top;transform-origin:left top}.swiper-container-rtl .swiper-pagination-progress .swiper-pagination-progressbar{-webkit-transform-origin:right top;-moz-transform-origin:right top;-ms-transform-origin:right top;-o-transform-origin:right top;transform-origin:right top}.swiper-container-horizontal>.swiper-pagination-progress{width:100%;height:4px;left:0;top:0}.swiper-container-vertical>.swiper-pagination-progress{width:4px;height:100%;left:0;top:0}.swiper-pagination-progress.swiper-pagination-white{background:rgba(255,255,255,.5)}.swiper-pagination-progress.swiper-pagination-white .swiper-pagination-progressbar{background:#fff}.swiper-pagination-progress.swiper-pagination-black .swiper-pagination-progressbar{background:#000}.swiper-container-3d{-webkit-perspective:1200px;-moz-perspective:1200px;-o-perspective:1200px;perspective:1200px}.swiper-container-3d .swiper-cube-shadow,.swiper-container-3d .swiper-slide,.swiper-container-3d .swiper-slide-shadow-bottom,.swiper-container-3d .swiper-slide-shadow-left,.swiper-container-3d .swiper-slide-shadow-right,.swiper-container-3d .swiper-slide-shadow-top,.swiper-container-3d .swiper-wrapper{-webkit-transform-style:preserve-3d;-moz-transform-style:preserve-3d;-ms-transform-style:preserve-3d;transform-style:preserve-3d}.swiper-container-3d .swiper-slide-shadow-bottom,.swiper-container-3d .swiper-slide-shadow-left,.swiper-container-3d .swiper-slide-shadow-right,.swiper-container-3d .swiper-slide-shadow-top{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:10}.swiper-container-3d .swiper-slide-shadow-left{background-image:-webkit-gradient(linear,left top,right top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,0)));background-image:-webkit-linear-gradient(right,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-moz-linear-gradient(right,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-o-linear-gradient(right,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:linear-gradient(to left,rgba(0,0,0,.5),rgba(0,0,0,0))}.swiper-container-3d .swiper-slide-shadow-right{background-image:-webkit-gradient(linear,right top,left top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,0)));background-image:-webkit-linear-gradient(left,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-moz-linear-gradient(left,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-o-linear-gradient(left,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:linear-gradient(to right,rgba(0,0,0,.5),rgba(0,0,0,0))}.swiper-container-3d .swiper-slide-shadow-top{background-image:-webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,.5)),to(rgba(0,0,0,0)));background-image:-webkit-linear-gradient(bottom,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-moz-linear-gradient(bottom,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-o-linear-gradient(bottom,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:linear-gradient(to top,rgba(0,0,0,.5),rgba(0,0,0,0))}.swiper-container-3d .swiper-slide-shadow-bottom{background-image:-webkit-gradient(linear,left bottom,left top,from(rgba(0,0,0,.5)),to(rgba(0,0,0,0)));background-image:-webkit-linear-gradient(top,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-moz-linear-gradient(top,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:-o-linear-gradient(top,rgba(0,0,0,.5),rgba(0,0,0,0));background-image:linear-gradient(to bottom,rgba(0,0,0,.5),rgba(0,0,0,0))}.swiper-container-coverflow .swiper-wrapper,.swiper-container-flip .swiper-wrapper{-ms-perspective:1200px}.swiper-container-cube,.swiper-container-flip{overflow:visible}.swiper-container-cube .swiper-slide,.swiper-container-flip .swiper-slide{pointer-events:none;-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-ms-backface-visibility:hidden;backface-visibility:hidden;z-index:1}.swiper-container-cube .swiper-slide .swiper-slide,.swiper-container-flip .swiper-slide .swiper-slide{pointer-events:none}.swiper-container-cube .swiper-slide-active,.swiper-container-cube .swiper-slide-active .swiper-slide-active,.swiper-container-flip .swiper-slide-active,.swiper-container-flip .swiper-slide-active .swiper-slide-active{pointer-events:auto}.swiper-container-cube .swiper-slide-shadow-bottom,.swiper-container-cube .swiper-slide-shadow-left,.swiper-container-cube .swiper-slide-shadow-right,.swiper-container-cube .swiper-slide-shadow-top,.swiper-container-flip .swiper-slide-shadow-bottom,.swiper-container-flip .swiper-slide-shadow-left,.swiper-container-flip .swiper-slide-shadow-right,.swiper-container-flip .swiper-slide-shadow-top{z-index:0;-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-ms-backface-visibility:hidden;backface-visibility:hidden}.swiper-container-cube .swiper-slide{visibility:hidden;-webkit-transform-origin:0 0;-moz-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0;width:100%;height:100%}.swiper-container-cube.swiper-container-rtl .swiper-slide{-webkit-transform-origin:100% 0;-moz-transform-origin:100% 0;-ms-transform-origin:100% 0;transform-origin:100% 0}.swiper-container-cube .swiper-slide-active,.swiper-container-cube .swiper-slide-next,.swiper-container-cube .swiper-slide-next+.swiper-slide,.swiper-container-cube .swiper-slide-prev{pointer-events:auto;visibility:visible}.swiper-container-cube .swiper-cube-shadow{position:absolute;left:0;bottom:0;width:100%;height:100%;background:#000;opacity:.6;-webkit-filter:blur(50px);filter:blur(50px);z-index:0}.swiper-container-fade.swiper-container-free-mode .swiper-slide{-webkit-transition-timing-function:ease-out;-moz-transition-timing-function:ease-out;-ms-transition-timing-function:ease-out;-o-transition-timing-function:ease-out;transition-timing-function:ease-out}.swiper-container-fade .swiper-slide{pointer-events:none;-webkit-transition-property:opacity;-moz-transition-property:opacity;-o-transition-property:opacity;transition-property:opacity}.swiper-container-fade .swiper-slide .swiper-slide{pointer-events:none}.swiper-container-fade .swiper-slide-active,.swiper-container-fade .swiper-slide-active .swiper-slide-active{pointer-events:auto}.swiper-scrollbar{border-radius:10px;position:relative;-ms-touch-action:none;background:rgba(0,0,0,.1)}.swiper-container-horizontal>.swiper-scrollbar{position:absolute;left:1%;bottom:3px;z-index:50;height:5px;width:98%}.swiper-container-vertical>.swiper-scrollbar{position:absolute;right:3px;top:1%;z-index:50;width:5px;height:98%}.swiper-scrollbar-drag{height:100%;width:100%;position:relative;background:rgba(0,0,0,.5);border-radius:10px;left:0;top:0}.swiper-scrollbar-cursor-drag{cursor:move}.swiper-lazy-preloader{width:42px;height:42px;position:absolute;left:50%;top:50%;margin-left:-21px;margin-top:-21px;z-index:10;-webkit-transform-origin:50%;-moz-transform-origin:50%;transform-origin:50%;-webkit-animation:swiper-preloader-spin 1s steps(12,end) infinite;-moz-animation:swiper-preloader-spin 1s steps(12,end) infinite;animation:swiper-preloader-spin 1s steps(12,end) infinite}.swiper-lazy-preloader:after{display:block;content:\"\";width:100%;height:100%;background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D'0%200%20120%20120'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20xmlns%3Axlink%3D'http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink'%3E%3Cdefs%3E%3Cline%20id%3D'l'%20x1%3D'60'%20x2%3D'60'%20y1%3D'7'%20y2%3D'27'%20stroke%3D'%236c6c6c'%20stroke-width%3D'11'%20stroke-linecap%3D'round'%2F%3E%3C%2Fdefs%3E%3Cg%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(30%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(60%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(90%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(120%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(150%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.37'%20transform%3D'rotate(180%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.46'%20transform%3D'rotate(210%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.56'%20transform%3D'rotate(240%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.66'%20transform%3D'rotate(270%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.75'%20transform%3D'rotate(300%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.85'%20transform%3D'rotate(330%2060%2C60)'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E\");background-position:50%;-webkit-background-size:100%;background-size:100%;background-repeat:no-repeat}.swiper-lazy-preloader-white:after{background-image:url(\"data:image/svg+xml;charset=utf-8,%3Csvg%20viewBox%3D'0%200%20120%20120'%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20xmlns%3Axlink%3D'http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink'%3E%3Cdefs%3E%3Cline%20id%3D'l'%20x1%3D'60'%20x2%3D'60'%20y1%3D'7'%20y2%3D'27'%20stroke%3D'%23fff'%20stroke-width%3D'11'%20stroke-linecap%3D'round'%2F%3E%3C%2Fdefs%3E%3Cg%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(30%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(60%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(90%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(120%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.27'%20transform%3D'rotate(150%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.37'%20transform%3D'rotate(180%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.46'%20transform%3D'rotate(210%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.56'%20transform%3D'rotate(240%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.66'%20transform%3D'rotate(270%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.75'%20transform%3D'rotate(300%2060%2C60)'%2F%3E%3Cuse%20xlink%3Ahref%3D'%23l'%20opacity%3D'.85'%20transform%3D'rotate(330%2060%2C60)'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E\")}@-webkit-keyframes swiper-preloader-spin{100%{-webkit-transform:rotate(360deg)}}@keyframes swiper-preloader-spin{100%{transform:rotate(360deg)}}", ""]);
+
+// exports
+
+
+/***/ }),
+/* 61 */
 /***/ (function(module, exports) {
 
 /*
@@ -5873,16 +6116,16 @@ function updateLink(linkElement, obj) {
 
 
 /***/ }),
-/* 59 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(51);
+var content = __webpack_require__(54);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(58)(content, {});
+var update = __webpack_require__(61)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -5899,14 +6142,14 @@ if(false) {
 }
 
 /***/ }),
-/* 60 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(31),
+  __webpack_require__(33),
   /* template */
-  __webpack_require__(80),
+  __webpack_require__(83),
   /* scopeId */
   null,
   /* cssModules */
@@ -5933,18 +6176,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 61 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(99)
+__webpack_require__(102)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(32),
+  __webpack_require__(34),
   /* template */
-  __webpack_require__(89),
+  __webpack_require__(92),
   /* scopeId */
   null,
   /* cssModules */
@@ -5971,14 +6214,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 62 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(33),
+  __webpack_require__(35),
   /* template */
-  __webpack_require__(92),
+  __webpack_require__(95),
   /* scopeId */
   null,
   /* cssModules */
@@ -6005,14 +6248,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 63 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(34),
+  __webpack_require__(36),
   /* template */
-  __webpack_require__(87),
+  __webpack_require__(90),
   /* scopeId */
   null,
   /* cssModules */
@@ -6039,14 +6282,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 64 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(35),
+  __webpack_require__(37),
   /* template */
-  __webpack_require__(85),
+  __webpack_require__(88),
   /* scopeId */
   null,
   /* cssModules */
@@ -6073,14 +6316,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 65 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(36),
+  __webpack_require__(38),
   /* template */
-  __webpack_require__(83),
+  __webpack_require__(86),
   /* scopeId */
   null,
   /* cssModules */
@@ -6107,14 +6350,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 66 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(37),
+  __webpack_require__(39),
   /* template */
-  __webpack_require__(78),
+  __webpack_require__(81),
   /* scopeId */
   null,
   /* cssModules */
@@ -6141,14 +6384,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 67 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(38),
+  __webpack_require__(40),
   /* template */
-  __webpack_require__(90),
+  __webpack_require__(93),
   /* scopeId */
   null,
   /* cssModules */
@@ -6175,18 +6418,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 68 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(94)
+__webpack_require__(97)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(39),
+  __webpack_require__(41),
   /* template */
-  __webpack_require__(77),
+  __webpack_require__(80),
   /* scopeId */
   null,
   /* cssModules */
@@ -6213,18 +6456,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 69 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(101)
+__webpack_require__(104)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(40),
+  __webpack_require__(42),
   /* template */
-  __webpack_require__(93),
+  __webpack_require__(96),
   /* scopeId */
   null,
   /* cssModules */
@@ -6251,18 +6494,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 70 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(95)
+__webpack_require__(98)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(41),
+  __webpack_require__(43),
   /* template */
-  __webpack_require__(79),
+  __webpack_require__(82),
   /* scopeId */
   null,
   /* cssModules */
@@ -6289,14 +6532,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 71 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(0)(
   /* script */
-  null,
+  __webpack_require__(44),
   /* template */
-  __webpack_require__(86),
+  __webpack_require__(89),
   /* scopeId */
   null,
   /* cssModules */
@@ -6323,18 +6566,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 72 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(96)
+__webpack_require__(99)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(42),
+  __webpack_require__(45),
   /* template */
-  __webpack_require__(81),
+  __webpack_require__(84),
   /* scopeId */
   null,
   /* cssModules */
@@ -6361,18 +6604,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 73 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(59)
+__webpack_require__(62)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(43),
+  __webpack_require__(46),
   /* template */
-  __webpack_require__(84),
+  __webpack_require__(87),
   /* scopeId */
   null,
   /* cssModules */
@@ -6399,18 +6642,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 74 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(97)
+__webpack_require__(100)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(44),
+  __webpack_require__(47),
   /* template */
-  __webpack_require__(82),
+  __webpack_require__(85),
   /* scopeId */
   null,
   /* cssModules */
@@ -6437,18 +6680,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 75 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(100)
+__webpack_require__(103)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(45),
+  __webpack_require__(48),
   /* template */
-  __webpack_require__(91),
+  __webpack_require__(94),
   /* scopeId */
   null,
   /* cssModules */
@@ -6475,18 +6718,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 76 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(98)
+__webpack_require__(101)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(46),
+  __webpack_require__(49),
   /* template */
-  __webpack_require__(88),
+  __webpack_require__(91),
   /* scopeId */
   null,
   /* cssModules */
@@ -6513,7 +6756,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 77 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6541,7 +6784,7 @@ if (false) {
 }
 
 /***/ }),
-/* 78 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6561,7 +6804,7 @@ if (false) {
 }
 
 /***/ }),
-/* 79 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6583,7 +6826,7 @@ if (false) {
 }
 
 /***/ }),
-/* 80 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6601,14 +6844,17 @@ if (false) {
 }
 
 /***/ }),
-/* 81 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "cmui-slider"
   }, [_c('div', {
-    staticClass: "swiper-container"
+    staticClass: "swiper-container",
+    attrs: {
+      "id": _vm.id
+    }
   }, [_c('div', {
     staticClass: "swiper-wrapper"
   }, [_vm._t("default")], 2), _vm._v(" "), _c('div', {
@@ -6624,7 +6870,7 @@ if (false) {
 }
 
 /***/ }),
-/* 82 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6671,7 +6917,7 @@ if (false) {
 }
 
 /***/ }),
-/* 83 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6692,7 +6938,7 @@ if (false) {
 }
 
 /***/ }),
-/* 84 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6741,7 +6987,7 @@ if (false) {
 }
 
 /***/ }),
-/* 85 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6821,7 +7067,7 @@ if (false) {
 }
 
 /***/ }),
-/* 86 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6838,7 +7084,7 @@ if (false) {
 }
 
 /***/ }),
-/* 87 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6864,7 +7110,7 @@ if (false) {
 }
 
 /***/ }),
-/* 88 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6896,7 +7142,7 @@ if (false) {
 }
 
 /***/ }),
-/* 89 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6930,7 +7176,7 @@ if (false) {
 }
 
 /***/ }),
-/* 90 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6995,7 +7241,7 @@ if (false) {
 }
 
 /***/ }),
-/* 91 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -7056,7 +7302,7 @@ if (false) {
 }
 
 /***/ }),
-/* 92 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -7073,7 +7319,7 @@ if (false) {
 }
 
 /***/ }),
-/* 93 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -7093,13 +7339,13 @@ if (false) {
 }
 
 /***/ }),
-/* 94 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(47);
+var content = __webpack_require__(50);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -7119,13 +7365,13 @@ if(false) {
 }
 
 /***/ }),
-/* 95 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(48);
+var content = __webpack_require__(51);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -7145,13 +7391,13 @@ if(false) {
 }
 
 /***/ }),
-/* 96 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(49);
+var content = __webpack_require__(52);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -7171,13 +7417,13 @@ if(false) {
 }
 
 /***/ }),
-/* 97 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(50);
+var content = __webpack_require__(53);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -7197,13 +7443,13 @@ if(false) {
 }
 
 /***/ }),
-/* 98 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(52);
+var content = __webpack_require__(55);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -7223,13 +7469,13 @@ if(false) {
 }
 
 /***/ }),
-/* 99 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(53);
+var content = __webpack_require__(56);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -7249,13 +7495,13 @@ if(false) {
 }
 
 /***/ }),
-/* 100 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(54);
+var content = __webpack_require__(57);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -7275,13 +7521,13 @@ if(false) {
 }
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(55);
+var content = __webpack_require__(58);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -7301,11 +7547,40 @@ if(false) {
 }
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(7);
+module.exports = __webpack_require__(9);
 
+
+/***/ }),
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = {
+	1: {
+		effect: 'coverflow',
+		grabCursor: true,
+		centeredSlides: true,
+		slidesPerView: 2,
+		loop: false,
+		coverflow: {
+			rotate: 50,
+			stretch: 0,
+			depth: 100,
+			modifier: 1,
+			slideShadows: true
+		}
+	},
+	2: {},
+	3: {}
+};
 
 /***/ })
 /******/ ]);

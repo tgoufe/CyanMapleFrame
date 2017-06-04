@@ -15,7 +15,7 @@ import alert from './ui/alert/index.js';
 import confirm from './ui/confirm/index.js';
 import notice from './ui/notice/index.js';
 import actions from './ui/actions/index.js';
-
+import slider from './component/slider/index.js'
 //挂载工具方法
 maple._ = util;
 maple.util = util;
@@ -46,7 +46,7 @@ maple.alert = alert;
 maple.confirm = confirm;
 maple.actions = actions;
 
-
+maple.slider=slider;
 // 初始化通用组件
 Object.keys( component ).forEach(d => Vue.component(d, component[d]));
 export default window.maple = maple;

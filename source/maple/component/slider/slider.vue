@@ -1,6 +1,6 @@
 <template>
 	<div class="cmui-slider">
-		<div class="swiper-container" >
+		<div class="swiper-container" :id="id">
 			<div class="swiper-wrapper">
 				<slot></slot>
 			</div>
@@ -10,15 +10,16 @@
 </template>
 <script>
 
-import Swiper from '../../lib/swiper/swiper';
+import Swiper from './swiper';
+import sliderList from './sliderList';
 import thememaker from './themeMaker';
 export default {
 	created:function(){
 		var _this=this;
 		setTimeout(function(){
-			if(_this.items&&_this.items.length>1){
-				_this.swiper=new Swiper($('.swiper-container',_this.$el), thememaker.call(_this));
-			}
+			_this.swiper=new Swiper($('.swiper-container',_this.$el), thememaker.call(_this));
+			_this.swiperIndex=sliderList.length;
+			sliderList.add(_this.swiper)
 		}, 0);
 	},
     watch:{
@@ -29,18 +30,15 @@ export default {
 				$(_this.$el).find('.pagination').empty();
 			}
 			setTimeout(function(){
-				if(_this.items&&_this.items.length>1){
+				if(_this.items){
 					_this.swiper=new Swiper($('.swiper-container',_this.$el), thememaker.call(_this));
+					sliderList[_this.swiperIndex]=_this.swiper;
 				}
 			}, 0);
 		}
 	},
-	methods: {
-		itemEvent: function(index, data) {
-			this.$dispatch('itemEvent', this, index, data)
-		}
-	},
 	props:{
+		id:{type:String,default:_.uniqueId('cmui-slider_')},
 		items: {type: Array},
 		theme:{type:Number},
 		col:{type:Number},
@@ -57,7 +55,4 @@ export default {
 </script>
 <style>
 @import '../../lib/swiper/swiper.css';
-.swiper-pagination-bullet {
-	border:0;
-}
 </style>

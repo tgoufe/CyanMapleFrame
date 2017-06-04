@@ -45,16 +45,16 @@
 			</div>
 		</div>
 	</div> -->
-		<!-- <cmui-slider :items="arr">
+		<cmui-slider :items="arr">
 			<cmui-slider-item v-for="(item,index) in arr">
 				<img src="http://image1.51tiangou.com/product/201606/25/68F1D199-02AD-4E30-93F1-AD4679B8A2C7.JPG!y" alt="">
 			</cmui-slider-item>
-		</cmui-slider> -->
+		</cmui-slider>
 		<!-- <div class="container" >
 			<cmui-number :start="20" :max="22" :min="15" :reverse="true" :radius="true"></cmui-number>
 		</div> -->
 		<!-- cmui-img -->
-		<cmui-img src="http://image1.51tiangou.com/product/201606/25/68F1D199-02AD-4E30-93F1-AD4679B8A2C7.JPG!y" :pre-view-list="imageList" :pre-view="true"></cmui-img>
+		<!-- <cmui-img src="http://image1.51tiangou.com/product/201606/25/68F1D199-02AD-4E30-93F1-AD4679B8A2C7.JPG!y" :pre-view-list="imageList" :pre-view="true"></cmui-img> -->
 		<!-- cmui-list -->
 		<!-- <cmui-list :col="3" :space="50">
 			<cmui-list-item v-for="item in imageList">
@@ -106,7 +106,7 @@
 		<!-- time -->
 		<!-- <cmui-time :value="timeValue"></cmui-time> -->
 
-		<div class="container">
+		<!-- <div class="container">
 			<div v-for="item in ['默认(between)','left','right','top','bottom','center','round','hfull','vfull']">
 				<p>{{item}}</p>
 				<div class="flex-container" :class="item">
@@ -115,7 +115,7 @@
 					<div class="demo paddingh10 paddingv30" style="background-color: #dad595">block3</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 	</div>
 	<style>
 	pre {
@@ -173,7 +173,7 @@ pre code {
 		var vm=new Vue({
 			el:'.main',
 			data:{
-				arr:Array.apply(null,{length:10}),
+				arr:_.times(10),
 				imageList:Array.apply(null,{length:10}).map(item=>'http://avatar.csdn.net/3/D/8/1_ufo2910628.jpg'),
 				cmuilistArray:Array.apply(null,{length:10}).map(item=>10),
 				pickerData:[[{

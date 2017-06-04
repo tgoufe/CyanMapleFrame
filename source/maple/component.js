@@ -1,5 +1,5 @@
-import slider from './component/slider/slider.vue';
-import sliderItem from './component/slider/slider-item.vue';
+// import slider from './component/slider/slider.vue';
+// import sliderItem from './component/slider/slider-item.vue';
 import number from './component/number/number.vue';
 import img from './component/img/img.vue';
 import list from './component/list/list.vue';
@@ -13,9 +13,9 @@ import collapseItem from './component/collapse/collapse-item.vue';
 import affix from './component/affix/affix.vue';
 // import time from './component/time/time.vue';
 export default {
-		'cmui-slider': slider
-	,	'cmui-slider-item': sliderItem
-	,	'cmui-number': number
+		// 'cmui-slider': slider
+	// ,	'cmui-slider-item': sliderItem
+		'cmui-number': number
 	,	'cmui-img': img
 	,	'cmui-list': list
 	,	'cmui-list-item': listItem
