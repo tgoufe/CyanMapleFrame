@@ -10,7 +10,7 @@ function Slider(){
 		var argParent;
 		var argStrings=_.filter(arguments,item=>{
 			if(_.isString(item)){
-				if(item[0]!='.'||item[0]!='#'){
+				if(item[0]=='.'||item[0]=='#'){
 					argParent=item;
 					return false;
 				}
@@ -51,19 +51,17 @@ function Slider(){
 				}
 			})(),
 			id:_.uniqueId('cmui-slider_'),
-			options:null,
+			options:{},
 			theme:''
 		}
-		
 		var options=_.assign(defaultOptions,argObject);
 		var parent=$(options.parent).eq(0);
 		if(!parent.length){
 			return sliderList;
 		}
 		var tpl='';
-		debugger
-		tpl+='<div class="cmui-slider" id="'+options.id+'">';
-		tpl+='	<div class="swiper-container" >';
+		tpl+='<div class="cmui-slider">';
+		tpl+='	<div class="swiper-container" id="'+options.id+'" >';
 		tpl+='		<div class="swiper-wrapper">';
 		options.items.forEach(item=>{
 			tpl+='<div class="swiper-slide">'
@@ -86,42 +84,5 @@ function Slider(){
 	}else{
 		return sliderList; 
 	}
-	// if(typeof arg=='string'){
-	// 	return _.filter(sliderList,(value,key)=>{
-	// 		value.container=arg//error
-	// 	})
-	// }else if(typeof arg=='object'){
-	// 	var options=_.assign({
-	// 		parent:'body',
-	// 		items:null,
-	// 		options:null,
-	// 		id:_.uniqueId('cmui-slider_')
-	// 	},arg)
-	// 	var parent=$(options.parent);
-	// 	if(parent.length&&(_.isArray(options.items)||_.isFunction(options.items))){
-	// 		var tpl='';
-	// 		tpl+='<div class="cmui-slider" id="'+options.id+'">';
-	// 		tpl+='	<div class="swiper-container" >';
-	// 		tpl+='		<div class="swiper-wrapper">';
-	// 		if(_.isArray(options.items)){
-	// 			options.items.forEach(item=>{
-	// 				tpl+='<div class="swiper-slide">'
-	// 				tpl+=item.toString();
-	// 				tpl+='</div>'
-	// 			})
-	// 		}
-	// 		tpl+='		</div>';
-	// 		tpl+='	    <div class="pagination"></div>';
-	// 		tpl+='	</div>';
-	// 		tpl+='</div>';
-	// 		var dom =$(tpl)
-	// 		parent.append(dom);
-	// 		sliderList.add(new Swiper($('.swiper-container',dom),options.options));
-	// 	}
-	// }else if(typeof arg=='number'){
-	// 	return arg>=sliderList.length?undefined:sliderList[arg]
-	// }else{
-	// 	return sliderList;
-	// }
 }
 export default Slider
