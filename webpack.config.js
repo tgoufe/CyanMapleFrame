@@ -2,14 +2,16 @@ var webpack = require('webpack');
 var path = require('path');
 var compiler = require('vue-template-compiler')
 module.exports = {
+    devtool: '#source-map',
     //插件项
     plugins: [
-        // new webpack.optimize.CommonsChunkPlugin({name:'base'})//提取公共文件
-        // new webpack.optimize.UglifyJsPlugin({
-        //     compress: {
-        //         warnings: false
-        //     }
-        // }) //压缩JS
+        new webpack.optimize.CommonsChunkPlugin({name:'base'}),//提取公共文件
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            },
+            sourceMap: true
+        }) //压缩JS
     ],
     //页面入口文件配置
     entry: {
