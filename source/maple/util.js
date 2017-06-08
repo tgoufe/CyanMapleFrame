@@ -76,25 +76,6 @@ export let parseURL = (url = location.href) => {
     };
 };
 
-export let getItemByAttrAndValue = (array,key,value) =>{
-    let data = {};
-    for (let i = 0; i < array.length; i++) {
-        if (array[i][key] === value) {
-            data = array[i];
-            break;
-        }
-    }
-    return data;
-};
-
-export let getItemsIds = array =>{
-    let data = [];
-    for (let i = 0; i < array.length; i++) {
-        data.push(array[i].id);
-    }
-    return data;
-};
-
 /**
  * options:{
  * 	key:"",
@@ -120,6 +101,7 @@ export let stopTime = key => {
     window.clearTimeout(cache[options.key]);
     delete cache[options.key];
 };
+
 export let stopAllTime = key => {
     for (let i in cache) {
         if (cache.hasOwnProperty(i)) {
