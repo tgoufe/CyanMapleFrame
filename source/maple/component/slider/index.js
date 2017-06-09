@@ -7,37 +7,58 @@ Vue.component('cmui-slider',sliderVue);
 Vue.component('cmui-slider-item',sliderItemVue);
 function Slider(){
 	if(arguments.length){
-		var argParent;
-		var argStrings=_.filter(arguments,item=>{
+		var argParent
+		,	argStrings=[]
+		,	argObject
+		,	argFunction
+		,	tempSliderList=new CMUI_SliderList()
+		;
+		// var argStrings=_.filter(arguments,item=>{
+		// 	if(_.isString(item)){
+		// 		if(item[0]=='.'||item[0]=='#'){
+		// 			argParent=item;
+		// 			return false;
+		// 		}
+		// 		return true;
+		// 	}
+		// 	return _.isNumber(item)
+		// });
+		// var argObject=_.filter(arguments,_.isPlainObject)[0];
+		// var argFunction=_.filter(arguments,_.isFunction)[0];
+		_.forEach(arguments,item=>{
 			if(_.isString(item)){
 				if(item[0]=='.'||item[0]=='#'){
-					argParent=item;
-					return false;
+					if(!argParent){
+						var dom=$(item)
+						if(dom.length){
+							argParent=dom
+						}
+					}
+				}else{
+					argStrings.push(item);
 				}
-				return true;
+			}else if(_.isNumber(item)){
+				argStrings.push(item.toString());
+			}else if(_.isFunction(item)){
+				argFunction=item;
+			}else if(_.isObject(item)){
+				if(item instanceof jQuery){
+					argParent=item;
+				}else{
+					argObject=item;
+				}
+				
 			}
-			return _.isNumber(item)
-		});
-		var argObject=_.filter(arguments,_.isPlainObject)[0];
-		var argFunction=_.filter(arguments,_.isFunction)[0];
-		var tempSliderList=new CMUI_SliderList();
+		})
+		
 		//只有一个选择器的情况
 		if(argParent&&arguments.length==1){
-			_.filter(sliderList,(value,key)=>{
-				var container=_.get(value,'container');
-				if(!container){
-					return false;
-				}else if(argParent[0]=='#'){
-					return container[0].id==argParent.slice(1)
-				}
-				else{
-					return container.hasClass(argParent.slice(1))
-				}
-			}).forEach(item=>tempSliderList.add(item))
+			_.filter(sliderList,(value,key)=>argParent==_.get(value,'container'))
+			.forEach(item=>tempSliderList.add(item))
 			return tempSliderList;
 		}
 		var defaultOptions={
-			parent:argParent||'body',
+			parent:argParent||$('body'),
 			items:(function(){
 				if(argFunction){
 					var rs=argFunction();

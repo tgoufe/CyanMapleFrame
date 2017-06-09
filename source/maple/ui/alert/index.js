@@ -6,6 +6,7 @@ var defaults = {
 	, okText: '确定'
 	, okFn:function(){}
 	, okStyle:null
+	, callback:function(){}
 };
 Vue.component('cmui-alert',alertVue);
 var id='cmui-alert-'+_.uniqueId();
@@ -45,5 +46,11 @@ function Alert(){
 	_.each(options,(value,key)=>{
 		CURRENT[key]=value
 	})
+	if(typeof options.callback=='function'){
+		CURRENT.$nextTick(function(){
+			options.callback($(CURRENT.$el))
+		})
+	}
+	return CURRENT;
 };
 export default Alert;
