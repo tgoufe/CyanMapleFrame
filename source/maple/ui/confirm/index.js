@@ -48,7 +48,7 @@ function Alert(){
 	}else{
 		return CURRENT
 	}
-	options = _.defaults(options, defaults);
+	options = _.defaults(_.find(arguments,_.isPlainObject),options, defaults);
 	document.body.classList.add('overflow-h');
 	CURRENT.showCmuiDialog=true;
 	_.each(options,(value,key)=>{

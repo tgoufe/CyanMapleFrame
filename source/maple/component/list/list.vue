@@ -6,6 +6,7 @@
 </div>
 </template>
 <script>
+import listList from './listList';
 export default {
 	props:{
 	    col:{type:[Number,Array]},
@@ -21,6 +22,9 @@ export default {
 	            return 20
 	        }
 	    }
+	},
+	mounted(){
+		listList.add($(this.$el))
 	}
 };
 </script>

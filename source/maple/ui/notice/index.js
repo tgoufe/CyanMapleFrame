@@ -1,58 +1,4 @@
 import noticeVue from "./index.vue";
-// var CURRENT = null
-// 	, timer1 = null
-// 	, timer2 = null;
-// var tpl = `<div class="mask mask-transparent center" @click="remove()">
-//     <div class="notice">
-//         <i v-show="iconName" class="icon-{{iconName}}"></i>
-//         <div v-text="text"></div>
-//     </div>
-// </div>`;
-
-// function Notice(string,iconName,autoCloseTime){
-// 	if(!arguments.length){
-// 		return CURRENT
-// 	}
-// 	document.body.classList.add('overflow-h');
-// 	autoCloseTime=typeof autoCloseTime=='number'?autoCloseTime:2000;
-// 	if( CURRENT ){
-// 		CURRENT.$destroy(true);
-// 		timer1 && clearTimeout( timer1 );
-// 		timer2 && clearTimeout( timer2 );
-// 	}
-
-// 	CURRENT = new Vue({
-// 		el:document.body.appendChild(document.createElement('div')),
-// 		template:tpl,
-// 		data:{
-// 			iconName:iconName,
-// 			text:string
-// 		},
-// 		methods:{
-// 			remove:function(){
-// 				this.$destroy(true);
-// 				CURRENT = null;
-// 				document.body.classList.remove('overflow-h')
-// 			}
-// 		}
-// 	});
-// 	if(autoCloseTime>0){
-// 		timer1 = setTimeout(function(){
-// 			if( CURRENT ){
-// 				CURRENT.$el.classList.add('an', 'an-out');
-// 			}
-// 			timer1 = null;
-// 		}, autoCloseTime);
-// 		timer2 = setTimeout(function(){
-// 			if( CURRENT ){
-// 				CURRENT.remove();
-// 			}
-
-// 			CURRENT = null;
-// 			timer2 = null;
-// 		}, autoCloseTime+1000);
-// 	}
-// }
 var defaults = {
 	  title: ''
 	, content: ''
@@ -93,7 +39,7 @@ function Notice(){
 	}else{
 		return CURRENT
 	}
-	options = _.defaults(options, defaults);
+	options = _.defaults(_.find(arguments,_.isPlainObject),options, defaults);
 	document.body.classList.add('overflow-h');
 	CURRENT.showCmuiDialog=true;
 	_.each(options,(value,key)=>{

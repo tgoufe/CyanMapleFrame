@@ -6,10 +6,12 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 	<link rel="stylesheet" href="../source/cyan/CMUI.css">
 	<script src="../javascript/lib/jlv.js"></script>
+	<script src="../javascript/base.js"></script>
 	<script src="../javascript/maple.js"></script>
 </head>
 <body>
 	<div class="main">
+		<cmui-textarea :max='20' :space="10" :className="'sdi sldi'"></cmui-textarea>
 		<!-- container box-container img-container ratio-container flex-container  -->
 		<!-- <cmui-list :items="cmuilistArray" :col="2" :space="10">
 			<cmui-list-item v-for="item in cmuilistArray">
@@ -28,15 +30,15 @@
 			</div>
 		</cmui-scrollbox-item>
 	</cmui-scrollbox> -->
-	<cmui-list :col="6" :space="10">
+	<!-- <cmui-list :col="6" :space="10">
 		<cmui-input></cmui-input>
 		<cmui-list-item  v-for="item in [1,2,3,1,2,3,1,2,3]">
 			<div class="bg-green marginb20">
 				Lorem ipsum Qui quis magna adipisicing in dolor.
 			</div>
 		</cmui-list-item>
-	</cmui-list>
-	<div class="listGroup listGroup-col3 border">
+	</cmui-list> -->
+	<!-- <div class="listGroup listGroup-col3 border">
 		<div class="listGroup_item" v-for="item in [1,2,3,1,2,3,1,2,3]">
 			<div class="padding10">
 				<div class="ratio-container">
@@ -44,12 +46,12 @@
 				</div>
 			</div>
 		</div>
-	</div>
-		<cmui-slider :items="arr">
+	</div> -->
+		<!-- <cmui-slider :items="arr">
 			<cmui-slider-item v-for="(item,index) in arr">
 				<img src="http://image1.51tiangou.com/product/201606/25/68F1D199-02AD-4E30-93F1-AD4679B8A2C7.JPG!y" alt="">
 			</cmui-slider-item>
-		</cmui-slider>
+		</cmui-slider> -->
 		<!-- <div class="container" >
 			<cmui-number :start="20" :max="22" :min="15" :reverse="true" :radius="true"></cmui-number>
 		</div> -->

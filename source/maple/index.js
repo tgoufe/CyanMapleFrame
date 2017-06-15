@@ -16,6 +16,8 @@ import confirm from './ui/confirm/index.js';
 import notice from './ui/notice/index.js';
 import actions from './ui/actions/index.js';
 import slider from './component/slider/index.js'
+import list from './component/list/index.js'
+import form from './component/form/index.js'
 //挂载工具方法
 maple._ = util;
 maple.util = util;
@@ -47,6 +49,8 @@ maple.confirm = confirm;
 maple.actions = actions;
 
 maple.slider=slider;
+maple.list=list;
+maple.form=form;
 // 初始化通用组件
 Object.keys( component ).forEach(d => Vue.component(d, component[d]));
 export default window.maple = maple;
