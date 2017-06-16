@@ -13,18 +13,6 @@ function Slider(){
 		,	argFunction
 		,	tempSliderList=new CMUI_SliderList()
 		;
-		// var argStrings=_.filter(arguments,item=>{
-		// 	if(_.isString(item)){
-		// 		if(item[0]=='.'||item[0]=='#'){
-		// 			argParent=item;
-		// 			return false;
-		// 		}
-		// 		return true;
-		// 	}
-		// 	return _.isNumber(item)
-		// });
-		// var argObject=_.filter(arguments,_.isPlainObject)[0];
-		// var argFunction=_.filter(arguments,_.isFunction)[0];
 		_.forEach(arguments,item=>{
 			if(_.isString(item)){
 				if(item[0]=='.'||item[0]=='#'){
@@ -41,6 +29,8 @@ function Slider(){
 				argStrings.push(item.toString());
 			}else if(_.isFunction(item)){
 				argFunction=item;
+			}else if(_.isArray(item)&&_.every(item,_.isString)){
+				argStrings=argStrings.concat(item);
 			}else if(_.isObject(item)){
 				if(item instanceof jQuery){
 					argParent=item;

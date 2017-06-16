@@ -15,9 +15,10 @@ import alert from './ui/alert/index.js';
 import confirm from './ui/confirm/index.js';
 import notice from './ui/notice/index.js';
 import actions from './ui/actions/index.js';
-import slider from './component/slider/index.js'
-import list from './component/list/index.js'
-import form from './component/form/index.js'
+import mask from './ui/mask/index.js';
+import slider from './component/slider/index.js';
+import list from './component/list/index.js';
+import form from './component/form/index.js';
 //挂载工具方法
 maple._ = util;
 maple.util = util;
@@ -47,7 +48,7 @@ maple.notice = notice;
 maple.alert = alert;
 maple.confirm = confirm;
 maple.actions = actions;
-
+maple.mask=mask;
 maple.slider=slider;
 maple.list=list;
 maple.form=form;
