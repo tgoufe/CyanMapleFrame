@@ -9,6 +9,7 @@ import log from './log';
 import load from './load';
 import scrollBar from './scroll_bar';
 import device from './device';
+import style from './style';
 import vm from './vm';
 import component from './component';
 import alert from './ui/alert/index.js';
@@ -42,6 +43,8 @@ maple.scrollBar = scrollBar;
 maple.device = device;
 //挂载vm控制器
 maple.vm = vm;
+//挂载style
+maple.style = style;
 
 
 maple.notice = notice;
