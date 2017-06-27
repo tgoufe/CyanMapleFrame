@@ -32,6 +32,6 @@ export default {
 
 	, merge
 	, dateFormat
-	, validate
+	// , validate
 	, tools
 };
