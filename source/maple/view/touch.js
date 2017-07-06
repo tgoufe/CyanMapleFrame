@@ -8,7 +8,7 @@
  *          否则使用 mouse 事件替代
  * */
 
-import Listener from './listener.js';
+import Listener from '../listener.js';
 
 const pointerEventType = [
 		'over'
@@ -51,63 +51,63 @@ let start
 
 if( 'PointerEvent' in window ){
 	start   = new Listener({
-		eventType: 'pointerdown'
+		type: 'pointerdown'
 	});
 	move    = new Listener({
-		eventType: 'pointermove'
+		type: 'pointermove'
 	});
 	end     = new Listener({
-		eventType: 'pointerup'
+		type: 'pointerup'
 	});
 
 	// todo 用途？
 	over    = new Listener({
-		eventType: 'pointerover'
+		type: 'pointerover'
 	});
 	out     = new Listener({
-		eventType: 'pointerout'
+		type: 'pointerout'
 	});
 	enter   = new Listener({
-		eventType: 'pointerenter'
+		type: 'pointerenter'
 	});
 	leave   = new Listener({
-		eventType: 'pointerleave'
+		type: 'pointerleave'
 	});
 }
 else if( 'TouchEvent' in window ){
 	start   = new Listener({
-		eventType: 'touchstart'
+		type: 'touchstart'
 	});
 	move    = new Listener({
-		eventType: 'touchmove'
+		type: 'touchmove'
 	});
 	end     = new Listener({
-		eventType: 'touchend'
+		type: 'touchend'
 	});
 }
 else{
 	start   = new Listener({
-		eventType: 'mousedown'
+		type: 'mousedown'
 	});
 	move    = new Listener({
-		eventType: 'mousemove'
+		type: 'mousemove'
 	});
 	end     = new Listener({
-		eventType: 'mouseup'
+		type: 'mouseup'
 	});
 
 	// todo 用途？
 	over    = new Listener({
-		eventType: 'mouseover'
+		type: 'mouseover'
 	});
 	out     = new Listener({
-		eventType: 'mouseout'
+		type: 'mouseout'
 	});
 	enter   = new Listener({
-		eventType: 'mouseenter'
+		type: 'mouseenter'
 	});
 	leave   = new Listener({
-		eventType: 'mouseleave'
+		type: 'mouseleave'
 	});
 }
 

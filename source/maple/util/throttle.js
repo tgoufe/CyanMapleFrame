@@ -17,10 +17,11 @@ let throttle = function(func, wait){
 	let timeout = null
 		, result = function(){
 			let that = this || null
+				, argv = [].slice.call( arguments )
 				;
 
 			if( !timeout ){
-				func.apply(that, arguments || []);
+				func.apply(that, argv || []);
 
 				timeout = setTimeout(function(){
 					clearTimeout( timeout );
@@ -53,7 +54,7 @@ let throttle = function(func, wait){
 		timeout = setTimeout(function(){
 			clearTimeout( timeout );
 			timeout = null;
-		});
+		}, wait);
 	};
 
 	return result;

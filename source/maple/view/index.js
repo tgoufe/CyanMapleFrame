@@ -8,7 +8,7 @@
  * @namespace   maple.view
  * */
 
-import listener     from './listener.js';
+import listener     from '../listener.js';
 
 import resize       from './resize.js';
 import scroll       from './scroll.js';

@@ -121,7 +121,7 @@ class SessionStorageModel extends Model{
 				keyList = [topic];
 			}
 			else if( argc > 1 ){
-				keyList = [].slice.call(arguments);
+				keyList = [].slice.call( arguments );
 			}
 			else{
 				keyList = topic;

@@ -9,10 +9,41 @@
 // 	]
 // 	;
 
+import Listener from '../listener.js';
+
 /**
- * @summary 解析 url
- * @param   {String}    [url]
- * @return  {Object}
+ * @summary     解析 url 的 search 部分
+ * @method
+ * @memberOf    url
+ * @param       {String}    [search='']
+ * return       {Object}
+ * */
+function parseSearch(search=''){
+	if( search && /^\?/.test(search) ){
+		search = search.slice(1);
+	}
+
+	return search ? search.split('&').reduce((all, d)=>{
+		let temp
+			;
+
+		if( d ){
+			temp = d.split('=');
+
+			// 解码
+			all[decodeURIComponent(temp[0])] = decodeURIComponent(temp[1] || '').replace(/\?10000skup(=true)?/, '');  // 删除微信下的?10000skip todo ?
+		}
+
+		return all;
+	}, {}) : {};
+}
+
+/**
+ * @summary     解析 url
+ * @method
+ * @memberOf    url
+ * @param       {String}    [url]   未传 url，默认使用 location.href
+ * @return      {Object}
  * */
 function parseUrl(url){
 	let a = document.createElement('a')
@@ -26,19 +57,7 @@ function parseUrl(url){
 	result.host        = a.hostname;
 	result.port        = a.port;
 	result.query       = a.search;
-	result.params      = a.search ? a.search.slice(1).split('&').reduce((all, d)=>{
-		let t
-			;
-
-		if( d ){
-
-			t = d.split('=');
-
-			all[t[0]] = (t[1] || '').replace(/\?10000skip(=true)?/, '');    // 删除微信下的?10000skip
-		}
-
-		return all;
-	}, {}) : {};
+	result.params      = parseSearch( a.search );
 	result.file        = (a.pathname.match(/\/([^\/?#]+)$/i) || ['', ''])[1];
 	result.hash        = a.hash.slice(1);
 	result.path        = a.pathname.replace(/^([^\/])/, '$1');
@@ -55,16 +74,8 @@ let runtimeUrl = parseUrl()
 
 runtimeUrl.parseUrl = parseUrl;
 
-/**
- * @summary     对没有协议头（以 // 开头）的路径加上协议头
- * @method
- * @memberOf    url
- * @param       {String}    url
- * @return      {String}
- * */
-runtimeUrl.addProtocol = function(url){
-	return /^\/\//.test( url ) ? location.protocol + url : url;
-};
+runtimeUrl.parseSearch = parseSearch;
+
 /**
  * @summary     替换当前的 query 和 params
  * @private
@@ -92,15 +103,29 @@ runtimeUrl._changeParams = function(param){
 		default:
 			break;
 	}
-	console.log(this.params);
+
 	search = Object.keys( this.params ).reduce((all, d)=>{
 		all.push( encodeURIComponent(d) +'='+ encodeURIComponent(this.params[d]) );
 
 		return all;
 	}, []);
+
 	this.query = search.length ? '?'+ search.join('&') : '';
 };
-// runtimeUrl.removeParam = function(){};
+/**
+ * @summary     将现有参数组合成一个 url
+ * @method
+ * @memberOf    url
+ * @return      {String}
+ * */
+runtimeUrl.pack = function(){
+	return this.protocol +'://'+
+		this.host +
+		(!this.port || this.port === '80' ? '' : ':'+ this.port) +
+		this.path +
+		this.query +
+		(this.hash ? '#'+ this.hash : '');
+};
 /**
  * @summary     添加参数并调整到路径
  * @method
@@ -123,7 +148,7 @@ runtimeUrl.push = function(params){
 runtimeUrl.replace = function(params){
 
 	this._changeParams.apply(this, arguments);
-	                                                   console.log(this.pack());
+
 	// 将当前浏览器上 url 换为替换后组装出来的链接
 	history.replaceState(null, '', this.pack());
 };
@@ -135,21 +160,33 @@ runtimeUrl.replace = function(params){
 runtimeUrl.reload = function(){
 	location.reload();
 };
+
 /**
- * @summary     将现有参数组合成一个 url
+ * @summary     对没有协议头（以 // 开头）的路径加上协议头
  * @method
  * @memberOf    url
+ * @param       {String}    url
  * @return      {String}
  * */
-runtimeUrl.pack = function(){
-	return this.protocol +'://'+
-		this.host +
-		(!this.port || this.port === '80' ? '' : ':'+ this.port) +
-		this.path +
-		this.query +
-		(this.hash ? '#'+ this.hash : '');
+runtimeUrl.addProtocol = function(url){
+	return /^\/\//.test( url ) ? location.protocol + url : url;
 };
 
+let hashChange = new Listener({
+	type: 'hashchange'
+	, target: window
+});
+
+hashChange.on();
+hashChange.add(function(e){
+	runtimeUrl.hash = parseUrl( e.newUrl ).hash;
+});
+
+
+/**
+ * 
+ * */
+runtimeUrl.hashChange = hashChange;
 /**
  * @exports     url
  * @type        {Object}

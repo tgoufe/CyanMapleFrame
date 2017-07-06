@@ -17,6 +17,7 @@ let debounce = function(func, wait){
 	let timeout = null
 		, result = function(){
 			let that = this || null
+				, argv = [].slice.call( arguments )
 				;
 
 			if( timeout ){
@@ -24,7 +25,7 @@ let debounce = function(func, wait){
 			}
 
 			timeout = setTimeout(function(){
-				func.apply(that, arguments || []);
+				func.apply(that, argv || []);
 			}, wait);
 		}
 		;

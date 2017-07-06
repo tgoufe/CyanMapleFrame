@@ -1,5 +1,7 @@
 'use strict';
 
+import Listener from '../listener.js';
+
 /**
  * @class
  * @classdesc   数据层基类，将数据保存在内存中
@@ -44,9 +46,18 @@ class Model{
 		this._eventList = [];
 		this._syncList = [];
 
-		this.on((topic, value)=>{
+		this._listener = new Listener({
+			type: 'modelChange'
+			, target: this
+		});
+		this._listener.on();
+		this._listener.add((topic, value)=>{
 			this._sync(topic, value);
 		});
+
+		// this.on((topic, value)=>{
+		// 	this._sync(topic, value);
+		// });
 	}
 
 	// ---------- 静态方法 ----------
@@ -170,11 +181,13 @@ class Model{
 	 * @param       {*}         value
 	 * */
 	_trigger(topic, value){
-		if( this._eventList.length ){
-			setTimeout(()=>{
-				this._eventList.forEach((d)=>d(topic, value));
-			}, 0);
-		}
+		this._listener.trigger(topic, value);
+
+		// if( this._eventList.length ){
+		// 	setTimeout(()=>{
+		// 		this._eventList.forEach((d)=>d(topic, value));
+		// 	}, 0);
+		// }
 	}
 	/**
 	 * @summary     数据同步的内部实现
@@ -285,19 +298,14 @@ class Model{
 	 * @param   {ModelChangeEvent}  callback
 	 * */
 	on(callback){
-		this._eventList.push( callback );
+		this._listener.add( callback );
 	}
 	/**
 	 * @summary 解除绑定数据监控回调函数
 	 * @param   {ModelChangeEvent}  callback
 	 * */
 	off(callback){
-		let i = this._eventList.indexOf( callback )
-			;
-
-		if( i !== -1 ){
-			this._eventList.splice(i, 1);
-		}
+		this._listener.off( callback );
 	}
 	/**
 	 * @summary 设置数据

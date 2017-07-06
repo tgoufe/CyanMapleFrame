@@ -5,14 +5,14 @@
  *          使用捕捉方式
  * */
 
-import Listener from './listener.js';
+import Listener from '../listener.js';
 
 /**
  * @memberOf    maple.view
  * @type        {Listener}
  * */
 let scroll = new Listener({
-		eventType: 'scroll'
+		type: 'scroll'
 	})
 	;
 

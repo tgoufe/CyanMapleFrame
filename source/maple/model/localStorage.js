@@ -1,7 +1,8 @@
 'use strict';
 
-import Model from './model.js';
-import merge from '../util/merge.js';
+import Model    from   './model.js';
+import merge    from   '../util/merge.js';
+import Listener from '../listener.js';
 
 /**
  * @class
@@ -36,7 +37,7 @@ class LocalStorageModel extends Model{
 			this._storeSync = self.localStorage;
 			this._store = Promise.resolve( self.localStorage );
 
-			config.listen && !LocalStorageModel._LISTENER_ON && LocalStorageModel._listen();
+			config.listen && !LocalStorageModel._listenOn && LocalStorageModel.listenOn();
 		}
 		else{
 			this._enabled = false;
@@ -49,22 +50,41 @@ class LocalStorageModel extends Model{
 	/**
 	 * @summary 全局 storage 事件监听
 	 * @static
-	 * @desc    只执行一次，执行后将 LocalStorageModel._LISTENER_ON 设为 true，该监听事件只能由其他页面修改 localStorage 的数据时触发
+	 * @desc    只执行一次，执行后将 LocalStorageModel._listenOn 设为 true，该监听事件只能由其他页面修改 localStorage 的数据时触发
 	 * */
-	static _listen(){
-		self.addEventListener('storage', (e)=>{
+	static listenOn(){
+		
+		if( LocalStorageModel._listenOn ){
+			return;
+		}
+
+		let globalStorage = new Listener({
+			type: 'storage'
+			, target: window || self
+		});
+
+		globalStorage.add(function(e){
 			let topic = e.key
 				, newVal = e.newValue
 				, oldVal = e.oldValue
-				;
+			;
 
 			if( LocalStorageModel._EVENT_LIST.length ){
 
 				LocalStorageModel._EVENT_LIST.forEach((d)=>d(topic, newVal, oldVal));
 			}
 		});
+		globalStorage.on();
 
-		LocalStorageModel._LISTENER_ON = true;
+		LocalStorageModel._globalStorage = globalStorage;
+		LocalStorageModel._listenOn = true;
+	}
+	static listenOff(){
+		if( LocalStorageModel._listenOn && LocalStorageModel._globalStorage ){
+			LocalStorageModel._globalStorage.off();
+
+			LocalStorageModel._listenOn = false;
+		}
 	}
 
 	// ---------- 公有方法 ----------
@@ -155,7 +175,7 @@ class LocalStorageModel extends Model{
 				keyList = [topic];
 			}
 			else if( argc > 1 ){
-				keyList = [].slice.call(arguments);
+				keyList = [].slice.call( arguments );
 			}
 			else{
 				keyList = topic;
@@ -271,7 +291,7 @@ LocalStorageModel._EVENT_LIST = [];
  * 全局 storage 监听事件是否开启
  * @static
  * */
-LocalStorageModel._LISTENER_ON = false;
+LocalStorageModel._listenOn = false;
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成
