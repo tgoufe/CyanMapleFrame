@@ -1,14 +1,12 @@
 'use strict';
 
-import Listener     from '../listener.js';
+import {listener}   from '../listener.js';
 
 /**
  * @memberOf    maple.view
  * @type        {Listener}
  * */
-let beforeunload = new Listener({
-	type: 'beforeunload'
-	, target: window
-});
+let beforeunload = listener('before')
+	;
 
 export default beforeunload;

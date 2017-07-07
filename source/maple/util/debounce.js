@@ -11,9 +11,10 @@
  * @memberOf    maple.util
  * @param       {Function}  func
  * @param       {Number}    wait
+ * @param       {Function}  cancelCB    上一次计时器取消时调用
  * @return      {Function}
  * */
-let debounce = function(func, wait){
+let debounce = function(func, wait, cancelCB){
 	let timeout = null
 		, result = function(){
 			let that = this || null
@@ -37,6 +38,8 @@ let debounce = function(func, wait){
 		if( timeout ){
 			clearTimeout( timeout );
 			timeout = null;
+
+			cancelCB && cancelCB();
 		}
 	};
 

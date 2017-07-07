@@ -4,7 +4,7 @@
  * @file    陀螺仪事件
  * */
 
-import Listener from '../listener.js';
+import {listener}   from '../listener.js';
 
 /**
  * @memberOf    maple.view
@@ -21,10 +21,9 @@ if( 'DeviceMotionEvent' in window ){    // 获取陀螺仪加速度
 // }
 
 if( type ){
-	deviceMotion = new Listener({
-		type
-		, target: window
-	});
+	deviceMotion = listener(type, {
+		useDebounce: true
+	}); 
 }
 
 export default deviceMotion;

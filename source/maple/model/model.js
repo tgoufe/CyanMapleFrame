@@ -1,6 +1,6 @@
 'use strict';
 
-import Listener from '../listener.js';
+import {listener}   from '../listener.js';
 
 /**
  * @class
@@ -46,14 +46,18 @@ class Model{
 		this._eventList = [];
 		this._syncList = [];
 
-		this._listener = new Listener({
-			type: 'modelChange'
-			, target: this
-		});
-		this._listener.on();
-		this._listener.add((topic, value)=>{
+		this._listener = listener('modelChange', this, (topic, value)=>{
 			this._sync(topic, value);
 		});
+
+		// this._listener = new Listener({
+		// 	type: 'modelChange'
+		// 	, target: this
+		// });
+		// this._listener.on();
+		// this._listener.add((topic, value)=>{
+		// 	this._sync(topic, value);
+		// });
 
 		// this.on((topic, value)=>{
 		// 	this._sync(topic, value);

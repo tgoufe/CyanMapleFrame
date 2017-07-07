@@ -8,14 +8,12 @@
  * @namespace   maple.view
  * */
 
-import listener     from '../listener.js';
-
 import resize       from './resize.js';
 import scroll       from './scroll.js';
 import deviceMotion from './deviceMotion.js';
 
 // todo ? 实现页面回退刷新
-import pageShow     from './pageShow.js';
+// import pageShow     from './pageShow.js';
 
 /**
  * 统计将用的的事件
@@ -49,12 +47,11 @@ let needRefreshOn = false
  * @exports view
  * */
 export default {
-	listener
-	, resize
+	resize
 	, scroll
 	, deviceMotion
 
-	, pageShow
+	// , pageShow
 
 	, beforeunload
 	, unload

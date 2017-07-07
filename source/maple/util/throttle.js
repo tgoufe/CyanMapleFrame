@@ -11,9 +11,10 @@
  * @memberOf    maple.util
  * @param       {Function}  func
  * @param       {Number}    wait
+ * @param       {Function}  cancelCB    当前操作无法执行时的回调函数
  * @return      {Function}
  * */
-let throttle = function(func, wait){
+let throttle = function(func, wait, cancelCB){
 	let timeout = null
 		, result = function(){
 			let that = this || null
@@ -38,6 +39,8 @@ let throttle = function(func, wait){
 		if( timeout ){
 			clearTimeout( timeout );
 			timeout = null;
+
+			cancelCB && cancelCB();
 		}
 	};
 

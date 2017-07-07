@@ -5,6 +5,7 @@
  * */
 
 import debounce from './util/debounce.js';
+import throttle from './util/throttle.js';
 import merge    from './util/merge.js';
 
 /**
@@ -21,6 +22,8 @@ class Listener{
 	 * @param   {Window|Document|Object}    [config.target]
 	 * @param   {Boolean}                   [config.useCapture]
 	 * @param   {Boolean}                   [config.passive]
+	 * @param   {Boolean}                   [config.useDebounce]    是否使用 debounce
+	 * @param   {Boolean}                   [config.useThrottle]    是否使用 throttle
 	 * @todo    处理 passive 参数
 	 * */
 	constructor(config={}){
@@ -74,6 +77,7 @@ class Listener{
 	/**
 	 * @summary 添加执行函数
 	 * @param   {Function}  callback
+	 * @return  {Listener}  返回 this，可以使用链式操作
 	 * */
 	add(callback){
 		if( this._eventQueue.indexOf(callback) === -1 ){
@@ -82,14 +86,17 @@ class Listener{
 		else{
 			console.log('该函数已经存在于队列中');
 		}
+
+		return this;
 	}
 	/**
 	 * @summary 开始监听事件
-	 * @param   {Boolean}   [useDebounce]   是否使用弹性
-	 * @param   {Number}    [wait]          若使用弹性则必填，为弹性时间，单位为毫秒
-	 * @todo    支持 throttle
+	 * @param   {Number}    [wait=0]    间隔时间，单位为毫秒，若传则使用 debounce 或 throttle 方式执行
+	 * @return  {Listener}  返回 this，可以使用链式操作
+	 * @desc    当传入 wait 参数时根据生成 Listener 对象实例时的 useDebounce 或 useThrottle 参数来判断使用哪种方式，若都设置则 debounce 优先
 	 * */
-	on(useDebounce=false, wait){
+	on(wait=0){
+		wait = Number( wait );
 
 		if( this._isListening ){
 			return;
@@ -99,8 +106,11 @@ class Listener{
 			return;
 		}
 
-		if( useDebounce && wait ){
+		if( this._config.useDebounce && wait && wait > 0 ){
 			this._listener = debounce(this._queueExecute(), wait);
+		}
+		else if( this._config.useThrottle && wait && wait > 0 ){
+			this._listener = throttle(this._queueExecute(), wait);
 		}
 		else{
 			this._listener = this._queueExecute();
@@ -111,10 +121,13 @@ class Listener{
 		}
 
 		this._isListening = true;
+
+		return this;
 	}
 	/**
 	 * @summary 取消监听
-	 * @param   {Boolean|Function}   [isAll=true]
+	 * @param   {Boolean|Function}  [isAll=true]
+	 * @return  {Listener}          返回 this，可以使用链式操作
 	 * @desc    若传入参数为 true，则将将事件监听解除绑定，若传入参数类型为函数，则只将该函数从函数队列删除，不解除监听事件
 	 * */
 	off(isAll=true){
@@ -142,9 +155,12 @@ class Listener{
 
 			this._eventQueue.splice(index, 1);
 		}
+
+		return this;
 	}
 	/**
 	 * @summary 立即执行
+	 * @param   {...*}
 	 * */
 	trigger(){
 		let context = {
@@ -170,9 +186,65 @@ class Listener{
  * */
 Listener._CONFIG = {
 	type: ''
-	, target: document || null
+	, target: window || self || null
 	, useCapture: true
 	, passsive: true
+	, useDebounce: false
+	, useThrottle: false
 };
 
-export default Listener;
+/**
+ * @summary     快速监听函数
+ * @param       {String}            type
+ * @param       {Object|Window|Document|Function}   [target={}]             当类型为 function 时将其赋值给 callback，将 target 设置为 null，当类型为 Object 时将其赋值给 options，将 target 设置为 null
+ * @param       {Function|Object}                   [callback={}]           当类型为 object 时将其赋值给 options，将 callback 设置为 null
+ * @param       {Object}                            [options={}]            配置参数与 Listener 参数相同
+ * @param       {Boolean}                           [options.useCapture]
+ * @param       {Boolean}                           [options.passive]
+ * @param       {Boolean}                           [options.useDebounce]
+ * @param       {Boolean}                           [options.useThrottle]
+ * @return      {Listener}
+ * */
+let listener = (type, target={}, callback={}, options={})=>{
+
+	let opts = {
+			type
+		}
+		, ls
+		;
+
+	if( typeof callback === 'object' ){
+		options = callback;
+		callback = null;
+	}
+	if( typeof target === 'function' ){
+		callback = target;
+		target = null;
+	}
+	// Object.create( null ) 创造出来的对象的 constructor 为 undefined
+	else if( typeof target === 'object' && (target.constructor === Object || target.constructor === undefined ) ){
+		options = target;
+		target = null;
+	}
+
+	if( target ){
+		opts.target = target;
+	}
+
+	opts = merge(opts, options);
+
+	ls = new Listener( opts );
+
+	ls.on();
+
+	if( callback ){
+		ls.add( callback );
+	}
+
+	return ls;
+};
+
+export {
+	Listener
+	, listener
+};

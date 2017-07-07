@@ -8,35 +8,35 @@
  *          否则使用 mouse 事件替代
  * */
 
-import Listener from '../listener.js';
+import {listener}   from '../listener.js';
 
-const pointerEventType = [
-		'over'
-		, 'enter'
-		, 'down'
-		, 'move'
-		, 'up'
-		, 'cancel'
-		, 'out'
-		, 'leave'
-	]
-	, touchEventType = [
-		'start'
-		, 'end'
-		, 'move'
-		, 'cancel'
-	]
-	, mouseEventType = [
-		'click'
-		, 'up'
-		, 'down'
-		, 'move'
-		, 'enter'
-		, 'leave'
-		, 'out'
-		, 'over'
-	]
-	;
+// const pointerEventType = [
+// 		'over'
+// 		, 'enter'
+// 		, 'down'
+// 		, 'move'
+// 		, 'up'
+// 		, 'cancel'
+// 		, 'out'
+// 		, 'leave'
+// 	]
+// 	, touchEventType = [
+// 		'start'
+// 		, 'end'
+// 		, 'move'
+// 		, 'cancel'
+// 	]
+// 	, mouseEventType = [
+// 		'click'
+// 		, 'up'
+// 		, 'down'
+// 		, 'move'
+// 		, 'enter'
+// 		, 'leave'
+// 		, 'out'
+// 		, 'over'
+// 	]
+// 	;
 
 let start
 	, move
@@ -50,68 +50,31 @@ let start
 	;
 
 if( 'PointerEvent' in window ){
-	start   = new Listener({
-		type: 'pointerdown'
-	});
-	move    = new Listener({
-		type: 'pointermove'
-	});
-	end     = new Listener({
-		type: 'pointerup'
-	});
+	start   = listener('pointerdown');
+	move    = listener('pointermove');
+	end     = listener('pointerup');
 
 	// todo 用途？
-	over    = new Listener({
-		type: 'pointerover'
-	});
-	out     = new Listener({
-		type: 'pointerout'
-	});
-	enter   = new Listener({
-		type: 'pointerenter'
-	});
-	leave   = new Listener({
-		type: 'pointerleave'
-	});
+	over    = listener('pointerover');
+	out     = listener('pointerout');
+	enter   = listener('pointerenter');
+	leave   = listener('pointerleave');
 }
 else if( 'TouchEvent' in window ){
-	start   = new Listener({
-		type: 'touchstart'
-	});
-	move    = new Listener({
-		type: 'touchmove'
-	});
-	end     = new Listener({
-		type: 'touchend'
-	});
+	start   = listener('touchstart');
+	move    = listener('touchmove');
+	end     = listener('touchend');
 }
 else{
-	start   = new Listener({
-		type: 'mousedown'
-	});
-	move    = new Listener({
+	start   = listener('mousedown');
+	move    = listener({
 		type: 'mousemove'
 	});
-	end     = new Listener({
-		type: 'mouseup'
-	});
+	end     = listener('mouseup');
 
 	// todo 用途？
-	over    = new Listener({
-		type: 'mouseover'
-	});
-	out     = new Listener({
-		type: 'mouseout'
-	});
-	enter   = new Listener({
-		type: 'mouseenter'
-	});
-	leave   = new Listener({
-		type: 'mouseleave'
-	});
+	over    = listener('mouseover');
+	out     = listener('mouseout');
+	enter   = listener('mouseenter');
+	leave   = listener('mouseleave');
 }
-
-// /**
-//  * @memberOf    maple.view
-//  * @type        {Listener}
-//  * */

@@ -9,7 +9,7 @@
 // 	]
 // 	;
 
-import Listener from '../listener.js';
+import {listener}   from '../listener.js';
 
 /**
  * @summary     解析 url 的 search 部分
@@ -172,21 +172,13 @@ runtimeUrl.addProtocol = function(url){
 	return /^\/\//.test( url ) ? location.protocol + url : url;
 };
 
-let hashChange = new Listener({
-	type: 'hashchange'
-	, target: window
-});
-
-hashChange.on();
-hashChange.add(function(e){
-	runtimeUrl.hash = parseUrl( e.newUrl ).hash;
-});
-
-
 /**
  * 
  * */
-runtimeUrl.hashChange = hashChange;
+runtimeUrl.hashChange = listener('hashchange', function(e){
+	runtimeUrl.hash = parseUrl( e.newUrl ).hash;
+});
+
 /**
  * @exports     url
  * @type        {Object}

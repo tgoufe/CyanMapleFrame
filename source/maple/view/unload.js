@@ -1,14 +1,11 @@
 'use strict';
 
-import Listener     from '../listener.js';
+import {listener}   from '../listener.js';
 
 /**
  * @memberOf    maple.view
  * @type        {Listener}
  * */
-let unload = new Listener({
-	type: 'unload'
-	, target: window
-});
+let unload = listener('unload');
 
 export default unload;
