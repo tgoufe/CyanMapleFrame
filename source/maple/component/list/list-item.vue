@@ -50,6 +50,7 @@ export default {
         clear(){
             const rs=this.$parent.$children.filter(item=>item.$options._componentTag=="cmui-list-item")
             const i=_.findIndex(rs,this);
+            console.log(this)
             return i%(this.$parent.col.length||this.$parent.col)==0?'left':''
         }
 	}

@@ -8,17 +8,10 @@ CMUI_ListList.prototype.add=function(item){
 }
 CMUI_ListList.prototype.remove=function(){
 	_.times(this.length,index=>{
-		// var swiper=this[index];
-		// if(swiper instanceof Swiper){
-		// 	var container=swiper.container;
-		// 	var baseIndex=_.findKey(sliderList,swiper)
-		// 	swiper.destroy(false, true);
-		// 	container.remove();
-		// 	this[index]=null
-		// 	if(this!=sliderList){
-		// 		sliderList[baseIndex]=null
-		// 	}
-		// }
+		if(this[index] instanceof jQuery){
+			this[index].remove();
+			this[index]=null;
+		}
 	})
 	return this;
 }

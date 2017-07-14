@@ -80,7 +80,8 @@ export default {
 		move: {
 			type: Function,
 			default: null
-		}
+		},
+		options:{type:Object,default:{}}
 	},
 	computed:{
 	    spaceName:function(){
@@ -162,8 +163,8 @@ export default {
 
 		computeIndexes() {
 			this.$nextTick(() => {
-				console.log(this.getChildrenNodes())
-				console.log(this.rootContainer.children)
+				// console.log(this.getChildrenNodes())
+				console.log(this.rootContainer)
 				this.visibleIndexes = computeIndexes(this.getChildrenNodes(), this.rootContainer.children, this.transitionMode)
 			})
 		},

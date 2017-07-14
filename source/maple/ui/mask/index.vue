@@ -1,6 +1,6 @@
 <template>
 	<div class="mask" :class="position" @click="cancel()" v-show="showCmuiDialog">
-		<div class="mask-content" v-html="content" :style="contentStyle">
+		<div class="mask-content" v-html="content" :style="contentStyle" style="max-width:100%">
 		</div>
 	</div>
 </template>

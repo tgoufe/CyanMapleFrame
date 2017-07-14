@@ -20,6 +20,8 @@ import mask from './ui/mask/index.js';
 import slider from './component/slider/index.js';
 import list from './component/list/index.js';
 import form from './component/form/index.js';
+import dragList from './component/dragList/index.js';
+import Vue from 'Vue';
 //挂载工具方法
 maple._ = util;
 maple.util = util;
@@ -45,7 +47,7 @@ maple.device = device;
 maple.vm = vm;
 //挂载style
 maple.style = style;
-
+maple.dragList=dragList;
 
 maple.notice = notice;
 maple.alert = alert;

@@ -1,6 +1,7 @@
 import listVue from './list.vue';
 import listItemVue from './list-item.vue';
 import listList from './listList';
+import Sortable from './Sortable.js';
 Vue.component('cmui-list',listVue);
 Vue.component('cmui-list-item',listItemVue);
 function getItemClassByCol(col){
@@ -40,9 +41,13 @@ function List(){
 			col:_.find(arguments,item=>_.isNumber(item)||_.isArray(item)&&_.every(item,_.isNumber))||1,
 			space:_.filter(arguments,_.isNumber)[1]||20,
 			items:_.find(arguments,item=>_.isArray(item)&&_.every(item,_.isString)||_.isFunction(item))||[],
-			parent:_.find(arguments,item=>_.isElement(item)||item instanceof jQuery)||'body'
+			parent:_.find(arguments,item=>_.isElement(item)||item instanceof jQuery)||'body',
+			sortable:!!_.find(arguments,_.isBoolean),
+			options:{
+				draggable:'.cmui-list-item'
+			}
 		}
-		var options=_.assign(defaultOptions,_.find(arguments,_.isPlainObject));
+		var options=_.defaultsDeep(defaultOptions,_.find(arguments,_.isPlainObject));
 		if(_.isFunction(options.items)){
 			var rs=options.items();
 			if(_.isArray(rs)){
@@ -69,6 +74,10 @@ function List(){
 		template+='</div>';
 		template=$(template)
 		$(options.parent).append(template);
+		if(options.sortable){
+			new Sortable(template.find('>.clearfix')[0],options.options)
+		}
+		listList.add(template)
 		return template;
 	}
 }
