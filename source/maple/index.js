@@ -17,10 +17,10 @@ import confirm from './ui/confirm/index.js';
 import notice from './ui/notice/index.js';
 import actions from './ui/actions/index.js';
 import mask from './ui/mask/index.js';
+import message from './ui/message/index.js';
 import slider from './component/slider/index.js';
 import list from './component/list/index.js';
 import form from './component/form/index.js';
-import dragList from './component/dragList/index.js';
 import Vue from 'Vue';
 //挂载工具方法
 maple._ = util;
@@ -47,7 +47,6 @@ maple.device = device;
 maple.vm = vm;
 //挂载style
 maple.style = style;
-maple.dragList=dragList;
 
 maple.notice = notice;
 maple.alert = alert;
@@ -57,6 +56,7 @@ maple.mask=mask;
 maple.slider=slider;
 maple.list=list;
 maple.form=form;
+maple.message=message;
 // 初始化通用组件
 Object.keys( component ).forEach(d => Vue.component(d, component[d]));
 export default window.maple = maple;

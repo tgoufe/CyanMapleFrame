@@ -263,7 +263,7 @@ blockquote,  dd, div, dl, dt, fieldset, form, h1, h2, h3, h4, h5, h6, input, pre
 .abs-bottom,.abs-top,.abs-full,.abs-left,.abs-right{
 	@extend .pos-a;
 }
-.fixed-bottom, .fixed-top, .fixed-full, .fixed-left, .fixed-right{
+.fixed-bottom, .fixed-top, .fixed-full, .fixed-left, .fixed-right,.fixed-center{
 	@extend .pos-f;
 }
 .abs-bottom,.fixed-bottom{
@@ -276,12 +276,13 @@ blockquote,  dd, div, dl, dt, fieldset, form, h1, h2, h3, h4, h5, h6, input, pre
 	left:0;
 	right:0;
 }
-.abs-full,.fixed-full{
+.abs-full,.fixed-full,.fixed-center{
 	top:0;
 	bottom:0;
 	left:0;
 	right:0;
 }
+.fixed-center{margin:auto}
 .abs-left,.fixed-left{
 	top:0;
 	bottom:0;
