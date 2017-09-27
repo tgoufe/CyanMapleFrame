@@ -1,10 +1,6 @@
 node_modules/
 .idea/.name
-/.idea
+.idea
 *.map
-javascript/maple.js
-javascript/base.js
-
-javascript/base.js
-
-javascript/maple.js
+demo/javascript/maple.js
+demo/javascript/base.js

@@ -26,18 +26,19 @@
     "vue-html-loader": "^1.2.3",
     "vue-loader": "^11.1.4",
     "vue-style-loader": "^2.0.3",
-    "vue-template-compiler": "^2.2.2",
-    "webpack": "^2.2.1",
+    "vue-template-compiler": "~2.4.4",
+    "webpack": "~2.7.0",
     "webpack-dev-server": "^2.4.1"
   },
   "dependencies": {
+    "es6-promise": "~4.1.1",
     "jquery": "~3.2.1",
     "lodash": "~4.17.4",
     "vue": "~2.3.4"
   },
-  "main": "",
+  "main": "dist/index.js",
   "scripts": {
-    "dev":"webpack-dev-server",
+    "dev": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -50,5 +51,5 @@
     "url": "https://github.com/tgoufe/CyanMapleFrame/issues"
   },
   "homepage": "https://github.com/tgoufe/CyanMapleFrame#readme",
-  "description": ""
+  "description": "+-----------------------------------------------------------+\r      |                                                           |\r      |             Maple                                         |\r      |                                                           |\r      |  +-------+  +----------+  +------------+  +------------+  |\r      |  |       |  |          |  |            |  |            |  |\r      |  |  url  |  |  device  |  |  listener  |  |  util      |  |   运行环境检测 & 基础工具函数\r      |  |       |  |          |  |            |  |            |  |\r      |  +-------+  +----------+  +------------+  +----------- +  |\r      |                                                           |\r     -----------------------------------------------------------------------\r      |                                                           |\r      |  +-------------------------+  +------------------------+  |\r      |  |                         |  |                        |  |\r      |  |  model                  |  |  view                  |  |   Model 数据处理 & View 视图处理\r      |  |                         |  |                        |  |\r      |  +-------------------------+  +------------------------+  |\r      |                                                           |\r     -----------------------------------------------------------------------\r      |                                                           |\r      |  +------------+  +------------+  +----------+             |\r      |  |            |  |            |  |          |             |\r      |  |  position  |  |  register  |  |  notify  |             |  浏览器增强功能（todo）\r      |  |            |  |            |  |          |             |\r      |  +------------+  +------------+  +----------+             |\r      |                                                           |\r      +-----------------------------------------------------------+"
 }

@@ -38,9 +38,9 @@ class Listener{
 
 		this._isListening = false;  // 当前监听状态
 
-		this._listener = null;    // 执行函数
+		this._listener = null;      // 执行函数
 
-		this._eventQueue = []; // 事件对列
+		this._eventQueue = [];      // 事件对列
 	}
 
 	// ---------- 私有方法 ----------
@@ -73,11 +73,18 @@ class Listener{
 		};
 	}
 
+	/**
+	 * @summary     监听事件回调
+	 * @callback    ListenerCallback
+	 * @param       {Object|Event}  event
+	 * @param       {...*}
+	 * */
+
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 添加执行函数
-	 * @param   {Function}  callback
-	 * @return  {Listener}  返回 this，可以使用链式操作
+	 * @param   {ListenerCallback}  callback
+	 * @return  {Listener}          返回 this，可以使用链式操作
 	 * */
 	add(callback){
 		if( this._eventQueue.indexOf(callback) === -1 ){
@@ -99,11 +106,11 @@ class Listener{
 		wait = Number( wait );
 
 		if( this._isListening ){
-			return;
+			return this;
 		}
 
 		if( !this._config.target ){
-			return;
+			return this;
 		}
 
 		if( this._config.useDebounce && wait && wait > 0 ){
@@ -133,7 +140,7 @@ class Listener{
 	off(isAll=true){
 
 		if( !this._config.target ){
-			return;
+			return this;
 		}
 
 		if( typeof isAll === 'boolean' && isAll ){
@@ -163,12 +170,15 @@ class Listener{
 	 * @param   {...*}
 	 * */
 	trigger(){
-		let context = {
+		let context = this._config.target
+			, event = {
 				type: this._config.type
 				, target: this._config.target
 			}
-			, argv = [].slice.call( arguments )
+			, argv = [].slice.call(arguments)
 			;
+
+		argv.unshift( event );
 
 		if( 'immediate' in this._listener ){
 			this._listener.immediate(context, argv);
@@ -195,21 +205,19 @@ Listener._CONFIG = {
 
 /**
  * @summary     快速监听函数
- * @param       {String}            type
- * @param       {Object|Window|Document|Function}   [target={}]             当类型为 function 时将其赋值给 callback，将 target 设置为 null，当类型为 Object 时将其赋值给 options，将 target 设置为 null
- * @param       {Function|Object}                   [callback={}]           当类型为 object 时将其赋值给 options，将 callback 设置为 null
+ * @param       {Window|Document|Object|String}     target                  监听对象，当类型为 String 时视为 type，将其赋值给 type，将 target 设置为 null
+ * @param       {String|ListenerCallback}           [type]                  事件类型，当类型为 function 时视为 callback，将其赋值给 callback，将 type 设置为 null，若 target 不为字符串类型则会报错
+ * @param       {ListenerCallback|Object}           [callback={}]           回调函数，当类型为 object 时视为 options，将其赋值给 options，将 callback 设置为 null
  * @param       {Object}                            [options={}]            配置参数与 Listener 参数相同
  * @param       {Boolean}                           [options.useCapture]
  * @param       {Boolean}                           [options.passive]
  * @param       {Boolean}                           [options.useDebounce]
  * @param       {Boolean}                           [options.useThrottle]
  * @return      {Listener}
+ * @desc        可以穿四个参数，最少传一个参数，若只传一个参数会视为 type
  * */
-let listener = (type, target={}, callback={}, options={})=>{
-
-	let opts = {
-			type
-		}
+let listener = (target, type, callback={}, options={})=>{
+	let opts = {}
 		, ls
 		;
 
@@ -217,14 +225,19 @@ let listener = (type, target={}, callback={}, options={})=>{
 		options = callback;
 		callback = null;
 	}
-	if( typeof target === 'function' ){
-		callback = target;
+
+	if( typeof type === 'function' ){
+		callback = type;
+		type = null;
+	}
+
+	if( typeof target === 'string' ){
+		type = target;
 		target = null;
 	}
-	// Object.create( null ) 创造出来的对象的 constructor 为 undefined
-	else if( typeof target === 'object' && (target.constructor === Object || target.constructor === undefined ) ){
-		options = target;
-		target = null;
+
+	if( type ){
+		opts.type = type;
 	}
 
 	if( target ){
@@ -242,6 +255,18 @@ let listener = (type, target={}, callback={}, options={})=>{
 	}
 
 	return ls;
+};
+
+let addHandler = (target, eventType, handler)=>{
+	if( 'addEventListener' in target ){
+		target.addEventListener(eventType, handler, false);
+	}
+	else if( 'attachEvent' in target ){
+		target.attachEvent('on'+ eventType, handler);
+	}
+	else{
+		target['on'+ eventType] = handler;
+	}
 };
 
 export {

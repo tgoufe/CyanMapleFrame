@@ -8,6 +8,7 @@ import {listener}   from '../listener.js';
 
 /**
  * @memberOf    maple.view
+ * @type        {Listener}
  * */
 let deviceMotion = null
 	, type = ''

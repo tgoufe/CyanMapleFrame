@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 var path = require('path');
-var compiler = require('vue-template-compiler')
+var compiler = require('vue-template-compiler');
+
 module.exports = {
     devtool: '#source-map',
     //插件项
@@ -15,12 +16,13 @@ module.exports = {
     ],
     //页面入口文件配置
     entry: {
-        maple: [__dirname + '/source/maple/index.js']
+        maple: [__dirname + '/src/maple/index.js']
+        , base: [__dirname + '/src/maple/base.js']
     },
     //入口文件输出配置
     output: {
         path: __dirname,
-        filename: './javascript/[name].js'
+        filename: './dist/[name].js'
     },
     module: {
         //加载器配置

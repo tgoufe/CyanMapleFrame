@@ -1,7 +1,8 @@
 'use strict';
 
-import Model from './model.js';
-import merge from '../util/merge.js';
+import Model        from './model.js';
+import merge        from '../util/merge.js';
+import HandlerQueue from '../util/handlerQueue.js';
 
 /**
  * 目前数据请求依赖于 jQuery.ajax 方法
@@ -23,10 +24,8 @@ class ServiceModel extends Model{
 	 * @constructor
 	 * @param   {Object}    [config={}]
 	 * @param   {String}    [config.baseUrl]
-	 * @param   {Boolean}   [config.isCrossDomain]
-	 * @param   {Boolean}   [config.useLock]
-	 * @param   {Function}  [config.successHandler]
-	 * @param   {Function}  [config.errorHandler]
+	 // * @param   {Boolean}   [config.isCrossDomain]
+	 // * @param   {Boolean}   [config.useLock]
 	 * @param   {Number}    [config.timeout]
 	 * */
 	constructor(config={}){
@@ -36,66 +35,27 @@ class ServiceModel extends Model{
 		
 		this._syncTo = null;
 
-		// 设置默认成功处理
-		if( !this._config.successHandler ){
-			this._config.successHandler = (rs)=>{
-				return rs;
-			};
-		}
-
-		// 设置默认错误处理
-		if( !this._config.errorHandler ){
-			this._config.errorHandler = (e)=>{
-				return Promise.reject( e );
-			};
-		}
-
-		// // 任务队列
-		// this._task = {};
-
-		// /**
-		//  * 判断是否使用 jsonp 方式发送数据
-		//  * */
-		// if( this._config.jsonp ){
-		// 	this._req = req.jsonp;
-		// }
-		// else{
-		// 	this._req = req.ajax;
-		// }
-	}
-
-	// ---------- 静态方法 ----------
-	/**
-	 * @summary 设置默认成功处理函数
-	 * @static
-	 * @param   {Function}  handler
-	 * */
-	static setDefaultSuccessHandler(handler){
-		ServiceModel._CONFIG.successHandler = handler;
-	}
-	/**
-	 * @summary 设置默认失败处理函数
-	 * @static
-	 * @param   {Function}  handler
-	 * */
-	static setDefaultErrorHandler(handler){
-		ServiceModel._CONFIG.errorHandler = handler;
+		this.interceptor = {
+			req: new HandlerQueue()
+			, res: new HandlerQueue()
+		};
 	}
 
 	// ---------- 私有方法 ----------
 	/**
-	 * @summary 对 setData 和 getData 的 options 添加跨域参数
+	 * @summary 对 setData 和 getData 的 options 添加默认参数
 	 * @param   {Object}    options setData 和 getData 的 options 参数
 	 * @return  {Object}
 	 * */
-	_setCrossDomain(options){
-		if( this._config.isCrossDomain && !('xhrFields' in options) ){
-			options.xhrFields = {
+	_setOpts(options){
+		return merge(options, {
+			cache: false
+			, dataType: 'json'
+			, timeout: this._config.timeout || 10000
+			, xhrFields: {
 				withCredentials: true
-			};
-		}
-
-		return options;
+			}
+		});
 	}
 
 	// ---------- 公有方法 ----------
@@ -103,6 +63,7 @@ class ServiceModel extends Model{
 	 * @summary     设置数据，默认视为发送 POST 请求到服务器，不会将返回结果保存到本地缓存
 	 * @override
 	 * @param       {String|Object} topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
+	 * @param       {String}        topic.url
 	 * @param       {Object}        [options={}]
 	 * @param       {Object}        [options.data]
 	 * @param       {String}        [options.method]
@@ -118,28 +79,27 @@ class ServiceModel extends Model{
 		}
 
 		topic = this._config.baseUrl + topic;
-		options.method = options.method || 'POST';
-		options.dataType = options.dataType || 'json';
 
-		if( this._config.isCrossDomain ){
-			options = this._setCrossDomain( options );
-		}
+		options = this._setOpts( options );
+
+		options.method = options.method || 'POST';
 
 		if( topic ){
-			/**
-			 * todo $.ajax 的返回结果没有被视为 promise，需要封装一下
-			 * */
-			result = Promise.resolve((()=>{
-				return $.ajax(topic, options).then((data)=>{
-					return data;
-				}).then((data)=>{
-					return this._config.successHandler(data);
-				}, ()=>{
-					return this._config.errorHandler();
-				});
-			})());
+			
+			// 执行请求拦截器
+			result = this.reqInterceptor(topic, options).then((rs)=>{
+
+				// 发送请求，向服务器发送数据
+				console.log('发送 post 请求', topic);
+
+				return this.request(topic, options);
+			}).then((res)=>{
+
+				// 执行响应拦截器
+				return this.resInterceptor( res );
+			});
 		}
-		else{
+		else{   // topic 无值不做任何处理
 			result = Promise.reject();
 		}
 
@@ -180,18 +140,27 @@ class ServiceModel extends Model{
 				result = Promise.reject();
 
 				topic = this._config.baseUrl + topic;
-				options.method = options.method || 'GET';
-				options.dataType = options.dataType || 'json';
 
-				if( this._config.isCrossDomain ){
-					options = this._setCrossDomain( options );
-				}
+				options = this._setOpts( options );
+
+				options.method = options.method || 'GET';
 			}
 
 			// 当从本地缓存时未找到期望的数据会 reject，或者不从缓存中获取数据时也会 reject
 			result = result.catch(()=>{
-				// 发送请求，从服务器获取数据
-				return $.ajax(topic, options).then((data)=>{
+
+				// 执行请求拦截器
+				return this.reqInterceptor(topic, options).then(()=>{
+
+					// 发送请求，从服务器获取数据
+					console.log('发送 get 请求', topic);
+
+					return this.request(topic, options);
+				}).then((res)=>{
+
+					// 执行响应拦截器
+					return this.resInterceptor( res );
+				}).then((data)=>{   // 将数据同步
 					let result
 						;
 
@@ -209,7 +178,7 @@ class ServiceModel extends Model{
 					}
 
 					return result;
-				}).then(this._config.successHandler, this._config.errorHandler);
+				});
 			});
 		}
 		else{   // topic 无值不做任何处理
@@ -249,6 +218,62 @@ class ServiceModel extends Model{
 			this._syncTo = model;
 		}
 	}
+	/**
+	 * @summary 发送请求
+	 * @param   {String}    topic
+	 * @param   {Object}    options
+	 * @return  {Promise}
+	 * */
+	request(topic, options){
+		return $.ajax(topic, options).then((res)=>{ // 请求成功
+			return res;
+		}, ()=>{    // 请求失败
+			return new Error();
+		});
+	}
+	/**
+	 * @summary 执行请求拦截器进行验证
+	 * @param   {String}    topic
+	 * @param   {Object}    options
+	 * @return  {Promise}
+	 * */
+	reqInterceptor(topic, options){
+		let condition = (rs)=>{
+				let result = rs.some((d)=>{
+						return d === false;
+					})
+					;
+
+				if( result ){
+					return Promise.reject();
+				}
+				else{
+					return Promise.resolve();
+				}
+			}
+			;
+
+		console.log('执行全局请求拦截器', topic);
+		return Promise.all( ServiceModel.interceptor.req.fireAll(null, topic, options) ).then( condition ).then(()=>{
+			console.log('执行局部请求拦截器', topic);
+
+			return Promise.all( this.interceptor.req.fireAll(null, topic, options) ).then( condition );
+		});
+	}
+	/**
+	 * @summary 执行响应拦截器进行验证
+	 * @param   {Object}    res
+	 * @return  {Promise}
+	 * */
+	resInterceptor(res){
+		console.log('执行全局响应拦截器');
+
+		return ServiceModel.interceptor.res.fireReduce(null, res).then((res)=>{
+			console.log('执行局部响应拦截器');
+			
+			return this.interceptor.res.fireReduce(null, res);
+		});
+	}
 }
 
 /**
@@ -257,13 +282,19 @@ class ServiceModel extends Model{
  * */
 ServiceModel._CONFIG = {
 	baseUrl: ''
-	, isCrossDomain: true
+	// , isCrossDomain: true
 	, task: false
 	// , jsonp: false
 	, timeout: 10000
-	// , beforeSendHandler: null
-	, successHandler: null
-	, errorHandler: null
+};
+
+/**
+ * 拦截器
+ * @static
+ * */
+ServiceModel.interceptor = {
+	req: new HandlerQueue()
+	, res: new HandlerQueue()
 };
 
 /**

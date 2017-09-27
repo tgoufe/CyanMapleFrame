@@ -1,7 +1,7 @@
 'use strict';
 
-import Model        from   './model.js';
-import merge        from   '../util/merge.js';
+import Model        from './model.js';
+import merge        from '../util/merge.js';
 import {listener}   from '../listener.js';
 
 /**
@@ -57,32 +57,12 @@ class LocalStorageModel extends Model{
 		if( LocalStorageModel._listenOn ){
 			return;
 		}
-
-		// let globalStorage = new Listener({
-		// 	type: 'storage'
-		// 	, target: window || self
-		// });
-		//
-		// globalStorage.add(function(e){
-		// 	let topic = e.key
-		// 		, newVal = e.newValue
-		// 		, oldVal = e.oldValue
-		// 	;
-		//
-		// 	if( LocalStorageModel._EVENT_LIST.length ){
-		//
-		// 		LocalStorageModel._EVENT_LIST.forEach((d)=>d(topic, newVal, oldVal));
-		// 	}
-		// });
-		// globalStorage.on();
-		//
-		// LocalStorageModel._globalStorage = globalStorage;
-		// LocalStorageModel._listenOn = true;
+		
 		LocalStorageModel._globalStorage = listener('storage', function(e){
 			let topic = e.key
 				, newVal = e.newValue
 				, oldVal = e.oldValue
-			;
+				;
 
 			if( LocalStorageModel._EVENT_LIST.length ){
 

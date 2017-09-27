@@ -42,26 +42,13 @@ class Model{
 	 * @constructor
 	 * */
 	constructor(){
-		this._value = {};
+		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 方法
 		this._eventList = [];
 		this._syncList = [];
 
-		this._listener = listener('modelChange', this, (topic, value)=>{
+		this._listener = listener(this, 'modelChange', (e, topic, value)=>{
 			this._sync(topic, value);
 		});
-
-		// this._listener = new Listener({
-		// 	type: 'modelChange'
-		// 	, target: this
-		// });
-		// this._listener.on();
-		// this._listener.add((topic, value)=>{
-		// 	this._sync(topic, value);
-		// });
-
-		// this.on((topic, value)=>{
-		// 	this._sync(topic, value);
-		// });
 	}
 
 	// ---------- 静态方法 ----------
@@ -133,14 +120,12 @@ class Model{
 
 					model = new Model[type]( options );
 
-					console.log('通过工厂方法生成', type, '类型的对象');
-
 					if( !notCache ){
 
 						// 使用缓存，将该子类实例缓存
 						Model._MODEL_CACHE[type] = model;
 
-						console.log('将', type, '类型的对象缓存');
+						console.log('通过工厂方法生成', type, '类型的对象', '将', type, '类型的对象缓存');
 					}
 				}
 				else{   // 使用缓存并存在该子类实例
@@ -150,8 +135,9 @@ class Model{
 				}
 			}
 			else{
-				console.log('不存在注册为 ', type, ' 的子类');
 				model = new Model();
+
+				console.log('不存在注册为 ', type, ' 的子类');
 			}
 		}
 		else{
@@ -186,12 +172,6 @@ class Model{
 	 * */
 	_trigger(topic, value){
 		this._listener.trigger(topic, value);
-
-		// if( this._eventList.length ){
-		// 	setTimeout(()=>{
-		// 		this._eventList.forEach((d)=>d(topic, value));
-		// 	}, 0);
-		// }
 	}
 	/**
 	 * @summary     数据同步的内部实现
@@ -224,30 +204,32 @@ class Model{
 	}
 
 	/**
-	 * @summary     事件触发函数
+	 * @summary     数据改变事件触发回调函数
 	 * @callback    ModelChangeEvent
+	 * @param       {Event}     event
 	 * @param       {String}    topic
 	 * @param       {*}         newValue
 	 * @param       {*}         [oldValue]
 	 * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
+	 *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
 	 * */
 
-	/**
-	 * @summary     在 Promise resolve 时调用的函数
-	 * @callback    promiseResolve
-	 * @param       {*}     result
-	 * */
-	/**
-	 * @summary     在 Promise reject 时调用的函数
-	 * @callback    promiseReject
-	 * @param       {*}     result
-	 * */
-	/**
-	 * @typedef     {Promise.<Object,Error>}    ModelPromise
-	 * @property    {Object}
-	 * @property    {Object}
-	 * @throws      {Error}
-	 * */
+	// /**
+	//  * @summary     在 Promise resolve 时调用的函数
+	//  * @callback    promiseResolve
+	//  * @param       {*}     result
+	//  * */
+	// /**
+	//  * @summary     在 Promise reject 时调用的函数
+	//  * @callback    promiseReject
+	//  * @param       {*}     result
+	//  * */
+	// /**
+	//  * @typedef     {Promise.<Object,Error>}    ModelPromise
+	//  * @property    {Object}
+	//  * @property    {Object}
+	//  * @throws      {Error}
+	//  * */
 
 	/**
 	 * @summary     当 setData 传入一个 json 时内部调用函数
@@ -338,7 +320,7 @@ class Model{
 				// 	});
 				// }
 
-				console.log('监控', topic, '属性的值');
+				// console.log('监控', topic, '属性的值');
 
 				/**
 				 * 不能同时设置访问器 (get 和 set) 和 writable 或 value，否则会报错误
@@ -413,27 +395,18 @@ class Model{
 		}
 		else{
 			try {
-				// if( topic in this._value ){
-				// 	if( this._value.hasOwnProperty(topic) ){
-				//
-				// 		delete this._value[topic];
-				// 	}
-				// 	else{
-				//
-				// 	}
-				// }
 				if( topic in this._value ){
-					if( this._value.hasOwnProperty(topic) ){
+					// if( this._value.hasOwnProperty(topic) ){
 
 						delete this._value[topic];
 
 						result = Promise.resolve(true);
 
 						this._trigger(topic, null);
-					}
-					else{
-						result = Promise.reject( new Error('只能删除自定义属性') );
-					}
+					// }
+					// else{
+					// 	result = Promise.reject( new Error('只能删除自定义属性') );
+					// }
 				}
 				else{   // model 中不存在该数据
 					result = Promise.resolve(true);

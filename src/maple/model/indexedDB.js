@@ -197,7 +197,7 @@ class IndexedDBModel extends Model{
 		}
 		else{
 			result = super.setData(topic, value).then(()=>{
-				return this._put(topic, this._stringify(value));
+				return this._put(topic, value);
 			});
 		}
 
@@ -222,14 +222,19 @@ class IndexedDBModel extends Model{
 		}
 		else{
 			result = super.getData( topic ).catch(()=>{
-				return this._select( topic ).then((value)=>{
+				return this._select( topic ).then((rs)=>{
+					let value
+						;
 
-					if( value ){
+					if( rs ){
+						value = rs.value;
 
-						try{
-							value = JSON.parse( value );
+						if( typeof value === 'string' ){ // 若为字符串类型的数据，尝试进行解析
+							try{
+								value = JSON.parse( value );
+							}
+							catch(e){}
 						}
-						catch(e){}
 
 						// 在内存中保留该值
 						super.setData(topic, value);
@@ -242,6 +247,7 @@ class IndexedDBModel extends Model{
 				});
 			});
 		}
+
 		return result;
 	}
 	/**
@@ -273,22 +279,69 @@ class IndexedDBModel extends Model{
 			return this._clear();
 		});
 	}
-	// todo indexedDB cursor 操作
-	// /**
-	//  * @summary 获取通过 range 获取数据
-	//  * @param   {Number}            [min]
-	//  * @param   {Number|Boolean}    [max]
-	//  * @param   {Boolean}           [eqMin=true]
-	//  * @param   {Boolean}           [eqMax=true]
-	//  * */
-	// getDataByRange(min, max, eqMin=true, eqMax=true){
-	// 	return this._store.then((db)=>{
-	// 		return new Promise((resolve, reject)=>{
-	// 			let objectStore = db.transitions([this._config.tableName], 'readwrite').objectStore( this._config.tableName )
-	// 				, objectStoreIndex = objectStore.index(  );
-	// 		});
-	// 	})
-	// }
+	/**
+	 * @summary 获取通过 range 获取数据
+	 * @param   {Number}            [min]
+	 * @param   {Number|Boolean}    [max]
+	 * @param   {Boolean}           [eqMin=true]
+	 * @param   {Boolean}           [eqMax=true]
+	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 cursor 列表
+	 * @todo    区间取值功能
+	 * */
+	getDataByRange(min, max, eqMin=true, eqMax=true){
+		let argc = arguments.length
+			;
+
+		return this._store.then((db)=>{
+			return new Promise((resolve, reject)=>{
+				let objectStore = db.transaction([this._config.tableName], 'readwrite').objectStore( this._config.tableName )
+					// , keyRangeValue = IDBKeyRange.bound(min, max, eqMin, eqMax)
+					// , objectStoreRequest = objectStore.openCursor( keyRangeValue )
+					, objectStoreRequest = objectStore.openCursor()
+					, cursorList = []
+					;
+
+				// switch( argc ){
+				// 	case 1:
+				// 		keyRangeValue = IDBKeyRange.bound( min );
+				// 		break;
+				// 	case 2:
+				// 		if( typeof max === 'boolean' ){
+				// 			keyRangeValue = IDBKeyRange.lowerBound(min, max);
+				// 		}
+				// 		else{
+				// 			keyRangeValue = IDBKeyRange.bound(min, max);
+				// 		}
+				// 		break;
+				// 	case 3:
+				// 		keyRangeValue = IDBKeyRange.bound()
+				// 		break;
+				// 	case 4:
+				// 		break;
+				// 	default:
+				// 		break;
+				// }
+
+				objectStoreRequest.onsuccess = function(e){
+					let cursor = e.target.result
+					;
+
+					if( cursor ){
+						cursorList.push( cursor.value );
+
+						cursor.continue();
+					}
+					else{
+						resolve( cursorList );
+					}
+				};
+				objectStoreRequest.onerror = function(e){
+					console.log( e );
+					reject( e );
+				};
+			});
+		});
+	}
 }
 
 /**
@@ -302,6 +355,10 @@ IndexedDBModel._CONFIG = {
 	, dbVersion: 1
 	, keyPath: 'topic'
 	, index: [{
+		name: 'topic'
+		, keyPath: 'topic'
+		, unique: true
+	}, {
 		name: 'value'
 		, keyPath: 'value'
 		, unique: false

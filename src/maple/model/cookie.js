@@ -1,5 +1,6 @@
 'use strict';
 
+import domain       from '../runtime/domain.js';
 import Model        from './model.js';
 import dateFormat   from '../util/dateFormat.js';
 
@@ -44,7 +45,7 @@ class CookieModel extends Model{
 	 * @return  {String}                返回一个 UTC 格式的时间字符串
 	 * */
 	static _transDate(date){
-		if( date instanceof Date){}
+		if( date instanceof Date ){}
 		else{
 			date = dateFormat.formatTimeStr( date );
 
@@ -94,8 +95,14 @@ class CookieModel extends Model{
 		document.cookie = encodeURIComponent( topic ) +'='+
 			encodeURIComponent( this._stringify(value) ) +
 			Object.keys( CookieModel._DEFAULT ).reduce((a, d)=>{    // 整理配置
+
+				a += '; '+ d +'=';
+
 				if( d in options ){
-					a += '; '+ d +'='+ options[d];
+					a += options[d];
+				}
+				else{
+					a += CookieModel._DEFAULT[d];
 				}
 
 				return a;
@@ -123,10 +130,16 @@ class CookieModel extends Model{
 			cookies = [];
 		}
 
+		/**
+		 * todo 调整机制
+		 *
+		 * 现在每次取值，都会将 cookie 进行一次解析
+		 * 期望改为只解析一次
+		 * */
 		for(l = cookies.length; i < l; i++ ){
 			t = cookies[i].split('=');
 
-			if( topic === decodeURIComponent( t[0] ) ){
+			if( topic === decodeURIComponent(t[0]) ){
 				value = decodeURIComponent( t[1] );
 				break;
 			}
@@ -322,7 +335,7 @@ class CookieModel extends Model{
  * */
 CookieModel._DEFAULT = {
 	path: '/'
-	, domain: ''
+	, domain: domain.env +'.'+ domain.host
 	, expires: ''
 	, secure: ''
 };

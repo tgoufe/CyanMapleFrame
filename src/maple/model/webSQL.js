@@ -50,7 +50,7 @@ class WebSQLModel extends Model{
 
 			this._config.sql = merge(sql, WebSQLModel._CONFIG.sql);
 		}
-		               console.log(this._config.sql)
+
 		Object.keys( this._config.sql ).forEach((d)=>{
 			this._config.sql[d] = this._replaceTableName( this._config.sql[d] );
 		});
