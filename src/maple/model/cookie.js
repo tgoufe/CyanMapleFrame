@@ -1,6 +1,5 @@
 'use strict';
 
-import domain       from '../runtime/domain.js';
 import Model        from './model.js';
 import dateFormat   from '../util/dateFormat.js';
 
@@ -335,7 +334,7 @@ class CookieModel extends Model{
  * */
 CookieModel._DEFAULT = {
 	path: '/'
-	, domain: domain.env +'.'+ domain.host
+	, domain: ''
 	, expires: ''
 	, secure: ''
 };

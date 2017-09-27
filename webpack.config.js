@@ -61,6 +61,6 @@ module.exports = {
         Vue:'Vue'
     },
     resolve: {
-        modules: [__dirname]
+        modules: ["node_modules", __dirname]
     }
 };
