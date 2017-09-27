@@ -34,8 +34,6 @@
 </pre>
  * */
 
-import $        from 'jquery';
-
 // /**
 //  * 基于 jQuery Deferred 对象简易实现 Promise，主要针对 UC 浏览器
 //  * @todo    期望改为根据全局环境动态加载
@@ -94,7 +92,6 @@ let maple = {
 	, url
 	, device
 
-	, Model
 	, model: Model
 
 	, view

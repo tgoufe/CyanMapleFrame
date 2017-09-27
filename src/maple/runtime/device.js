@@ -65,9 +65,9 @@ let device = function(){
 };
 
 let android = ua.match(/(Android);?[\s\/]+([\d.]+)?/);
-let ipad = ua.match(/(iPad).*OS\s([\d_]+)/);
-let ipod = ua.match(/(iPod)(.*OS\s([\d_]+))?/);
-let iphone = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/);
+let ipad    = ua.match(/(iPad).*OS\s([\d_]+)/);
+let ipod    = ua.match(/(iPod)(.*OS\s([\d_]+))?/);
+let iphone  = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/);
 
 device.ios = device.android = device.iphone = device.ipad = device.androidChrome = false;
 
@@ -112,11 +112,14 @@ device.webView = (iphone || ipad || ipod) && ua.match(/.*AppleWebKit(?!.*Safari)
 // todo iOS8 移除了 minimal-ui 删掉？
 // Minimal UI
 if (device.os && device.os === 'ios') {
-	let osVersionArr = device.osVersion.split('.');
+	let osVersionArr = device.osVersion.split('.')
+		, $metaViewport = $('meta[name="viewport"]')
+		;
 	device.minimalUi = !device.webView &&
 		(ipod || iphone) &&
 		(osVersionArr[0] * 1 === 7 ? osVersionArr[1] * 1 >= 1 : osVersionArr[0] * 1 > 7) &&
-		$('meta[name="viewport"]').length > 0 && $('meta[name="viewport"]').attr('content').indexOf('minimal-ui') >= 0;
+		$metaViewport.length > 0 &&
+		$metaViewport.attr('content').indexOf('minimal-ui') >= 0;
 }
 
 // Check for status bar and fullscreen app mode
@@ -130,7 +133,7 @@ device.statusBar = device.webView && (windowWidth * windowHeight === screen.widt
 device.pixelRatio = window.devicePixelRatio || 1;
 
 // 微信，坑..
-device.weixin = /MicroMessenger/i.test( ua );
+device.wechat = device.weixin = /MicroMessenger/i.test( ua );
 
 // UC 浏览器
 device.uc = ua.indexOf('UCBrowser') > -1;
@@ -140,14 +143,15 @@ device.alipay = ua.indexOf("AlipayClient") > 0;
 
 
 /**
- * @exports device
+ * @exports     device
+ * @type        {Object}
+ * @memberOf    maple
  * */
 export default device;
 
 /**
  * todo 更换位置
  * */
-// Classes
 let classNames = [];
 
 classNames.push('pixel-ratio-' + Math.floor(device.pixelRatio));

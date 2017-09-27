@@ -1,9 +1,8 @@
 'use strict';
 
-import url          from 'url';
+import url          from '../runtime/url.js';
 import merge        from '../util/merge.js';
 import {listener}   from '../listener.js';
-import view     from '../view/index.js';
 
 /**
  * @summary     路由回调函数
@@ -220,18 +219,6 @@ class Router{
 		});
 	}
 }
-
-let temp = {
-	pushState(){}
-	, replaceState(){}
-	, go(){}
-	, forward(){}
-	, back(){}
-
-	, assign(){}
-	, replace(){}
-	, reload(){}
-};
 
 let router = new Router();
 
