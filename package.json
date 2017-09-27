@@ -37,7 +37,7 @@
     "lodash": "~4.17.4",
     "vue": "~2.3.4"
   },
-  "main": "dist/index.js",
+  "main": "dist/base.js",
   "scripts": {
     "dev": "webpack-dev-server",
     "build": "webpack",

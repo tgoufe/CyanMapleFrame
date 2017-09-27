@@ -94,6 +94,7 @@ let maple = {
 	, url
 	, device
 
+	, Model
 	, model: Model
 
 	, view

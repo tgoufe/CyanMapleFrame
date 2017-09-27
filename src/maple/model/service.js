@@ -298,6 +298,11 @@ ServiceModel.interceptor = {
 };
 
 /**
+ * 特别标记 ServiceModel
+ * */
+Model.ServiceModel = ServiceModel;
+
+/**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成
  * */
 Model.register('service', ServiceModel);
