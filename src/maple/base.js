@@ -107,7 +107,7 @@ let maple = {
 	, notify
 };
 
-// window.maple = maple;
+window.maple = maple;
 
 export default maple;
 

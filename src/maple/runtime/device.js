@@ -5,7 +5,7 @@
  * @todo    评估一下是否有用，基本上只用到判断是否为微信，判断 app 使用了 cookie。。。
  * */
 
-import $    from 'jquery';
+// import $    from 'jquery';
 
 const alias = {
 		androidchorme: 'androidchrome'
@@ -109,18 +109,18 @@ if( device.ios && device.osVersion && ua.indexOf('Version/') >= 0 ){
 // WebView
 device.webView = (iphone || ipad || ipod) && ua.match(/.*AppleWebKit(?!.*Safari)/i);
 
-// todo iOS8 移除了 minimal-ui 删掉？
-// Minimal UI
-if (device.os && device.os === 'ios') {
-	let osVersionArr = device.osVersion.split('.')
-		, $metaViewport = $('meta[name="viewport"]')
-		;
-	device.minimalUi = !device.webView &&
-		(ipod || iphone) &&
-		(osVersionArr[0] * 1 === 7 ? osVersionArr[1] * 1 >= 1 : osVersionArr[0] * 1 > 7) &&
-		$metaViewport.length > 0 &&
-		$metaViewport.attr('content').indexOf('minimal-ui') >= 0;
-}
+// // todo iOS8 移除了 minimal-ui 删掉？
+// // Minimal UI
+// if (device.os && device.os === 'ios') {
+// 	let osVersionArr = device.osVersion.split('.')
+// 		, $metaViewport = $('meta[name="viewport"]')
+// 		;
+// 	device.minimalUi = !device.webView &&
+// 		(ipod || iphone) &&
+// 		(osVersionArr[0] * 1 === 7 ? osVersionArr[1] * 1 >= 1 : osVersionArr[0] * 1 > 7) &&
+// 		$metaViewport.length > 0 &&
+// 		$metaViewport.attr('content').indexOf('minimal-ui') >= 0;
+// }
 
 // Check for status bar and fullscreen app mode
 let windowHeight = document.documentElement.clientHeight
@@ -149,36 +149,36 @@ device.alipay = ua.indexOf("AlipayClient") > 0;
  * */
 export default device;
 
-/**
- * todo 更换位置
- * */
-let classNames = [];
-
-classNames.push('pixel-ratio-' + Math.floor(device.pixelRatio));
-if( device.pixelRatio >= 2 ){
-	classNames.push('retina');
-}
-
-// OS classes
-if( device.os ){
-	classNames.push(device.os, device.os + '-' + device.osVersion.split('.')[0], device.os + '-' + device.osVersion.replace(/\./g, '-'));
-	if( device.os === 'ios'){
-		let major = parseInt(device.osVersion.split('.')[0], 10);
-		for (let i = major - 1; i >= 6; i--) {
-			classNames.push('ios-gt-' + i);
-		}
-	}
-
-}
-// Status bar classes
-if( device.statusBar ){
-	classNames.push('with-statusbar-overlay');
-}
-else{
-	$('html').removeClass('with-statusbar-overlay');
-}
-
-// Add html classes
-if( classNames.length > 0 ){
-	$('html').addClass(classNames.join(' '));
-}
+// /**
+//  * todo 更换位置
+//  * */
+// let classNames = [];
+//
+// classNames.push('pixel-ratio-' + Math.floor(device.pixelRatio));
+// if( device.pixelRatio >= 2 ){
+// 	classNames.push('retina');
+// }
+//
+// // OS classes
+// if( device.os ){
+// 	classNames.push(device.os, device.os + '-' + device.osVersion.split('.')[0], device.os + '-' + device.osVersion.replace(/\./g, '-'));
+// 	if( device.os === 'ios'){
+// 		let major = parseInt(device.osVersion.split('.')[0], 10);
+// 		for (let i = major - 1; i >= 6; i--) {
+// 			classNames.push('ios-gt-' + i);
+// 		}
+// 	}
+//
+// }
+// // Status bar classes
+// if( device.statusBar ){
+// 	classNames.push('with-statusbar-overlay');
+// }
+// else{
+// 	$('html').removeClass('with-statusbar-overlay');
+// }
+//
+// // Add html classes
+// if( classNames.length > 0 ){
+// 	$('html').addClass(classNames.join(' '));
+// }

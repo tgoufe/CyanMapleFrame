@@ -5,10 +5,10 @@ import merge        from '../util/merge.js';
 import HandlerQueue from '../util/handlerQueue.js';
 
 /**
- * 目前数据请求依赖于 jQuery.ajax 方法
- * @todo 替换为自开发请求类库
+ * @file    所有 ajax 请求基类
+ *          目前数据请求依赖于 jQuery.ajax 方法
+ * @todo    替换为自开发请求类库
  * */
-import $ from 'jquery';
 
 /**
  * @class
@@ -225,11 +225,18 @@ class ServiceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	request(topic, options){
-		return $.ajax(topic, options).then((res)=>{ // 请求成功
-			return res;
-		}, ()=>{    // 请求失败
-			return new Error();
-		});
+
+		try{
+			return $.ajax(topic, options).then((res)=>{ // 请求成功
+				return res;
+			}, ()=>{    // 请求失败
+				return new Error();
+			});
+		}
+		catch(e){
+			console.log('未加载 jquery');
+			return Promise.reject();
+		}
 	}
 	/**
 	 * @summary 执行请求拦截器进行验证

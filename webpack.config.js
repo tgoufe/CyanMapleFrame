@@ -18,6 +18,8 @@ module.exports = {
     entry: {
         maple: [__dirname + '/src/maple/index.js']
         , base: [__dirname + '/src/maple/base.js']
+
+        , 
     },
     //入口文件输出配置
     output: {
@@ -59,6 +61,7 @@ module.exports = {
     },
     externals:{
         Vue:'Vue'
+        , $: 'jquery'
     },
     resolve: {
         modules: ["node_modules", __dirname]
