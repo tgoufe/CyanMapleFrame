@@ -39,7 +39,7 @@
 //  * @todo    期望改为根据全局环境动态加载
 //  * */
 // import './promise.js';
-import 'es6-promise/auto';
+// import 'es6-promise/auto';
 
 /**
  * @namespace   maple

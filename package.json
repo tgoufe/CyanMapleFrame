@@ -38,6 +38,7 @@
     "vue": "~2.3.4"
   },
   "main": "dist/base.js",
+  "module": "src/maple/base.js",
   "scripts": {
     "dev": "webpack-dev-server",
     "build": "webpack",

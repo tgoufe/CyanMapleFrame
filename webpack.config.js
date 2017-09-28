@@ -1,6 +1,7 @@
-var webpack = require('webpack');
-var path = require('path');
-var compiler = require('vue-template-compiler');
+let webpack = require('webpack')
+    , path = require('path')
+    , compiler = require('vue-template-compiler')
+    ;
 
 module.exports = {
     devtool: '#source-map',
@@ -18,8 +19,6 @@ module.exports = {
     entry: {
         maple: [__dirname + '/src/maple/index.js']
         , base: [__dirname + '/src/maple/base.js']
-
-        , 
     },
     //入口文件输出配置
     output: {
@@ -28,7 +27,7 @@ module.exports = {
     },
     module: {
         //加载器配置
-        loaders: [{
+        rules: [{
             test: /\.css$/,
             loader: 'style-loader!css-loader!sass-loader'
         }, {
@@ -61,7 +60,6 @@ module.exports = {
     },
     externals:{
         Vue:'Vue'
-        , $: 'jquery'
     },
     resolve: {
         modules: ["node_modules", __dirname]
