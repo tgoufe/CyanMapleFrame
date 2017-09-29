@@ -17,13 +17,13 @@ module.exports = {
     ],
     //页面入口文件配置
     entry: {
-        maple: [__dirname + '/src/maple/index.js']
-        , base: [__dirname + '/src/maple/base.js']
+        maple: [path.resolve(__dirname, './src/maple/index.js')]
+        , base: [path.resolve(__dirname, './src/maple/base.js')]
     },
     //入口文件输出配置
     output: {
-        path: __dirname,
-        filename: './dist/[name].js'
+        path: path.resolve(__dirname, './dist/'),
+        filename: '[name].js'
     },
     module: {
         //加载器配置
@@ -44,7 +44,7 @@ module.exports = {
             loader: 'vue-loader',
             options: {
                 loaders: {
-                    js: 'babel-loader?{"presets":["es2015"],"plugins": ["transform-object-rest-spread"]}',
+                    js: 'babel-loader',
                     css: 'vue-style-loader!css-loader',
                     scss: 'style-loader!css-loader!sass-loader',
                     sass: 'style-loader!css-loader!sass-loader?indentedSyntax'
