@@ -100,12 +100,11 @@ class HandlerQueue{
 	}
 	/**
 	 * @summary 执行队列中的全部 handler，将返回一个结果数组
-	 * @param   {Object}    [context]
 	 * @param   {...*}
 	 * @return  {Array}
 	 * @desc    当传入参数时，参数被视为传入 handler 的参数（所有 handler 都会传入相同的参数），全部执行后会重置
 	 * */
-	fireAll(context){
+	fireAll(){
 		let args = arguments
 			;
 

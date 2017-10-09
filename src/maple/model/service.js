@@ -261,10 +261,10 @@ class ServiceModel extends Model{
 			;
 
 		console.log('执行全局请求拦截器', topic);
-		return Promise.all( ServiceModel.interceptor.req.fireAll(null, topic, options) ).then( condition ).then(()=>{
+		return Promise.all( ServiceModel.interceptor.req.fireAll(topic, options) ).then( condition ).then(()=>{
 			console.log('执行局部请求拦截器', topic);
 
-			return Promise.all( this.interceptor.req.fireAll(null, topic, options) ).then( condition );
+			return Promise.all( this.interceptor.req.fireAll(topic, options) ).then( condition );
 		});
 	}
 	/**
@@ -275,10 +275,10 @@ class ServiceModel extends Model{
 	resInterceptor(res){
 		console.log('执行全局响应拦截器');
 
-		return ServiceModel.interceptor.res.fireReduce(null, res).then((res)=>{
+		return ServiceModel.interceptor.res.fireReduce( res ).then((res)=>{
 			console.log('执行局部响应拦截器');
 			
-			return this.interceptor.res.fireReduce(null, res);
+			return this.interceptor.res.fireReduce( res );
 		});
 	}
 }
