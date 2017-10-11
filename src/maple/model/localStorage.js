@@ -37,7 +37,18 @@ class LocalStorageModel extends Model{
 			this._storeSync = self.localStorage;
 			this._store = Promise.resolve( self.localStorage );
 
-			config.listen && !LocalStorageModel._listenOn && LocalStorageModel.listenOn();
+			if( this._config.listen ){
+				LocalStorageModel.listenOn();
+
+				// todo 保留事件
+				LocalStorageModel._GLOBAL_LISTENER.add((e)=>{
+					let topic = e.key
+						, newVal = e.newValue
+						;
+
+					this.setData(topic, newVal);
+				});
+			}
 		}
 		else{
 			this._enabled = false;
@@ -58,22 +69,14 @@ class LocalStorageModel extends Model{
 			return;
 		}
 		
-		LocalStorageModel._globalStorage = listener('storage', function(e){
-			let topic = e.key
-				, newVal = e.newValue
-				, oldVal = e.oldValue
-				;
-
-			if( LocalStorageModel._EVENT_LIST.length ){
-
-				LocalStorageModel._EVENT_LIST.forEach((d)=>d(topic, newVal, oldVal));
-			}
-		});
+		LocalStorageModel._GLOBAL_LISTENER = listener('storage');
 		LocalStorageModel._listenOn = true;
 	}
 	static listenOff(){
-		if( LocalStorageModel._listenOn && LocalStorageModel._globalStorage ){
-			LocalStorageModel._globalStorage.off();
+		if( LocalStorageModel._listenOn && LocalStorageModel._GLOBAL_LISTENER ){
+			LocalStorageModel._GLOBAL_LISTENER.off();
+
+			LocalStorageModel._GLOBAL_LISTENER = null;
 
 			LocalStorageModel._listenOn = false;
 		}
@@ -236,34 +239,6 @@ class LocalStorageModel extends Model{
 			});
 		});
 	}
-
-	/**
-	 * @summary 绑定数据监视事件
-	 * @param   {ModelChangeEvent}  callback
-	 * */
-	on(callback){
-
-		this._eventList.push( callback );
-
-		LocalStorageModel._EVENT_LIST.push( callback );
-	}
-	/**
-	 * @summary 解除绑定数据监控回调函数
-	 * @param   {ModelChangeEvent}  callback
-	 * */
-	off(callback){
-		let i = this._eventList.indexOf( callback )
-			;
-
-		if( i !== -1 ){
-			this._eventList.splice(i, 1);
-		}
-
-		i = LocalStorageModel._EVENT_LIST.indexOf( callback );
-		if( i !== -1 ){
-			LocalStorageModel._EVENT_LIST.splice(i, 1);
-		}
-	}
 }
 
 /**
@@ -274,16 +249,20 @@ class LocalStorageModel extends Model{
 LocalStorageModel._CONFIG = {
 	listen: true
 };
-/**
- * 保存的事件队列
- * @static
- * */
-LocalStorageModel._EVENT_LIST = [];
+// /**
+//  * 保存的事件队列
+//  * @static
+//  * */
+// LocalStorageModel._EVENT_LIST = [];
 /**
  * 全局 storage 监听事件是否开启
  * @static
  * */
-LocalStorageModel._listenOn = false;
+LocalStorageModel._listenOn = true;
+/**
+ * 全局 storage 事件监听
+ * */
+LocalStorageModel._GLOBAL_LISTENER = listener('storage');
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成
