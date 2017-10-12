@@ -12,7 +12,7 @@
  |  |       |  |          |  |            |  |            |  |
  |  |  url  |  |  device  |  |  listener  |  |  util      |  |   运行环境检测 & 基础工具函数
  |  |       |  |          |  |            |  |            |  |
- |  +-------+  +----------+  +------------+  +----------- +  |
+ |  +-------+  +----------+  +------------+  +------------+  |
  |                                                           |
 -----------------------------------------------------------------------
  |                                                           |
@@ -33,13 +33,6 @@
  +-----------------------------------------------------------+
 </pre>
  * */
-
-// /**
-//  * 基于 jQuery Deferred 对象简易实现 Promise，主要针对 UC 浏览器
-//  * @todo    期望改为根据全局环境动态加载
-//  * */
-// import './promise.js';
-// import 'es6-promise/auto';
 
 /**
  * @namespace   maple
@@ -84,6 +77,25 @@ import router   from './router/index.js';
  * */
 import position from './position.js';
 
+/**
+ * todo 实验性功能
+ * */
+
+/**
+ * ---------- 动画库 ----------
+ * */
+import * as animate from './animate/index.js';
+
+/**
+ * ---------- 注册后台 worker ----------
+ * */
+import register from './register/index.js';
+
+/**
+ * ---------- 桌面通知 ----------
+ * */
+import notify   from './notify.js';
+
 let maple = {
 	Listener
 	, listener
@@ -110,22 +122,3 @@ let maple = {
 window.maple = maple;
 
 export default maple;
-
-/**
- * todo 实验性功能
- * */
-
-/**
- * ---------- 动画库 ----------
- * */
-import * as animate from './animate/index.js';
-
-/**
- * ---------- 注册后台 worker ----------
- * */
-import register from './register/index.js';
-
-/**
- * ---------- 桌面通知 ----------
- * */
-import notify   from './notify.js';

@@ -257,18 +257,6 @@ let listener = (target, type, callback={}, options={})=>{
 	return ls;
 };
 
-let addHandler = (target, eventType, handler)=>{
-	if( 'addEventListener' in target ){
-		target.addEventListener(eventType, handler, false);
-	}
-	else if( 'attachEvent' in target ){
-		target.attachEvent('on'+ eventType, handler);
-	}
-	else{
-		target['on'+ eventType] = handler;
-	}
-};
-
 export {
 	Listener
 	, listener

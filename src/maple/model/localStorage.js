@@ -46,6 +46,11 @@ class LocalStorageModel extends Model{
 						, newVal = e.newValue
 						;
 
+					try{
+						newVal = JSON.parse( newVal );
+					}
+					catch(e){}
+
 					this.setData(topic, newVal);
 				});
 			}

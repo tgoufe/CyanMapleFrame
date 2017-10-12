@@ -11,7 +11,7 @@
  * @memberOf    maple.util
  * @param       {Function}  func
  * @param       {Number}    wait
- * @param       {Function}  cancelCB    上一次计时器取消时调用
+ * @param       {Function}  [cancelCB]  上一次计时器取消时调用
  * @return      {Function}
  * */
 let debounce = function(func, wait, cancelCB){
