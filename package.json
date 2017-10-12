@@ -1,6 +1,6 @@
 {
   "name": "cyan-maple",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "jqMobileVersion": "1.4.2",
   "devDependencies": {
     "babel-core": "~6.26.0",
