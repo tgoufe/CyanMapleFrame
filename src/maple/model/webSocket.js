@@ -17,6 +17,73 @@ class WebSocketModel extends Model{
 		super( config );
 
 		this._config = merge(config, WebSocketModel._CONFIG);
+
+		this._clinet = new Promise((resolve, reject)=>{
+			if( 'WebSocket' in self ){
+				let socket = new WebSocket(this._config.url)
+					;
+
+				socket.onopen = ()=>{
+					resolve( socket );
+				};
+				socket.onclose = ()=>{
+					this._clinet = Promise.reject( new Error('该 Web Socket 连接已经被关闭') );
+				};
+				socket.onmessage = (e)=>{
+					let data = e.data
+						;
+
+					if( data.topic && data.data ){
+						super.setData(data.topic, data.data);
+					}
+				}
+			}
+			else{
+				reject( new Error('此浏览器不支持 Web Socket') );
+			}
+		});
+	}
+
+	//---------- 公有接口 ----------
+	/**
+	 * @summary 获取数据
+	 * @param   {String}    topic
+	 * @param   {*}         data
+	 * */
+	setData(topic, data){
+		return this._clinet.then((socket)=>{
+			socket.send({
+				topic
+				, data
+			});
+		}).then(()=>{
+			return true
+		});
+	}
+	/**
+	 *
+	 * */
+	getData(topic){}
+	/**
+	 *
+	 * */
+	removeData(topic){}
+	/**
+	 * 
+	 * */
+	clearData(){}
+	/**
+	 * @summary 关闭当前 socket 连接
+	 * @param   {Number}    [code]
+	 * @param   {String}    [reason]
+	 * @return  {Promise}
+	 * */
+	close(code, reason){
+		this._clinet.then((socket)=>{
+			socket.close();
+		});
+
+		return Promise.resolve( true );
 	}
 }
 
