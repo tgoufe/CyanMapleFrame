@@ -1,5 +1,5 @@
 <template>
-	<div class="mask center" :class="className" style="z-index: 1;" v-if="showCmuiDialog">
+	<div class="mask center" :class="className" style="z-index: 1;" v-if="showCmuiDialog" @touchmove.prevent.stop="disabledTouchMove">
 		<div class="cmui-dialogContainer cmui-alertContainer">
 			<div class="cmui-dialogTitle cmui-alertTitle" v-html="title"></div>
 			<div class="cmui-dialogBody cmui-alertBody" v-if="content" v-html="content" :style="bodyStyle"></div>
@@ -76,6 +76,7 @@
 				document.body.classList.remove('overflow-h');
 				(typeof this.okFn==='function')&&this.okFn()
 			}
+			, disabledTouchMove(){}
 		}
 	}
 </script>
