@@ -1,6 +1,7 @@
 'use strict';
 
 import {listener}   from '../listener.js';
+import merge        from '../util/merge.js';
 
 /**
  * @class
@@ -40,14 +41,18 @@ model.getData('isLogin', 'token', 'hybrid').then(({isLogin, token, hybrid})=>{
 class Model{
 	/**
 	 * @constructor
+	 * @param   {Object}    [config={}]
+	 * @param   {String}    [config.eventType]
 	 * */
-	constructor(){
+	constructor(config={}){
 		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 方法
 		this._history = Object.create( null );  // 历史记录
 		this._eventList = [];
 		this._syncList = [];
 
-		this._listener = listener(this, 'modelChange', (e, topic, value)=>{
+		this.config = merge(config, Model._CONFIG);
+
+		this._listener = listener(this, this.config.eventType, (e, topic, value)=>{
 			this._sync(topic, value);
 		});
 	}
@@ -509,6 +514,13 @@ class Model{
 }
 
 // ---------- 静态属性 ----------
+/**
+ * 默认配置
+ * */
+Model._CONFIG = {
+	eventType: 'modelChange'
+};
+
 /**
  * 子类对象缓存
  * @static
