@@ -19,6 +19,8 @@ import merge        from './merge.js';
 // 时间格式处理
 import dateFormat   from './dateFormat.js';
 
+import HandlerQueue from './handlerQueue.js';
+
 // 验证
 // import validate     from './validate.js';
 
@@ -32,6 +34,9 @@ export default {
 
 	, merge
 	, dateFormat
+
+	, HandlerQueue
+
 	// , validate
 	, tools
 };
