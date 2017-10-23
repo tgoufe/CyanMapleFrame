@@ -15,6 +15,7 @@ import lockup       from './lockup.js';
 
 // 数据处理类
 import merge        from './merge.js';
+import classify     from './classify.js';
 
 // 时间格式处理
 import dateFormat   from './dateFormat.js';
@@ -33,6 +34,8 @@ export default {
 	, lockup
 
 	, merge
+	, classify
+
 	, dateFormat
 
 	, HandlerQueue
