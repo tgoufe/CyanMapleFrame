@@ -77,13 +77,23 @@ class Url{
 
 		return search ? search.split('&').reduce((all, d)=>{
 			let temp
+				, key, value
 				;
 
 			if( d ){
 				temp = d.split('=');
+				key = decodeURIComponent( temp[0] );
+				value = decodeURIComponent( temp[1] || '' );
 
 				// 解码
-				all[decodeURIComponent(temp[0])] = decodeURIComponent(temp[1] || '').replace(/\?10000skup(=true)?/, '');  // 删除微信下的?10000skip todo ?
+				// all[decodeURIComponent(temp[0])] = decodeURIComponent(temp[1] || '').replace(/\?10000skip(=true)?/, '');  // 删除微信下的?10000skip todo ?
+
+				try{    // 对数据类型进行转换
+					value = JSON.parse( value );
+				}
+				catch(e){}
+
+				all[key] = value;
 			}
 
 			return all;
