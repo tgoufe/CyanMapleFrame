@@ -1,25 +1,45 @@
 let webpack = require('webpack')
     , path = require('path')
+    , HtmlWebpackPlugin = require('html-webpack-plugin')
     , compiler = require('vue-template-compiler')
+    //demo页面地址
+    , demoPgaeList=[
+        'headComponent.js'
+    ]
+    //文件入口
+    , entry={
+        maple: [path.resolve(__dirname, './src/maple/index.js')]
+    }
+    //插件
+    , plugins=[
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {
+        //         warnings: false
+        //     },
+        //     sourceMap: true
+        // }) //压缩JS
+    ]
     ;
-
+//压缩页面HTML文件并且插入对应JS文件
+demoPgaeList.forEach(function(i) {
+    var path = i.replace(/\.js$/, '');
+    entry[path] = './demo/javascript/'+i;
+    plugins.push(new HtmlWebpackPlugin({
+        minify: { //压缩HTML文件
+            removeComments: true, //移除HTML中的注释
+            collapseWhitespace: true //删除空白符与换行符
+        },
+        template: './demo/html/'+path+'.html',
+        chunks: ['maple', path],
+        filename: './demo/html/'+path+'.html'
+    }))
+});
 module.exports = {
     devtool: '#source-map',
     //插件项
-    plugins: [
-        // new webpack.optimize.CommonsChunkPlugin({name:'base'}),//提取公共文件
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            },
-            sourceMap: true
-        }) //压缩JS
-    ],
+    plugins,
     //页面入口文件配置
-    entry: {
-        maple: [path.resolve(__dirname, './src/maple/index.js')]
-        , base: [path.resolve(__dirname, './src/maple/base.js')]
-    },
+    entry,
     //入口文件输出配置
     output: {
         path: path.resolve(__dirname, './dist/'),
