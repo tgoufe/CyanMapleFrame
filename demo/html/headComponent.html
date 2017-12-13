@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+	<title>headComponent</title>
+	<script src="../../src/libs/flexible/flexible.js"></script>
+	<link rel="stylesheet" href="../../src/cyan/CMUI.css">
+</head>
+<body>
+	<div id="main" class="padding10 bg-blue">
+		<pc-head></pc-head>
+		<cmui-list :col="2" :border="true" class="overflow-h">
+			<cmui-list-item v-for="item in [1,2,3,4]">
+				<div class="bg-red">
+					<div class="ratio-container">
+						<span>123</span>
+					</div>
+				</div>
+			</cmui-list-item>
+		</cmui-list>
+	</div>
+	<script src="../../src/libs/jquery/jquery.min.js"></script>
+	<script src="../../src/libs/lodash/lodash.min.js"></script>
+	<script src="../../src/libs/vue/vue.min.js"></script>
+</body>
+</html>

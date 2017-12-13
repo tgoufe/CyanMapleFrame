@@ -1,59 +1,59 @@
 <template>
-<div class="cmui-list-item" v-bind:class="[itemClass,paddingClass]" v-bind:style="{'clear':clear}">
-  <slot></slot>
+<div class="cmui-list-item" v-bind:style="itemStyle()">
+    <div class="cmui-list-item-container" :style="itemContainerStyle">
+        <slot></slot>
+    </div>
 </div>
 </template>
+<style>
+    .cmui-list-item{
+        float: left;
+        position: relative;
+        min-height: 1px;
+    }
+</style>
 <script>
-function getClassListByColList(colList){
-	var total=colList.reduce((pre,next)=>pre+next);
-	if(total%2==0||total%3==0){
-		return colList.map(item=>'box-span'+parseInt(12/total*item))
-	}else if(total%5==0){
-		return colList.map(item=>'box-col'+parseInt(15/total*item))
-	}else{
-		return ['box-span12']
-	}
-}
-
 export default {
-	computed:{
-	    itemClass:function(){
-        	if(typeof this.$parent.col=='number'){
-    	        switch(this.$parent.col){
-    	            case 2:
-    	             return 'box-span6';
-    	            case 3:
-    	             return 'box-span4';
-    	            case 4:
-    	             return 'box-span3';
-    	            case 5:
-    	             return 'box-col3';
-    	            case 6:
-    	             return 'box-span2';
-    	            default:
-    	            return 'box-span12';
-    	        }
-        	}else if(
-        		(Object.prototype.toString.call(this.$parent.col)=='[object Array]')
-        		&&this.$parent.col.every(item=>item==parseInt(item))
-        		){
-        		const rs=this.$parent.$children.filter(item=>item.$options._componentTag=="cmui-list-item")
-        		const i=_.findIndex(rs,this)%this.$parent.col.length;
-        		return getClassListByColList(this.$parent.col)[i]
-        	}else{
-        		return 'box-span12'
-        	}
-	    },
-	    paddingClass:function(){
-	    	return 'paddingr'+this.$parent.spaceName
-	    },
-        clear(){
-            const rs=this.$parent.$children.filter(item=>item.$options._componentTag=="cmui-list-item")
-            const i=_.findIndex(rs,this);
-            console.log(this)
-            return i%(this.$parent.col.length||this.$parent.col)==0?'left':''
+    name:'cmui-list-item',
+    data:function(){
+        var itemContainerStyle
+        ,   parent=this.$parent
+        ,   border
+        ;
+        if(parent.border&&parent.realSpace!=0){
+            border='1px solid '+parent.borderColor
         }
-	}
+        return {
+            itemContainerStyle:{border}
+        }
+    },
+    computed:{
+        itemList(){
+            return this.$parent.$children.filter(item=>item.$options._componentTag=="cmui-list-item");
+        }
+    },
+    methods:{
+        itemStyle(){
+            var width
+            ,   clear
+            ,   col=this.$parent.realCol
+            ,   colCount=_.isNumber(col)?col:col.length
+            ,   index=_.findIndex(this.itemList,this)
+            ,   paddingRight=this.$parent.realSpace+'rem'
+            ,   paddingBottom=this.$parent.realSpace+'rem'
+            ,   boxShadow=this.$parent.boxShadow
+            ;
+            if(_.isNumber(col)){
+                width=100/col+'%';
+                clear=index%col===0?'left':undefined;
+            }else if(_.isArray(col)){
+                var total=col.reduce((pre,next)=>pre+next);
+                width=100*col[index%col.length]/total+'%';
+                clear=index%col.length===0?'left':undefined;
+            }
+            return{width,clear,paddingRight,paddingBottom,boxShadow}
+        }
+    }
 };
 
 </script>
