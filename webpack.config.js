@@ -1,6 +1,7 @@
 let webpack = require('webpack')
     , path = require('path')
     , compiler = require('vue-template-compiler')
+	, HtmlWebpackPlugin = require('html-webpack-plugin')
     ;
 
 module.exports = {
@@ -14,15 +15,45 @@ module.exports = {
             },
             sourceMap: true
         }) //压缩JS
+        , new HtmlWebpackPlugin({
+		    filename: 'debounce.html'
+            ,  minify: {    //压缩HTML文件
+			    removeComments: true        //移除HTML中的注释
+			    , collapseWhitespace: true  //删除空白符与换行符
+		    }
+		    , chunks: ['base', 'debounce']
+		    , inject: 'body'
+	    })
+        , new HtmlWebpackPlugin({
+		    filename: 'throttle.html'
+		    ,  minify: {    //压缩HTML文件
+			    removeComments: true        //移除HTML中的注释
+			    , collapseWhitespace: true  //删除空白符与换行符
+		    }
+		    , chunks: ['base', 'throttle']
+		    , inject: 'body'
+	    })
+        , new HtmlWebpackPlugin({
+		    filename: 'listener.html'
+		    ,  minify: {    //压缩HTML文件
+			    removeComments: true        //移除HTML中的注释
+			    , collapseWhitespace: true  //删除空白符与换行符
+		    }
+		    , chunks: ['base', 'listener']
+		    , inject: 'body'
+	    })
     ],
     //页面入口文件配置
     entry: {
         maple: [path.resolve(__dirname, './src/maple/index.js')]
         , base: [path.resolve(__dirname, './src/maple/base.js')]
+        , 'debounce': [path.resolve(__dirname, './demo/src/javascript/debounce.js')]
+        , 'throttle': [path.resolve(__dirname, './demo/src/javascript/throttle.js')]
+        , 'listener': [path.resolve(__dirname, './demo/src/javascript/listener.js')]
     },
     //入口文件输出配置
     output: {
-        path: path.resolve(__dirname, './dist/'),
+        path: path.resolve(__dirname, './demo/dist/'),
         filename: '[name].js'
     },
     module: {
