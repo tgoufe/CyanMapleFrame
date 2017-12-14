@@ -9,6 +9,10 @@ let webpack = require('webpack')
     //文件入口
     , entry={
         maple: [path.resolve(__dirname, './src/maple/index.js')]
+		, base: [path.resolve(__dirname, './src/maple/base.js')]
+		// , 'debounce': [path.resolve(__dirname, './demo/src/javascript/debounce.js')]
+		// , 'throttle': [path.resolve(__dirname, './demo/src/javascript/throttle.js')]
+		// , 'listener': [path.resolve(__dirname, './demo/src/javascript/listener.js')]
     }
     //插件
     , plugins=[
@@ -36,8 +40,43 @@ demoPgaeList.forEach(function(i) {
 });
 module.exports = {
     devtool: '#source-map',
-    //插件项
-    plugins,
+	//插件项
+    plugins: plugins.concat([
+	// new webpack.optimize.CommonsChunkPlugin({name:'base'}),//提取公共文件
+	new webpack.optimize.UglifyJsPlugin({
+		compress: {
+			warnings: false
+		},
+		sourceMap: true
+	// }) //压缩JS
+	// , new HtmlWebpackPlugin({
+	// 	filename: 'debounce.html'
+	// 	,  minify: {    //压缩HTML文件
+	// 		removeComments: true        //移除HTML中的注释
+	// 		, collapseWhitespace: true  //删除空白符与换行符
+	// 	}
+	// 	, chunks: ['base', 'debounce']
+	// 	, inject: 'body'
+	// })
+	// , new HtmlWebpackPlugin({
+	// 	filename: 'throttle.html'
+	// 	,  minify: {    //压缩HTML文件
+	// 		removeComments: true        //移除HTML中的注释
+	// 		, collapseWhitespace: true  //删除空白符与换行符
+	// 	}
+	// 	, chunks: ['base', 'throttle']
+	// 	, inject: 'body'
+	// })
+	// , new HtmlWebpackPlugin({
+	// 	filename: 'listener.html'
+	// 	,  minify: {    //压缩HTML文件
+	// 		removeComments: true        //移除HTML中的注释
+	// 		, collapseWhitespace: true  //删除空白符与换行符
+	// 	}
+	// 	, chunks: ['base', 'listener']
+	// 	, inject: 'body'
+	})
+]),
     //页面入口文件配置
     entry,
     //入口文件输出配置

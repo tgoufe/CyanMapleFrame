@@ -110,6 +110,9 @@ scroll.scrollBar = function(offset, value){
 					else if (temp[2] === 'view') {  // 屏数
 						curr = Math.max(body.scrollHeight - curr * doc.clientHeight, 0);
 					}
+					else{
+						curr = Math.max(body.scrollHeight - curr, 0);
+					}
 
 					body.scrollTop = curr;
 					break;
@@ -133,6 +136,9 @@ scroll.scrollBar = function(offset, value){
 					}
 					else if (temp[2] === 'view') {  // 屏数
 						curr = Math.max(body.scrollWidth - curr * doc.clientWidth, 0);
+					}
+					else{
+						curr = Math.max(body.scrollWidth - curr, 0);
 					}
 
 					body.scrollLeft = curr;

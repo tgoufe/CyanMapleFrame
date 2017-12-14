@@ -24,6 +24,14 @@ class HandlerQueue{
 		}
 	}
 	/**
+	 * @summary 队列中是否存在该 handler
+	 * @param   {Function}  handler
+	 * @return  {Boolean}
+	 * */
+	has(handler){
+		return this._queue.indexOf( handler ) !== -1;
+	}
+	/**
 	 * @summary 从队列中移除相应的 handler
 	 * @param   {Number|Function}   findBy
 	 * */
@@ -93,15 +101,29 @@ class HandlerQueue{
 	 * @summary 执行队列中的一个 handler，内部指针将指向下一个 handler
 	 * @param   {...*}
 	 * @return  {*}
-	 * @desc    当出入参数时，参数被视为传入 handler 的参数
+	 * @desc    当传入参数时，参数被视为传入 handler 的参数
 	 * */
 	fire(){
 		return this.next()( ...arguments );
 	}
 	/**
+	 * @summary 以指定上下文来执行队列中的一个 handler，内部指针将指向下一个 handler
+	 * @param   {Element|Window|Object} context=null
+	 * @param   {Array|*}               [args=[]]
+	 * @return  {*}
+	 * */
+	fireWith(context=null, args=[]){
+
+		if( !Array.isArray(args) ){
+			args = [args];
+		}
+
+		return this.next().apply(context, args);
+	}
+	/**
 	 * @summary 执行队列中的全部 handler，将返回一个结果数组
 	 * @param   {...*}
-	 * @return  {Array}
+	 * @return  {Array} 数组中将不包括已失效
 	 * @desc    当传入参数时，参数被视为传入 handler 的参数（所有 handler 都会传入相同的参数），全部执行后会重置
 	 * */
 	fireAll(){
@@ -113,7 +135,51 @@ class HandlerQueue{
 		return this._queue.filter( d=>d !== null ).map( d=>d( ...args ) );
 	}
 	/**
-	 * @summary 以 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
+	 * @summary 以指定上下文的方式执行队列中的全部 handler，将返回一个结果数组
+	 * @param   {Element|Window|Object} context=null
+	 * @param   {Array|*}               [args=[]]
+	 * @return  {*}
+	 * */
+	fireAllWith(context=null, args=[]){
+		this.reset();
+
+		if( !Array.isArray(args) ){
+			args = [args];
+		}
+
+		return this._queue.filter( d=>d !== null ).map( d=>d.apply(context, args) );
+	}
+	/**
+	 * @summary 顺序执行队列中的全部 handler，前一个 handler 的返回结果觉得下一个 handler 是否执行
+	 * @param   {...*}
+	 * @return  {Boolean|Undefined}
+	 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
+	 * */
+	fireLine(){
+		let args = arguments
+			;
+
+		this.reset();
+
+		return this._queue.filter( d=>d !== null ).some( d=>d( ...args ) === false );
+	}
+	/**
+	 * @summary 以指定上下文的方式顺序执行队列中的全部 handler，前一个 handler 的返回结果觉得下一个 handler 是否执行
+	 * @param   {Element|Window|Object} context=null
+	 * @param   {Array|*}               [args=[]]
+	 * @return  {*}
+	 * */
+	fireLineWith(context=null, args=[]){
+		this.reset();
+
+		if( !Array.isArray(args) ){
+			args = [args];
+		}
+
+		return this._queue.filter( d=>d !== null ).some( d=>d.apply(context, args) === false );
+	}
+	/**
+	 * @summary 用 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
 	 * @param   {*}         [init]
 	 * @return  {Promise}
 	 * @desc    当传入参数时，参数被视为传入第一个 handler 的参数，全部执行后会重置
@@ -126,6 +192,24 @@ class HandlerQueue{
 
 		return this._queue.filter( d=>d !== null ).reduce((promise, d)=>{
 			return promise.then( rs=>d( rs ) );
+		}, Promise.resolve( init ));
+	}
+	/**
+	 * @summary 以指定上下文的方式用 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
+	 * @param   {Element|Window|Object} context=null
+	 * @param   {*}                     [init]
+	 * @return  {Promise}
+	 * @desc    当传入 init 参数时，参数被视为传入第一个 handler 的参数，全部执行后会重置
+	 *          由于为 reduce 方式调用，将只允许传入一个初始参数，并且原则上所有 handler 都应只有一个参数
+	 *          由于为 reduce 方式调用，将返回 Promise 类型的结果
+	 * */
+	fireReduceWith(context=null, init){
+
+		this.reset();
+
+
+		return this._queue.filter( d=>d !== null ).reduce((promise, d)=>{
+			return promise.then( rs=>d.call(context, rs) );
 		}, Promise.resolve( init ));
 	}
 }

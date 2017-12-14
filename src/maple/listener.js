@@ -4,9 +4,16 @@
  * @file    全局事件监听对象
  * */
 
-import debounce from './util/debounce.js';
-import throttle from './util/throttle.js';
-import merge    from './util/merge.js';
+import merge        from './util/merge.js';
+import HandlerQueue from './util/handlerQueue.js';
+
+const LISTENER_CONFIG = {
+		type: ''
+		, target: window || self || null
+		, useCapture: true
+		, passsive: true
+	}
+	;
 
 /**
  * @class
@@ -22,8 +29,6 @@ class Listener{
 	 * @param   {Window|Document|Object}    [config.target]
 	 * @param   {Boolean}                   [config.useCapture]
 	 * @param   {Boolean}                   [config.passive]
-	 * @param   {Boolean}                   [config.useDebounce]    是否使用 debounce
-	 * @param   {Boolean}                   [config.useThrottle]    是否使用 throttle
 	 * @todo    处理 passive 参数
 	 * */
 	constructor(config={}){
@@ -40,7 +45,19 @@ class Listener{
 
 		this._listener = null;      // 执行函数
 
-		this._eventQueue = [];      // 事件对列
+		// this._eventQueue = [];      // 事件对列
+
+		this._eventQueue = new HandlerQueue();
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * 监听事件的默认配置
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return LISTENER_CONFIG;
 	}
 
 	// ---------- 私有方法 ----------
@@ -54,22 +71,10 @@ class Listener{
 			;
 
 		return function(){
-			let rs = true
-				, i = 0
-				, j = eventQueue.length
-				, that = this || null
-				, argv = [].slice.call( arguments )
+			let context = this || null
 				;
 
-			for(; i < j; i++){
-				rs = eventQueue[i].apply(that, argv);
-
-				if( rs === false ){
-					return false;
-				}
-			}
-
-			return rs;
+			return eventQueue.fireLineWith(context, Array.from(arguments));
 		};
 	}
 
@@ -87,8 +92,8 @@ class Listener{
 	 * @return  {Listener}          返回 this，可以使用链式操作
 	 * */
 	add(callback){
-		if( this._eventQueue.indexOf(callback) === -1 ){
-			this._eventQueue.push( callback );
+		if( !this._eventQueue.has(callback) ){
+			this._eventQueue.add( callback );
 		}
 		else{
 			console.log('该函数已经存在于队列中');
@@ -98,12 +103,10 @@ class Listener{
 	}
 	/**
 	 * @summary 开始监听事件
-	 * @param   {Number}    [wait=0]    间隔时间，单位为毫秒，若传则使用 debounce 或 throttle 方式执行
 	 * @return  {Listener}  返回 this，可以使用链式操作
 	 * @desc    当传入 wait 参数时根据生成 Listener 对象实例时的 useDebounce 或 useThrottle 参数来判断使用哪种方式，若都设置则 debounce 优先
 	 * */
-	on(wait=0){
-		wait = Number( wait );
+	on(){
 
 		if( this._isListening ){
 			return this;
@@ -113,15 +116,7 @@ class Listener{
 			return this;
 		}
 
-		if( this._config.useDebounce && wait && wait > 0 ){
-			this._listener = debounce(this._queueExecute(), wait);
-		}
-		else if( this._config.useThrottle && wait && wait > 0 ){
-			this._listener = throttle(this._queueExecute(), wait);
-		}
-		else{
-			this._listener = this._queueExecute();
-		}
+		this._listener = this._queueExecute();
 
 		if( 'addEventListener' in this._config.target ){
 			this._config.target.addEventListener(this._config.type, this._listener, this._config.useCapture);
@@ -149,18 +144,11 @@ class Listener{
 				this._config.target.removeEventListener(this._config.type, this._listener, this._config.useCapture);
 			}
 
-			if( 'cancel' in this._listener ){
-				this._listener.cancel();
-
-				this._listener = null;
-			}
-
 			this._isListening = false;
 		}
 		else if( typeof isAll === 'function' ){
-			let index = this._eventQueue.indexOf( isAll );
 
-			this._eventQueue.splice(index, 1);
+			this._eventQueue.remove( isAll );
 		}
 
 		return this;
@@ -180,28 +168,23 @@ class Listener{
 
 		argv.unshift( event );
 
-		if( 'immediate' in this._listener ){
-			this._listener.immediate(context, argv);
-		}
-		else{
-			this._listener.apply(context, argv);
-		}
+		this._listener.apply(context, argv);
 	}
 }
 
-/**
- * 监听事件的默认配置
- * @static
- * @const
- * */
-Listener._CONFIG = {
-	type: ''
-	, target: window || self || null
-	, useCapture: true
-	, passsive: true
-	, useDebounce: false
-	, useThrottle: false
-};
+// /**
+//  * 监听事件的默认配置
+//  * @static
+//  * @const
+//  * */
+// Listener._CONFIG = {
+// 	type: ''
+// 	, target: window || self || null
+// 	, useCapture: true
+// 	, passsive: true
+// 	, useDebounce: false
+// 	, useThrottle: false
+// };
 
 /**
  * @summary     快速监听函数
@@ -211,8 +194,6 @@ Listener._CONFIG = {
  * @param       {Object}                            [options={}]            配置参数与 Listener 参数相同
  * @param       {Boolean}                           [options.useCapture]
  * @param       {Boolean}                           [options.passive]
- * @param       {Boolean}                           [options.useDebounce]
- * @param       {Boolean}                           [options.useThrottle]
  * @return      {Listener}
  * @desc        可以穿四个参数，最少传一个参数，若只传一个参数会视为 type
  * */
