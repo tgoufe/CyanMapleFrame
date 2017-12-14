@@ -19,6 +19,12 @@
 				</div>
 			</cmui-list-item>
 		</cmui-list>
+		<cmui-tabbar :col="2.5">
+			<cmui-tabbar-item v-for="(item,index) in list"">
+				<div class="text-center" >{{item}}</div>
+			</cmui-tabbar-item>
+		</cmui-tabbar>
+		<a href="###" @click="change" class="btn red">change</a>
 	</div>
 	<script src="../../src/libs/jquery/jquery.min.js"></script>
 	<script src="../../src/libs/lodash/lodash.min.js"></script>

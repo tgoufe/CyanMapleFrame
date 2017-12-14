@@ -80,5 +80,8 @@ module.exports = {
     },
     resolve: {
         modules: ["node_modules", __dirname]
+    },
+    devServer:{
+        disableHostCheck:true
     }
 };
