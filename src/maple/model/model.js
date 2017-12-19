@@ -4,6 +4,25 @@ import {listener}   from '../listener.js';
 import merge        from '../util/merge.js';
 
 /**
+ * 默认配置
+ * @const
+ * */
+const MODEL_CONFIG = {
+		eventType: 'modelChange'
+	}
+	/**
+	 * 子类对象缓存
+	 * @const
+	 * */
+	, MODEL_CACHE = {}
+	/**
+	 * 子类别名列表
+	 * @const
+	 * */
+	, MODEL_ALIAS = {}
+	;
+
+/**
  * @class
  * @classdesc   数据层基类，将数据保存在内存中
  * @example
@@ -153,6 +172,32 @@ class Model{
 		}
 
 		return model;
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认配置
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return MODEL_CONFIG;
+	}
+	/**
+	 * @summary 子类对象缓存
+	 * @static
+	 * @const
+	 * */
+	static get _MODEL_CACHE(){
+		return MODEL_CACHE;
+	}
+	/**
+	 * @summary 子类别名列表
+	 * @static
+	 * @const
+	 * */
+	static get _MODEL_ALIAS(){
+		return MODEL_ALIAS;
 	}
 
 	// ---------- 私有方法 ----------
@@ -512,24 +557,5 @@ class Model{
 		}
 	}
 }
-
-// ---------- 静态属性 ----------
-/**
- * 默认配置
- * */
-Model._CONFIG = {
-	eventType: 'modelChange'
-};
-
-/**
- * 子类对象缓存
- * @static
- * */
-Model._MODEL_CACHE = {};
-/**
- * 子类别名列表
- * @static
- * */
-Model._MODEL_ALIAS = {};
 
 export default Model;

@@ -4,6 +4,27 @@ import Model from './model.js';
 import merge from '../util/merge.js';
 
 /**
+ * 默认配置
+ * @const
+ * */
+const INDEXED_DB_CONFIG = {
+		dbName: 'storage'
+		, tableName: 'storage'
+		, dbVersion: 1
+		, keyPath: 'topic'
+		, index: [{
+			name: 'topic'
+			, keyPath: 'topic'
+			, unique: true
+		}, {
+			name: 'value'
+			, keyPath: 'value'
+			, unique: false
+		}]
+	}
+	;
+
+/**
  * @class
  * @classdesc   对 IndexedDB 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 indexedDB，别名 idb，将可以使用工厂方法生成
  * @extends     Model
@@ -80,6 +101,16 @@ class IndexedDBModel extends Model{
 				reject( new Error('此数据库不支持 IndexedDB') );
 			}
 		});
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认配置
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return INDEXED_DB_CONFIG;
 	}
 
 	// ---------- 私有方法 ----------
@@ -343,27 +374,6 @@ class IndexedDBModel extends Model{
 		});
 	}
 }
-
-/**
- * 默认配置
- * @const
- * @static
- * */
-IndexedDBModel._CONFIG = {
-	dbName: 'storage'
-	, tableName: 'storage'
-	, dbVersion: 1
-	, keyPath: 'topic'
-	, index: [{
-		name: 'topic'
-		, keyPath: 'topic'
-		, unique: true
-	}, {
-		name: 'value'
-		, keyPath: 'value'
-		, unique: false
-	}]
-};
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成

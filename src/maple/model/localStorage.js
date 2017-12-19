@@ -5,6 +5,15 @@ import merge        from '../util/merge.js';
 import {listener}   from '../listener.js';
 
 /**
+ * 默认参数
+ * @const
+ * */
+const LOCAL_STORAGE_MODEL_CONFIG = {
+		listen: true
+	}
+	;
+
+/**
  * @class
  * @classdesc   对 localStorage 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 localStorage，别名 ls，将可以使用工厂方法生成
  * @extends     Model
@@ -77,6 +86,11 @@ class LocalStorageModel extends Model{
 		LocalStorageModel._GLOBAL_LISTENER = listener('storage');
 		LocalStorageModel._listenOn = true;
 	}
+	/**
+	 * @summary 全局 storage 事件解除监听
+	 * @static
+	 * @desc    执行后将 LocalStorageModel._listenOn 设为 false
+	 * */
 	static listenOff(){
 		if( LocalStorageModel._listenOn && LocalStorageModel._GLOBAL_LISTENER ){
 			LocalStorageModel._GLOBAL_LISTENER.off();
@@ -85,6 +99,16 @@ class LocalStorageModel extends Model{
 
 			LocalStorageModel._listenOn = false;
 		}
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认参数
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return LOCAL_STORAGE_MODEL_CONFIG;
 	}
 
 	// ---------- 公有方法 ----------
@@ -247,25 +271,13 @@ class LocalStorageModel extends Model{
 }
 
 /**
- * 默认参数
- * @const
- * @static
- * */
-LocalStorageModel._CONFIG = {
-	listen: true
-};
-// /**
-//  * 保存的事件队列
-//  * @static
-//  * */
-// LocalStorageModel._EVENT_LIST = [];
-/**
  * 全局 storage 监听事件是否开启
  * @static
  * */
 LocalStorageModel._listenOn = true;
 /**
  * 全局 storage 事件监听
+ * @static
  * */
 LocalStorageModel._GLOBAL_LISTENER = listener('storage');
 

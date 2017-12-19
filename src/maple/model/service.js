@@ -12,6 +12,27 @@ import request      from '../request.js';
  * */
 
 /**
+ * 默认配置
+ * @const
+ * */
+const SERVICE_MODEL_CONFIG = {
+		baseUrl: ''
+		// , isCrossDomain: true
+		, task: false
+		// , jsonp: false
+		, timeout: 10000
+	}
+	/**
+	 * 拦截器
+	 * @const
+	 * */
+	, INTERCEPTOR = {
+		req: new HandlerQueue()
+		, res: new HandlerQueue()
+	}
+	;
+
+/**
  * @class
  * @classdesc   对服务器接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 service，别名 s，将可以使用工厂方法生成
  * @extends     Model
@@ -40,6 +61,24 @@ class ServiceModel extends Model{
 			req: new HandlerQueue()
 			, res: new HandlerQueue()
 		};
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认配置
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return SERVICE_MODEL_CONFIG;
+	}
+	/**
+	 * @summary 拦截器
+	 * @static
+	 * @const
+	 * */
+	static get interceptor(){
+		return INTERCEPTOR;
 	}
 
 	// ---------- 私有方法 ----------
@@ -263,27 +302,6 @@ class ServiceModel extends Model{
 		});
 	}
 }
-
-/**
- * 默认配置
- * @static
- * */
-ServiceModel._CONFIG = {
-	baseUrl: ''
-	// , isCrossDomain: true
-	, task: false
-	// , jsonp: false
-	, timeout: 10000
-};
-
-/**
- * 拦截器
- * @static
- * */
-ServiceModel.interceptor = {
-	req: new HandlerQueue()
-	, res: new HandlerQueue()
-};
 
 /**
  * 特别标记 ServiceModel

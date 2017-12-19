@@ -7,6 +7,10 @@
 import merge        from './util/merge.js';
 import HandlerQueue from './util/handlerQueue.js';
 
+/**
+ * 监听事件的默认配置
+ * @const
+ * */
 const LISTENER_CONFIG = {
 		type: ''
 		, target: window || self || null
@@ -52,7 +56,7 @@ class Listener{
 
 	// ---------- 静态属性 ----------
 	/**
-	 * 监听事件的默认配置
+	 * @summary 监听事件的默认配置
 	 * @static
 	 * @const
 	 * */
@@ -171,20 +175,6 @@ class Listener{
 		this._listener.apply(context, argv);
 	}
 }
-
-// /**
-//  * 监听事件的默认配置
-//  * @static
-//  * @const
-//  * */
-// Listener._CONFIG = {
-// 	type: ''
-// 	, target: window || self || null
-// 	, useCapture: true
-// 	, passsive: true
-// 	, useDebounce: false
-// 	, useThrottle: false
-// };
 
 /**
  * @summary     快速监听函数

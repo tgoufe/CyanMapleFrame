@@ -4,6 +4,15 @@ import Model from './model.js';
 import merge from '../util/merge.js';
 
 /**
+ * 默认配置
+ * @const
+ * */
+const CACHE_STORAGE_MODEL_CONFIG = {
+		cacheName: 'storage'
+	}
+	;
+
+/**
  * @class
  * @extends Model
  * @classdesc   对浏览器源生 CacheStorage 接口进行封装，统一调用接口，主要提供给 Service Worker 调用，普通页面使用场景有限，在 Model.factory 工厂方法注册为 cacheStorage，别名 cs，将可以使用工厂方法生成
@@ -30,6 +39,16 @@ class CacheStorageModel extends Model{
 		else{
 			this._store = Promise.reject( new Error('此浏览器不支持 Service Worker') );
 		}
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认配置
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return CACHE_STORAGE_MODEL_CONFIG;
 	}
 
 	// ---------- 私有方法 ----------
@@ -135,15 +154,6 @@ class CacheStorageModel extends Model{
 		});
 	}
 }
-
-/**
- * 默认配置
- * @const
- * @static
- * */
-CacheStorageModel._CONFIG = {
-	cacheName: 'storage'
-};
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成

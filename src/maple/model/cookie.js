@@ -4,6 +4,18 @@ import Model        from './model.js';
 import dateFormat   from '../util/dateFormat.js';
 
 /**
+ * 默认 cookie 设置参数
+ * @const
+ * */
+const COOKIE_DEFAULT = {
+		path: '/'
+		, domain: ''
+		, expires: ''
+		, secure: ''
+	}
+	;
+
+/**
  * @class
  * @classdesc   对 cookie 的使用进行封装，统一调用接口，在 Model.factory 工厂方法注册为 cookie，别名 c，将可以使用工厂方法生成
  * @extends     Model
@@ -64,6 +76,16 @@ class CookieModel extends Model{
 		// }
 
 		return date && date.toUTCString();
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认 cookie 设置参数
+	 * @static
+	 * @const
+	 * */
+	static get _DEFAULT(){
+		return COOKIE_DEFAULT;
 	}
 
 	// ---------- 私有方法 ----------
@@ -326,36 +348,6 @@ class CookieModel extends Model{
 		return this._enabled ? document.cookie.length : 0;
 	}
 }
-
-/**
- * 默认 cookie 设置参数
- * @const
- * @static
- * */
-CookieModel._DEFAULT = {
-	path: '/'
-	, domain: ''
-	, expires: ''
-	, secure: ''
-};
-// /**
-//  * 简短时间设置格式
-//  * @const
-//  * @static
-//  * */
-// CookieModel._SHORT_TIME_EXPR = /^(-?\d+)(s|m|h|d|y)?$/i;
-// /**
-//  * 时间单位对应的毫秒数
-//  * @const
-//  * @static
-//  * */
-// CookieModel._SHORT_TIME_NUM = {
-// 	s: 1e3
-// 	, m: 6e4
-// 	, h: 36e5
-// 	, d: 864e5
-// 	, y: 31536e6
-// };
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成
