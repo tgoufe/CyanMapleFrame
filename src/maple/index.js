@@ -20,6 +20,7 @@ import mask from './ui/mask/index.js';
 import message from './ui/message/index.js';
 import slider from './component/slider/index.js';
 import list from './component/list/index.js';
+import tabbar from './component/tabbar/index.js';
 import form from './component/form/index.js';
 import Vue from 'Vue';
 //挂载工具方法
