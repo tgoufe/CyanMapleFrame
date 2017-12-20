@@ -4,3 +4,5 @@ node_modules/
 *.map
 demo/javascript/maple.js
 demo/javascript/base.js
+
+demo/dist
