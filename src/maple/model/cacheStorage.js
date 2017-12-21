@@ -29,7 +29,7 @@ class CacheStorageModel extends Model{
 	 * @param   {String}    [config.cacheName]
 	 * */
 	constructor(config={}){
-		super();
+		super( config );
 
 		this._config = merge(config, CacheStorageModel._CONFIG);
 

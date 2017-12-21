@@ -51,7 +51,7 @@ class ServiceModel extends Model{
 	 * @param   {Number}    [config.timeout]
 	 * */
 	constructor(config={}){
-		super();
+		super( config );
 
 		this._config = merge(config, ServiceModel._CONFIG);
 		

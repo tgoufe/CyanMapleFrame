@@ -61,7 +61,7 @@ class WebSQLModel extends Model{
 	 * @desc    传入 sql 语句时，可用 {{tableName}} 来代替表名
 	 * */
 	constructor(config={}){
-		super();
+		super( config );
 
 		let sql = config.sql
 			;
@@ -97,7 +97,7 @@ class WebSQLModel extends Model{
 				});
 			}
 			else{
-				reject(new Error('此浏览器不支持 Web SQL Database'));
+				reject( new Error('此浏览器不支持 Web SQL Database') );
 			}
 		});
 	}

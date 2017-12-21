@@ -17,9 +17,10 @@ let sessionStorageModel = new SessionStorageModel()
 class SessionStorageModel extends Model{
 	/**
 	 * @constructor
+	 * @param   {Object}    [config={}]
 	 * */
-	constructor(){
-		super();
+	constructor(config={}){
+		super( config );
 
 		if( 'sessionStorage' in self ){
 			this._enabled = true;

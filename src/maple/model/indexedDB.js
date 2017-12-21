@@ -50,7 +50,7 @@ class IndexedDBModel extends Model{
 	 * @param   {Boolean}   [config.index[].unique=false]   默认值 false
 	 * */
 	constructor(config={}){
-		super();
+		super( config );
 
 		this._config = merge(config, IndexedDBModel._CONFIG);
 
