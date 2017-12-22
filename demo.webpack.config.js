@@ -54,6 +54,15 @@ module.exports = {
 			, chunks: ['base', 'router']
 			, inject: 'body'
 		})
+		, new HtmlWebpackPlugin({
+			filename: 'model.html'
+			,  minify: {    //压缩HTML文件
+				removeComments: true        //移除HTML中的注释
+				, collapseWhitespace: true  //删除空白符与换行符
+			}
+			, chunks: ['base', 'model']
+			, inject: 'body'
+		})
 	],
 	//页面入口文件配置
 	entry: {
@@ -62,6 +71,7 @@ module.exports = {
 		, throttle: [path.resolve(__dirname, 'demo/src/javascript/throttle.js')]
 		, listener: [path.resolve(__dirname, 'demo/src/javascript/listener.js')]
 		, router:   [path.resolve(__dirname, 'demo/src/javascript/router.js')]
+		, model:   [path.resolve(__dirname, 'demo/src/javascript/model.js')]
 	},
 	//入口文件输出配置
 	output: {

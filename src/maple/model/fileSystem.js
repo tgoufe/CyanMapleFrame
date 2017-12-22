@@ -3,21 +3,30 @@
 import Model from './model.js';
 import merge from '../util/merge.js';
 
+/**
+ * 默认配置
+ * @const
+ * */
 const FILE_SYSTEM_CONFIG = {
 		fileName: 'storage.txt'
 		, fileSize: 2>>20
+		, fileType: 1           // 0 为临时文件，1 为持久文件
 	}
 	;
 
 /**
  * @class
- * @classdesc
+ * @classdesc   对 File System 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 file，别名 fs，将可以使用工厂方法生成。默认使用文件名为 storage.txt，2MB 空间
  * @extends     Model
+ * @todo        调整机制，增加缓存
  * */
 class FileSystemModel extends Model{
 	/**
 	 * @constructor
 	 * @param   {Object}    [config={}]
+	 * @param   {String}    [config.fileName]
+	 * @param   {Number}    [config.fileSize]
+	 * @param   {Number}    [config.fileType]   文件的保存类型，0 为临时文件，1 为持久文件，可以使用 FileSystemModel.TEMPORARY 和 FileSystemModel.PERSISTENT 来替代
 	 * */
 	constructor(config={}){
 		super( config );
@@ -25,12 +34,18 @@ class FileSystemModel extends Model{
 		this._config = merge(config, FileSystemModel._CONFIG);
 
 		this._fs = new Promise((resolve, reject)=>{
-			if( 'webkitPersistentStorage' in navigator ){
-				navigator.webkitPersistentStorage.requestQuota(this.config.fileSize, (grantedBytes)=>{
-					self.webkitRequestFileSystem(self.PERSISTENT, grantedBytes, (fs)=>{
-						resolve( fs );
-					});
-				});
+			let requestFileSystem = self.requestFileSystem || self.webkitRequestFileSystem || null
+				;
+
+			// if( 'webkitPersistentStorage' in navigator ){
+			// 	navigator.webkitPersistentStorage.requestQuota(this.config.fileSize, (grantedBytes)=>{
+			// 		self.webkitRequestFileSystem(self.PERSISTENT, grantedBytes, (fs)=>{
+			// 			resolve( fs );
+			// 		});
+			// 	});
+			// }
+			if( requestFileSystem ){
+				requestFileSystem(self.PERSISTENT, this._config.fileSize, resolve, reject);
 			}
 			else{
 				reject( new Error('此浏览器不支持 Local File System') );
@@ -47,73 +62,274 @@ class FileSystemModel extends Model{
 	static get _CONFIG(){
 		return FILE_SYSTEM_CONFIG;
 	}
+	/**
+	 * @summary 持久化文件类型的值
+	 * @static
+	 * */
+	static get PERSISTENT(){
+		return self.PERSISTENT;
+	}
+	/**
+	 * @summary 临时文件类型的值
+	 * @static
+	 * */
+	static get TEMPORARY(){
+		return self.TEMPORARY;
+	}
+
+	// ---------- 私有方法 ----------
+	/**
+	 * @summary 获取 FileEntry 对象
+	 * @private
+	 * @param   {Object}    [options={}]
+	 * @param   {Boolean}   [options.create]    是否创建文件
+	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 fileEntry 对象
+	 * */
+	_getFileEntry(options={}){
+		return this._fs.then((fs)=>{
+			return new Promise((resolve, reject)=>{
+				fs.root.getFile(this._config.fileName, options, resolve, reject);
+			});
+		});
+	}
+	/**
+	 * @summary 获取 FileWriter 对象
+	 * @private
+	 * @param   {FileSystemFileEntry}   fileEntry
+	 * @return  {Promise}               返回一个 Promise 对象，在 resolve 时传回 fileWriter 对象
+	 * */
+	_getFileWriter(fileEntry){
+		return new Promise((resolve, reject)=>{
+			fileEntry.createWriter(resolve, reject);
+		});
+	}
+	/**
+	 * @summary 向文件写入内容
+	 * @private
+	 * @param   {FileWriter}    fileWriter
+	 * @param   {String}        content
+	 * @return  {Promise}       返回一个 Promise 对象，在 resolve 时传回 true
+	 * */
+	_writeFile(fileWriter, content){
+		return new Promise((resolve, reject)=>{
+			let blob = new Blob([content], {
+					type: 'text/plain'
+				})
+				;
+
+			fileWriter.onwriteend = function(e){
+				resolve( true );
+			};
+			fileWriter.onerror = function(e){
+				console.log( e );
+				reject( e );
+			};
+
+			fileWriter.write( blob );
+		});
+	}
+	/**
+	 * @summary 向文件写入内容
+	 * @private
+	 * @param   {String}    content
+	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * */
+	_write(content){
+		return this._getFileEntry().then((fileEntry)=>{
+			return this._getFileWriter( fileEntry );
+		}).then((fileWriter)=>{
+			return this._writeFile(fileWriter, content);
+		}).then(()=>{
+			return true;
+		});
+	}
+	/**
+	 * @summary 获取文件对象
+	 * @private
+	 * @param   {FileSystemFileEntry}   fileEntry
+	 * @return  {Promise}               返回一个 Promise 对象，在 resolve 时传回 file 对象
+	 * */
+	_getFile(fileEntry){
+		return new Promise((resolve, reject)=>{
+			return fileEntry.file(resolve, reject);
+		});
+	}
+	/**
+	 * @summary 读取文件内容
+	 * @private
+	 * @param   {File}      file
+	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回文件内容字符串
+	 * */
+	_readFile(file){
+		return new Promise((resolve, reject)=>{
+			let fileReader = new FileReader()
+				;
+
+			fileReader.onload = function(e){
+				resolve( e.target.result );
+			};
+			fileReader.onerror = function(e){
+				console.log( e );
+				reject( e );
+			};
+
+			fileReader.readAsText( file );
+		});
+	}
+	/**
+	 * @summary 获取文件的全部内容
+	 * @private
+	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回对文件内容解析后的 JSON 对象
+	 * */
+	_read(){
+		return this._getFileEntry({
+			create: true
+		}).then((fileEntry)=>{
+			console.log('读取文件 ', fileEntry.toURL());
+			return this._getFile( fileEntry );
+		}).then((file)=>{
+			return this._readFile( file );
+		}, (e)=>{
+			console.log( e );
+
+			return '{}';
+		}).then((content)=>{
+			content = content || '{}';
+
+			try{
+				content = JSON.parse( content );
+
+				// 将所有取到的值缓存
+				return super.setData( content ).then(()=>{
+					return content;
+				});
+
+				// return content;
+			}
+			catch(e){
+				console.log( e );
+				return Promise.reject( e );
+			}
+		});
+	}
 
 	// ---------- 公有方法 ----------
+	/**
+	 * @summary 设置数据
+	 * @param   {String|Object} topic
+	 * @param   {*}             value
+	 * @return  {Promise}       返回一个 Promise 对象，在 resolve 时传回 true
+	 * @desc    保持值得时候，同时会保持在内存中
+	 * */
 	setData(topic, value){
-		return this._fs.then((fs)=>{
-			return new Promise((resolve, reject)=>{
-				fs.root.getFile(this._config.fileName, {
-					create: true
-				}, (fileEntry)=>{
-					fileEntry.createWriter((fileWriter)=>{
-						let blob = new Blob([value], {
-								type: 'text/plain'
-							})
-							;
+		let result = this._read()
+			;
 
-						fileWriter.onwriteend = function(e){
-							resolve( true );
-						};
-						fileWriter.onerror = function(e){
-							console.log( e );
-							reject( e );
-						};
+		if( typeof topic === 'object' ){
+			result = result.then((content)=>{
+				let keys = Object.keys( topic )
+					;
 
-						fileWriter.write( blob );
-					}, (e)=>{
-						console.log( e );
-						reject( e );
-					});
+				keys.forEach((k)=>{
+					content[k] = topic[k];
+				});
+
+				return Promise.all( keys.map((k)=>{
+					return super.setData(k, topic[k]);
+				}) ).then(()=>{
+					return content;
 				});
 			});
+		}
+		else{
+			result = result.then((content)=>{
+				return super.setData(topic, value).then(()=>{
+					content[topic] = value;
+
+					return content;
+				});
+			});
+		}
+
+		return result.then((content)=>{
+			return this._write( JSON.stringify(content) );
 		});
 	}
-
+	/**
+	 * @summary 获取数据
+	 * @param   {String|String[]|...String} topic
+	 * @return  {Promise}                   返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
+	 * @desc    获取数据时会优先从内存中取值，若没有则从 file system 中取值并将其存入内存中，当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
+	 * */
 	getData(topic){
-		return this._fs.then((fs)=>{
-			return new Promise((resolve, reject)=>{
-				fs.root.getFile(this._config.fileName, {}, function(fileEntry){
-					fileEntry.file((file)=>{
-						let fileReader = new FileReader()
-							;
+		let argc = arguments.length
+			, result
+			;
 
-						fileReader.onload = function(e){
-							resolve( e.target.result );
-						};
-						fileReader.onerror = function(e){
-							console.log( e );
-							reject( e );
-						};
+		if( Array.isArray(topic) || argc > 1 ){
+			result = this._getByArray( topic );
+		}
+		else if( argc > 1 ){
+			result = this._getByArray( [].slice.call(arguments) );
+		}
+		else{
+			result = super.getData( topic ).catch(()=>{
+				return this._read().then((content)=>{
+					let value = null
+						;
 
-						fileReader.readAsText( file );
-					});
+					try{
+						value = content[topic];
+
+						super.setData(topic, value);
+					}
+					catch(e){}
+
+					return value;
 				});
 			});
-		});
+		}
+
+		return result;
 	}
+	/**
+	 * @summary 将数据从缓存中删除
+	 * @param   {String|String[]}   topic
+	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
+	 * */
+	removeData(topic){
+		let result
+			;
 
-	removeData(){}
+		if( Array.isArray(topic) ){
+			result = this._removeByArray( topic );
+		}
+		else{
+			result = super.removeData( topic ).then(()=>{
+				return this._read().then((content)=>{
 
-	clearData(){
-		return this._fs.then((fs)=>{
-			return new Promise((resolve, reject)=>{
-				fs.root.getFile(this._config.fileName, {create: false}, (fileEntry)=>{
-					fileEntry.file(function(file){
-						file.remove(()=>{
-							resolve( true );
-						});
-					});
+					delete content[topic];
+					
+					return this._write( JSON.stringify(content) );
 				});
+			});
+		}
+
+		return result;
+	}
+	/**
+	 * @summary 清空数据
+	 * @return  {Promise}   返回一个 Promise 对象
+	 * @desc    删除文件
+	 * */
+	clearData(){
+		return this._getFileEntry({
+			create: false
+		}).then((fileEntry)=>{
+			return new Promise((resolve, reject)=>{
+				console.log(fileEntry.toURL(), ' 文件被删除');
+				
+				fileEntry.remove(resolve, reject);
 			});
 		});
 	}
@@ -134,3 +350,12 @@ class FileSystemModel extends Model{
 		});
 	}
 }
+
+/**
+ * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成
+ * */
+Model.register('file', FileSystemModel);
+/**
+ * 注册别名
+ * */
+Model.registerAlias('file', ['fs']);
