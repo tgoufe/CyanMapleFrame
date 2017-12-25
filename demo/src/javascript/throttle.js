@@ -1,6 +1,6 @@
 'use strict';
 
-import maple    from '../../../dist/lib/base.js';
+import maple    from '../../../src/maple/base.js';
 
 let i = 0
 	, throttleTest = maple.util.throttle(()=>{

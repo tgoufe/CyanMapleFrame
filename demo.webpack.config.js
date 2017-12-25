@@ -66,7 +66,7 @@ module.exports = {
 	],
 	//页面入口文件配置
 	entry: {
-		base: [path.resolve(__dirname, 'dist/lib/base.js')]
+		base: [path.resolve(__dirname, 'src/maple/base.js')]
 		, debounce: [path.resolve(__dirname, 'demo/src/javascript/debounce.js')]
 		, throttle: [path.resolve(__dirname, 'demo/src/javascript/throttle.js')]
 		, listener: [path.resolve(__dirname, 'demo/src/javascript/listener.js')]

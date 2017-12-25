@@ -1,6 +1,6 @@
 'use strict';
 
-import maple    from '../../../dist/lib/base.js';
+import maple    from '../../../src/maple/base.js';
 
 let model = maple.model
 	, ls = model.factory('ls')
