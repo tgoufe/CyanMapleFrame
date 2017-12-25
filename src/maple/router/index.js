@@ -6,10 +6,27 @@ import merge        from '../util/merge.js';
 import {listener}   from '../listener.js';
 
 /**
+ * 路由默认配置
+ * @const
+ * */
+const CONFIG = {
+		mode: 'history'
+		, baseUrl: ''   // 若设置 baseUrl 应以 / 结尾
+	}
+	;
+
+/**
  * @summary     路由回调函数
  * @callback    RouterEvent
- * @param       {Object}
  * @param       {Object}    params
+ * */
+
+/**
+ * @summary     路由信息
+ * @typedef     {Object}        RouteConfig
+ * @property    {String|RegExp} path
+ * @property    {RouterEvent}   callback
+ // * @property    {Array}         [route.children]    // todo 子路由功能
  * */
 
 /**
@@ -19,9 +36,9 @@ import {listener}   from '../listener.js';
 class Router{
 	/**
 	 * @constructor
-	 * @param   {Object}    [config={}]
-	 * @param   {String}    [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式
-	 * @param   {Array}     [config.routers]
+	 * @param   {Object}        [config={}]
+	 * @param   {String}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式
+	 * @param   {RouteConfig[]} [config.routers]
 	 * */
 	constructor(config={}){
 		// this.listener = listener(this, 'routerChange', (e, newUrl, oldUrl)=>{
@@ -69,19 +86,27 @@ class Router{
 		}
 	}
 
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 路由默认属性
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return CONFIG;
+	}
+
 	// ---------- 私有方法 ----------
 	/**
 	 * @summary 跳转到路径
 	 * @private
-	 * @param   {String|Url}        path
-	 * @param   {Object|Boolean}    [params={}]
-	 * @return  {Boolean}           是否有匹配的路由执行成功
+	 * @param   {Url}       targetUrl
+	 * @return  {Boolean}   是否有匹配的路由执行成功
 	 * */
-	_get(path, params={}){
-		let tempUrl = url.parseUrl( path )
+	_get(targetUrl){
+		let path = targetUrl.path
+			, params = targetUrl.params
 			;
-
-		path = tempUrl.path;
 
 		return this.routers.some((route)=>{
 			let result = route.pattern.exec( path )
@@ -89,6 +114,7 @@ class Router{
 				;
 
 			if( result ){    // 存在匹配 path
+
 				// 解析 url 中的参数
 				temp = result.slice(1).reduce((all, d, i)=>{
 					all[route.paramNames[i]] = d;
@@ -99,13 +125,11 @@ class Router{
 				temp = merge(temp, params);
 
 				// 替换当前参数
-				tempUrl.changeParams( temp );
+				// targetUrl.changeParams( temp );
 
 				try{
 					// 执行路由回调
 					route.callback( temp );
-
-					// this.listener.trigger(url.pack(), tempUrl.pack());
 				}
 				catch(e){
 					console.log(path, '路由执行错误', e);
@@ -127,19 +151,16 @@ class Router{
 		if( url.hash ){
 			tempUrl = url.parseUrl( url.hash );
 
-			if( this.has( tempUrl.path ) ){
+			if( this.has(tempUrl.path) ){
 				this._get( tempUrl );
 			}
 		}
 	}
 	/**
 	 * @summary 注册路径
-	 * @param   {Object|String|RegExp}  route           当 route 为 Object 类型时且不为 RegExp 视为路由配置对象
-	 * @param   {String|RegExp}         route.path
-	 * @param   {RouterEvent}           route.callback
-	 * @param   {Array}                 [route.children]    // todo
-	 * @param   {RouterEvent}           [callback]      当 route 为 String 或 RegExp 类型时有效
-	 * @return  {Router}                this
+	 * @param   {String|RegExp|RouteConfig} route       当 route 为 Object 类型时且不为 RegExp 视为路由配置对象
+	 * @param   {RouterEvent}               [callback]  当 route 为 String 或 RegExp 类型时有效
+	 * @return  {Router}                    this
 	 * @desc    path 以 / 开始视为根目录开始，否则以当前路径目录下，不能带参数和 hash(? #)
 	 *          可以配置动态路由，参数名以 :name 的形式
 	 *          解析出来的路由参数将以组合到传入 RouterEvent 函数的参数 params 中
@@ -167,9 +188,15 @@ class Router{
 		else if( typeof path === 'string' ){
 
 			if( !/^\//.test(path) ){    // 当前目录下
-				path = url.dir + path;  // 添加根目录
+				if( this.config.baseUrl ){
+					path = this.config.baseUrl + path;  // 基于 baseUrl
+				}
+				else{
+					path = url.dir + path;  // 添加根目录
+				}
 			}
 
+			// 替换动态路由参数
 			pattern = path.replace(/:([^\/]*)/g, (str, paramName)=>{
 				paramNames.push( paramName );
 
@@ -215,22 +242,21 @@ class Router{
 	 * @desc    当为 hash 模式时，该方法实际并未直接执行 router 的 callback，仅仅调用 url.setHash 方法，来触发 hashChange 事件进而执行 router 的 callback，所以将会是异步
 	 * */
 	go(path, params={}){
-		let tempUrl = url.parseUrl( path )
+		let targetUrl = url.parseUrl( path )
 			, rs
 			;
 
-		if( this.config.mode === 'history' ){
-			// todo 传参问题
-			rs = this._get(tempUrl, params);
+		targetUrl.changeParams( params );
+
+		if( this.config.mode === 'history' ){   // history 模式
+			rs = this._get( targetUrl );
 		}
-		else if( this.config.mode === 'hash' ){
-			tempUrl.changeParams( params );
-			
-			rs = this.has( tempUrl.path );
+		else if( this.config.mode === 'hash' ){ // hash 模式
+			rs = this.has( targetUrl.path );
 		}
 
 		if( rs ){
-			this.pushHistory( tempUrl );
+			this.pushHistory( targetUrl );
 		}
 
 		return rs;
@@ -251,13 +277,4 @@ class Router{
 	}
 }
 
-Router._CONFIG = {
-	mode: 'history'
-};
-
-let router = new Router({
-	mode: device.weixin ? 'hash' : 'history'
-});
-
-
-export default router;
+export default Router;

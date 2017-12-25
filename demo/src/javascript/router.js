@@ -2,31 +2,45 @@
 
 import maple    from '../../../src/maple/base.js';
 
-let router = maple.router
+let router = new maple.Router({
+		mode: maple.device.weixin ? 'hash' : 'history'
+		, routers: [{
+			path: '/a/index.html'
+			, callback(params){
+				addLog('a: '+ JSON.stringify(params));
+			}
+		}, {
+			path: '/b/index.html'
+			, callback(params){
+				addLog('b: '+ JSON.stringify(params));
+			}
+		}, {
+			path: '/c/index.html'
+			, callback(params){
+				addLog('c: '+ JSON.stringify(params));
+			}
+		}]
+	})
 	;
 
 router.register({
-	path: '/a/index.html'
+	path: '/d/index.html'
 	, callback(params){
-		console.log('a', params);
+		addLog('d: '+ JSON.stringify(params));
 	}
 });
 
-router.register({
-	path: '/b/index.html'
-	, callback(params){
-		console.log('b', params)
-	}
-});
+let addLog = (log)=>{
+		let t = document.createElement('p')
+			;
 
-router.register({
-	path: '/c/index.html'
-	, callback(params){
-		console.log('c', params);
-	}
-});
+		t.innerHTML = location.href +'<br>'+ log;
 
-let a = ['a', 'b', 'c']
+		document.body.appendChild( t );
+	}
+	;
+
+let a = ['a', 'b', 'c', 'd']
 	, i = 0
 	, timer = setInterval(()=>{
 		i++;
@@ -35,10 +49,10 @@ let a = ['a', 'b', 'c']
 			clearInterval( timer );
 		}
 		else{
-			let rs = router.go(`/${a[i%3]}/index.html`, {['p'+ a[i%3]]: a[i%3]})
+			let rs = router.go(`/${a[i%4]}/index.html`, {['p'+ a[i%4]]: a[i%4]})
 				;
 
-			console.log( rs );
+			addLog( rs );
 		}
 	}, 3000)
 	;
