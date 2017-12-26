@@ -62,18 +62,6 @@ class CookieModel extends Model{
 
 			date = date === 0 ? '' : new Date( Date.now() + date );
 		}
-		// else if( typeof date === 'number' ){
-		// 	temp = new Date();
-		// 	temp.setTime( +temp + CookieModel._SHORT_TIME_NUM.d * date );
-		// 	date = temp;
-		// }
-		// else if( temp = CookieModel._SHORT_TIME_EXPR.exec( date ) ){
-		// 	date = new Date();
-		// 	date.setTime( date.getTime() + Number( temp[1] ) * CookieModel._SHORT_TIME_NUM[temp[2]] );
-		// }
-		// else{
-		// 	date = '';
-		// }
 
 		return date && date.toUTCString();
 	}
@@ -86,6 +74,14 @@ class CookieModel extends Model{
 	 * */
 	static get _DEFAULT(){
 		return COOKIE_DEFAULT;
+	}
+	/**
+	 * @summary 设置默认参数的 domain 值
+	 * @static
+	 * @param   {String}    domain
+	 * */
+	static setDomain(domain){
+		COOKIE_DEFAULT.domain = domain;
 	}
 
 	// ---------- 私有方法 ----------
@@ -116,14 +112,11 @@ class CookieModel extends Model{
 		document.cookie = encodeURIComponent( topic ) +'='+
 			encodeURIComponent( this._stringify(value) ) +
 			Object.keys( CookieModel._DEFAULT ).reduce((a, d)=>{    // 整理配置
+				let t = options[d] || CookieModel._DEFAULT[d]
+					;
 
-				a += '; '+ d +'=';
-
-				if( d in options ){
-					a += options[d];
-				}
-				else{
-					a += CookieModel._DEFAULT[d];
+				if( t ){
+					a += '; '+ d +'='+ t;
 				}
 
 				return a;
@@ -315,15 +308,19 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]}   topic
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {String|String[]|...String} topic
+	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    调用 _setCookie 方法，过期时间为负值
 	 * */
 	removeData(topic){
-		let result
+		let argc = arguments.length
+			, result
 			;
 		if( Array.isArray(topic) ){
 			result = this._removeByArray( topic );
+		}
+		else if( argc > 1 ){
+			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
 			result = super.removeData( topic ).then(()=>{

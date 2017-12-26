@@ -156,15 +156,19 @@ class SessionStorageModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]}   topic
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {String|String[]|...String} topic
+	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	removeData(topic){
-		let result
+		let argc = arguments.length
+			, result
 			;
 
 		if( result ){
 			result = this._removeByArray( topic );
+		}
+		else if( argc > 1 ){
+			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
 			result = super.removeData( topic ).then(()=>{

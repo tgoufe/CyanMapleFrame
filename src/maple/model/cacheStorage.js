@@ -114,8 +114,8 @@ class CacheStorageModel extends Model{
 	/**
 	 * @summary 将缓存删除
 	 * @param   {String|Request}    topic
-	 * @param   {Object}    [options={}]    cache.delete 的可选参数
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {Object}            [options={}]    cache.delete 的可选参数
+	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	removeData(topic, options={}){
 		topic = this._tranToRequest( topic );

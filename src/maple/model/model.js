@@ -66,7 +66,6 @@ class Model{
 	constructor(config={}){
 		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 方法
 		this._history = Object.create( null );  // 历史记录
-		this._eventList = [];
 		this._syncList = [];
 
 		this.config = merge(config, Model._CONFIG);
@@ -462,16 +461,20 @@ class Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]}   topic
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {String|String[]|...String} topic
+	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    目前子类的实现中都调用了 super.removeData，若其它子类的实现中并没有调用，但需对数据监控，应在适当的时候调用 _trigger 方法
 	 * */
 	removeData(topic){
-		let result
+		let argc = arguments.length
+			, result
 			;
 
 		if( Array.isArray(topic) ){
 			result = this._removeByArray( topic );
+		}
+		else if( argc > 1 ){
+			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
 			try {
@@ -555,6 +558,20 @@ class Model{
 		if( i !== -1 ){
 			this._syncList.splice(i, 1);
 		}
+	}
+
+	/**
+	 * @summary toString 方法
+	 * */
+	toString(){
+		return JSON.stringify( this._value );
+	}
+	/**
+	 * @summary toJSON 方法
+	 * @desc    JSON.stringify 序列号 Model 及子类的实例对象时调用
+	 * */
+	toJSON(){
+		return this._value;
 	}
 }
 

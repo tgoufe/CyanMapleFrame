@@ -1,19 +1,20 @@
 'use strict';
 
 import maple    from '../../../src/maple/base.js';
+import log      from '../log.js';
 
 let i = 0
 	, throttleTest = maple.util.throttle(()=>{
-		console.log('throttle', i);
+		log('throttle', i);
 	}, 1000)
 	, throttleLeadingTest = maple.util.throttle(()=>{
-		console.log('throttle leading', i);
+		log('throttle leading', i);
 	}, 1000, true)
 	, mainInterval = setInterval(()=>{
 		++i;
 
 		if( i < 200 ){
-			console.log( i );
+			log( i );
 			throttleTest();
 			throttleLeadingTest();
 		}

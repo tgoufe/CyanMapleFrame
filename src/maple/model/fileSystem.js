@@ -18,7 +18,6 @@ const FILE_SYSTEM_CONFIG = {
  * @class
  * @classdesc   对 File System 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 file，别名 fs，将可以使用工厂方法生成。默认使用文件名为 storage.txt，2MB 空间
  * @extends     Model
- * @todo        调整机制，增加缓存
  * */
 class FileSystemModel extends Model{
 	/**
@@ -136,6 +135,7 @@ class FileSystemModel extends Model{
 	 * */
 	_write(content){
 		return this._getFileEntry().then((fileEntry)=>{
+			console.log('写入文件 ',  fileEntry.toURL());
 			return this._getFileWriter( fileEntry );
 		}).then((fileWriter)=>{
 			return this._writeFile(fileWriter, content);
@@ -199,12 +199,7 @@ class FileSystemModel extends Model{
 			try{
 				content = JSON.parse( content );
 
-				// 将所有取到的值缓存
-				return super.setData( content ).then(()=>{
-					return content;
-				});
-
-				// return content;
+				return content;
 			}
 			catch(e){
 				console.log( e );
@@ -222,38 +217,36 @@ class FileSystemModel extends Model{
 	 * @desc    保持值得时候，同时会保持在内存中
 	 * */
 	setData(topic, value){
-		let result = this._read()
+		let result
+			, writeTarget
 			;
 
 		if( typeof topic === 'object' ){
-			result = result.then((content)=>{
-				let keys = Object.keys( topic )
-					;
+			writeTarget = topic;
+		}
+		else if( typeof topic === 'string' ){
+			writeTarget = {
+				[topic]: value
+			};
+		}
 
-				keys.forEach((k)=>{
-					content[k] = topic[k];
-				});
+		if( writeTarget ){
 
-				return Promise.all( keys.map((k)=>{
-					return super.setData(k, topic[k]);
-				}) ).then(()=>{
-					return content;
-				});
+			Object.keys( writeTarget ).forEach((t)=>{
+				return super.setData(t, writeTarget[t]);
+			});
+
+			result = this._read().then((content)=>{
+				return merge(writeTarget, content);
+			}).then((content)=>{
+				return this._write( JSON.stringify(content) );
 			});
 		}
 		else{
-			result = result.then((content)=>{
-				return super.setData(topic, value).then(()=>{
-					content[topic] = value;
-
-					return content;
-				});
-			});
+			result = Promise.reject( new Error('参数错误') );
 		}
 
-		return result.then((content)=>{
-			return this._write( JSON.stringify(content) );
-		});
+		return result;
 	}
 	/**
 	 * @summary 获取数据
@@ -263,59 +256,84 @@ class FileSystemModel extends Model{
 	 * */
 	getData(topic){
 		let argc = arguments.length
-			, result
-			;
-
-		if( Array.isArray(topic) || argc > 1 ){
-			result = this._getByArray( topic );
-		}
-		else if( argc > 1 ){
-			result = this._getByArray( [].slice.call(arguments) );
-		}
-		else{
-			result = super.getData( topic ).catch(()=>{
-				return this._read().then((content)=>{
-					let value = null
-						;
-
-					try{
-						value = content[topic];
-
-						super.setData(topic, value);
-					}
-					catch(e){}
-
-					return value;
-				});
-			});
-		}
-
-		return result;
-	}
-	/**
-	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]}   topic
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
-	 * */
-	removeData(topic){
-		let result
+			, topicList
+			, readCache = null      // 读取文件结果缓存
+			, getReadCache = ()=>{  // 执行读取文件操作
+				return this._read();
+			}
 			;
 
 		if( Array.isArray(topic) ){
-			result = this._removeByArray( topic );
+			topicList = topic;
+		}
+		else if( argc > 1 ){
+			topicList = [].slice.call( arguments );
 		}
 		else{
-			result = super.removeData( topic ).then(()=>{
-				return this._read().then((content)=>{
-
-					delete content[topic];
-					
-					return this._write( JSON.stringify(content) );
-				});
-			});
+			topicList = [topic];
 		}
 
-		return result;
+		return Promise.all( topicList.map((t)=>{
+			return super.getData(t).catch(()=>{
+				if( !readCache ){   // 没有缓存，获取缓存
+					readCache = getReadCache();
+				}
+
+				return readCache.then((content)=>{
+					return content[t] || null;
+				});
+			});
+		}) ).then((data)=>{
+			let result
+				;
+			
+			if( Array.isArray( topic ) || argc > 1 ){
+				result = topicList.reduce((rs, d, i)=>{
+					rs[d] = data[i];
+
+					return rs;
+				}, {});
+			}
+			else{
+				result = data[0];
+			}
+
+			return result;
+		});
+	}
+	/**
+	 * @summary 将数据从缓存中删除
+	 * @param   {String|String[]|...String} topic
+	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
+	 * */
+	removeData(topic){
+		let argc = arguments.length
+			, topicList
+			;
+
+		if( Array.isArray(topic) ){
+			topicList = topic;
+		}
+		else if( argc > 1 ){
+			topicList = [].slice.call( arguments );
+		}
+		else{
+			topicList = [topic];
+		}
+
+		topicList.forEach((t)=>{
+			return super.removeData( t );
+		});
+
+		return this._read().then((content)=>{
+			return topicList.reduce((all, t)=>{
+				delete all[t];
+
+				return all;
+			}, content);
+		}).then((content)=>{
+			return this._write( JSON.stringify(content) );
+		});
 	}
 	/**
 	 * @summary 清空数据
@@ -323,12 +341,14 @@ class FileSystemModel extends Model{
 	 * @desc    删除文件
 	 * */
 	clearData(){
-		return this._getFileEntry({
-			create: false
+		return super.clearData().then(()=>{
+			return this._getFileEntry({
+				create: false
+			});
 		}).then((fileEntry)=>{
 			return new Promise((resolve, reject)=>{
 				console.log(fileEntry.toURL(), ' 文件被删除');
-				
+
 				fileEntry.remove(resolve, reject);
 			});
 		});

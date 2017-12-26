@@ -1,19 +1,20 @@
 'use strict';
 
 import maple    from '../../../src/maple/base.js';
+import log      from '../log.js';
 
 let i = 0
 	, debounceTest = maple.util.debounce(()=>{
-		console.log('debounce', i);
+		log('debounce', i);
 	}, 1000)
 	, debounceMaxTest = maple.util.debounce(()=>{
-		console.log('debounce max', i);
+		log('debounce max', i);
 	}, 1000, 4000)
 	, mainInterval = setInterval(()=>{
 		++i;
 
 		if( i < 200 ){
-			console.log( i );
+			log( i );
 			debounceTest();
 			debounceMaxTest();
 		}
