@@ -1,6 +1,6 @@
 {
   "name": "cyan-maple",
-  "version": "0.5.0",
+  "version": "0.8.0",
   "jqMobileVersion": "1.4.2",
   "devDependencies": {
     "babel-core": "~6.26.0",
@@ -43,6 +43,8 @@
   "scripts": {
     "dev": "webpack-dev-server",
     "build": "webpack",
+    "bulidBase": "webpack --config base.webpack.config.js",
+    "bulidDemo": "webpack --config demo.webpack.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

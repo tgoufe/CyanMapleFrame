@@ -70,7 +70,7 @@ import view     from './view/index.js';
 /**
  * ---------- Router 路由控制 ----------
  * */
-import router   from './router/index.js';
+import Router   from './router/index.js';
 
 /**
  * ---------- 获取地理位置 ----------
@@ -109,7 +109,8 @@ let maple = {
 
 	, view
 
-	, router
+	, Router
+	, router: Router
 
 	, position
 

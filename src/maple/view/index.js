@@ -98,4 +98,4 @@ export default {
 	, offset
 	, needRefresh
 	, postMessage
-}
+};

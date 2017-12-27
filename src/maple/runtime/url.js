@@ -103,7 +103,6 @@ class Url{
 	/**
 	 * @summary     将现有参数组合成一个 url
 	 * @return      {String}
-	 * @todo        onlyPath 参数保留？
 	 * */
 	pack(){
 		return this.protocol +'://'+
@@ -185,6 +184,7 @@ url.parseUrl = (url)=>{
 url.addProtocol = (url)=>{
 	return /^\/\//.test( url ) ? location.protocol + url : url;
 };
+
 /**
  * @summary     刷新当前页面
  * @method
@@ -201,6 +201,13 @@ url.reload = ()=>{
 url.back = ()=>{
 	history.back();
 };
+
+url.setHash = function(hash){
+	this.hash = hash;
+	location.hash = hash;
+};
+
+// ---------- url 上的参数操作 ----------
 /**
  * @summary     调整参数并指向调整后的路径，当前 url 添加到历史记录
  * @method
@@ -236,28 +243,6 @@ url.push = function(params, pushState){
 	return this;
 };
 /**
- * @summary     将 url 指向目标路径，当前 url 添加到历史记录
- * @method
- * @memberOf    url
- * @param       {String}    href
- * @param       {Object}    [state=null]
- * @return      {Url}       this
- * */
-url.pushHistory = function(href, state=null){
-	history.pushState(state, '', href);
-	
-	return this;
-};
-/**
- * @summary     跳转到目标页面，当前 url 添加到历史记录
- * @method
- * @memberOf    url
- * @param       {String}    href
- * */
-url.changePage = function(href){
-	location.assign( href );
-};
-/**
  * @summary     替换当前 url 上的参数
  * @method
  * @memberOf    url
@@ -269,6 +254,38 @@ url.replace = function(params){
 
 	// 将当前浏览器上 url 换为替换后组装出来的链接
 	history.replaceState(null, '', this.pack());
+
+	return this;
+};
+
+// ---------- 页面跳转操作 ----------
+/**
+ * @summary     跳转到目标页面，当前 url 添加到历史记录
+ * @method
+ * @memberOf    url
+ * @param       {String}    href
+ * */
+url.changePage = function(href){
+	location.assign( href );
+};
+/**
+ * @summary     替换当前 url 为目标路径，页面刷新
+ * */
+url.replacePage = function(href){
+	location.replace( href );
+};
+
+// ---------- 修改 url 状态 ----------
+/**
+ * @summary     将 url 指向目标路径，当前 url 添加到历史记录
+ * @method
+ * @memberOf    url
+ * @param       {String}    href
+ * @param       {Object}    [state=null]
+ * @return      {Url}       this
+ * */
+url.pushHistory = function(href, state=null){
+	history.pushState(state, '', href);
 
 	return this;
 };
@@ -285,12 +302,8 @@ url.replaceHistory = function(href, state=null){
 
 	return this;
 };
-/**
- * @summary     替换当前 url 为目标路径，页面刷新
- * */
-url.replacePage = function(href){
-	location.replace( href );
-};
+
+// ---------- 相关事件处理 ----------
 /**
  * @summary     监听 hashChange 事件
  * @type        {Listener}
@@ -336,9 +349,10 @@ url.popState = listener('popstate', (e, newUrl)=>{
 	}
 
 	// todo state 做什么？
-	console.log(state);
+	// console.log(state);
 
-	// 替换当期 url 对象属性 todo 更好的实现？
+	// 替换当期 url 对象属性
+	// todo 更好的实现？
 	Object.keys( temp ).forEach((k)=>{
 		url[k] = temp[k];
 	});

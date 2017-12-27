@@ -107,18 +107,27 @@ blockquote,  dd, div, dl, dt, fieldset, form, h1, h2, h3, h4, h5, h6, input, pre
     	border:1px solid $border-color-default;
     }
 }
+.hide-scrollBar{
+    -webkit-overflow-scrolling: touch;
+	&::-webkit-scrollbar {
+	    display: none;
+	}
+}
+.scroll-container-y{
+	overflow-y: scroll;
+    overflow-x: hidden;
+    @extend .hide-scrollBar;
+}
 .scroll-container{
     overflow-x: scroll;
     overflow-y: hidden;
     font-size: 0;
     white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
 	&>*{
 		display: inline-block;
+		font-size: initial;
 	}
-	&::-webkit-scrollbar {
-	    display: none;
-	}
+	@extend .hide-scrollBar;
 }
 .flex-container{
 	@include display-flex();

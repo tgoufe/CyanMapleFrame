@@ -4,6 +4,25 @@ import {listener}   from '../listener.js';
 import merge        from '../util/merge.js';
 
 /**
+ * 默认配置
+ * @const
+ * */
+const MODEL_CONFIG = {
+		eventType: 'modelChange'
+	}
+	/**
+	 * 子类对象缓存
+	 * @const
+	 * */
+	, MODEL_CACHE = {}
+	/**
+	 * 子类别名列表
+	 * @const
+	 * */
+	, MODEL_ALIAS = {}
+	;
+
+/**
  * @class
  * @classdesc   数据层基类，将数据保存在内存中
  * @example
@@ -47,7 +66,6 @@ class Model{
 	constructor(config={}){
 		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 方法
 		this._history = Object.create( null );  // 历史记录
-		this._eventList = [];
 		this._syncList = [];
 
 		this.config = merge(config, Model._CONFIG);
@@ -153,6 +171,32 @@ class Model{
 		}
 
 		return model;
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认配置
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return MODEL_CONFIG;
+	}
+	/**
+	 * @summary 子类对象缓存
+	 * @static
+	 * @const
+	 * */
+	static get _MODEL_CACHE(){
+		return MODEL_CACHE;
+	}
+	/**
+	 * @summary 子类别名列表
+	 * @static
+	 * @const
+	 * */
+	static get _MODEL_ALIAS(){
+		return MODEL_ALIAS;
 	}
 
 	// ---------- 私有方法 ----------
@@ -417,16 +461,20 @@ class Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]}   topic
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {String|String[]|...String} topic
+	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    目前子类的实现中都调用了 super.removeData，若其它子类的实现中并没有调用，但需对数据监控，应在适当的时候调用 _trigger 方法
 	 * */
 	removeData(topic){
-		let result
+		let argc = arguments.length
+			, result
 			;
 
 		if( Array.isArray(topic) ){
 			result = this._removeByArray( topic );
+		}
+		else if( argc > 1 ){
+			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
 			try {
@@ -511,25 +559,20 @@ class Model{
 			this._syncList.splice(i, 1);
 		}
 	}
+
+	/**
+	 * @summary toString 方法
+	 * */
+	toString(){
+		return JSON.stringify( this._value );
+	}
+	/**
+	 * @summary toJSON 方法
+	 * @desc    JSON.stringify 序列号 Model 及子类的实例对象时调用
+	 * */
+	toJSON(){
+		return this._value;
+	}
 }
-
-// ---------- 静态属性 ----------
-/**
- * 默认配置
- * */
-Model._CONFIG = {
-	eventType: 'modelChange'
-};
-
-/**
- * 子类对象缓存
- * @static
- * */
-Model._MODEL_CACHE = {};
-/**
- * 子类别名列表
- * @static
- * */
-Model._MODEL_ALIAS = {};
 
 export default Model;

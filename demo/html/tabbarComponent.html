@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+	<title>headComponent</title>
+	<script src="../../src/libs/flexible/flexible.js"></script>
+	<link rel="stylesheet" href="../../src/cyan/CMUI.css">
+</head>
+<body>
+	<div id="main" style="height:400px">
+		<pc-head title="tabBar组件展示"></pc-head>
+		<cmui-tabbar
+		col="flex"
+		position="top"
+		ref="tab"
+		:nav="[true,true]"
+		@tab-extra="extra"
+		@nav-item="navItem"
+		:watch="tabbarData"
+		>
+			<cmui-tabbar-item
+			v-for="(item,index) in tabbarData"
+			:key="index"
+			>
+				<div class="padding10 text-center paddingh20">
+					<span>{{item.title}}</span>
+				</div>
+				
+				<div slot="content">
+					<cmui-list :col="4" :space="1"  border="#ff6565">
+						<cmui-list-item v-for="item in [1,2,3,4,5,6,7,8,9]">
+							<div class="ratio-container">
+								<span>{{index}}</span>
+							</div>
+						</cmui-list-item>
+					</cmui-list>
+				</div>
+			</cmui-tabbar-item>
+		</cmui-tabbar>
+		<a href="###" @click="add" class="btn red">add</a>
+	</div>
+	<script src="../../src/libs/jquery/jquery.min.js"></script>
+	<script src="../../src/libs/lodash/lodash.min.js"></script>
+	<script src="../../src/libs/vue/vue.min.js"></script>
+</body>
+</html>

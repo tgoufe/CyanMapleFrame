@@ -4,6 +4,28 @@ import Model from './model.js';
 import merge from '../util/merge.js';
 
 /**
+ * 默认配置
+ * @const
+ * */
+const WEB_SQL_MODEL_CONFIG = {
+		dbName: 'storage'
+		, tableName: 'storage'
+		, dbVersion: 1
+		// 数据库可用空间大小，如果指定太大，浏览器会提示用户是否允许使用这么多空间
+		, dbSize: 2<<20
+		, sql: {
+			create:         'create table if not exists `{{tableName}}`(id integer primary key autoincrement,topic text unique,value text)'
+			, select:       'select * from `{{tableName}}` where topic=?'
+			, update:       'update `{{tableName}}` set value=? where topic=?'
+			, insert:       'insert into `{{tableName}}`(topic,value) values(?,?)'
+			, delete:       'delete from `{{tableName}}` where topic=?'
+			, clear:        'delete from `{{tableName}}`'
+			, createIndex:  'create index if not exists index_{{col}} on `{{tableName}}`(`{{col}}`)'
+		}
+	}
+	;
+
+/**
  * @class
  * @classdesc   对 WebSQL Database 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 webSQL，别名 ws,sql，将可以使用工厂方法生成。默认使用表名为 storage，有 id,topic,value 3 个列的表，在生成对象时传入 options 可覆盖默认 SQL 语句
  * @extends     Model
@@ -39,7 +61,7 @@ class WebSQLModel extends Model{
 	 * @desc    传入 sql 语句时，可用 {{tableName}} 来代替表名
 	 * */
 	constructor(config={}){
-		super();
+		super( config );
 
 		let sql = config.sql
 			;
@@ -75,9 +97,19 @@ class WebSQLModel extends Model{
 				});
 			}
 			else{
-				reject(new Error('此浏览器不支持 Web SQL Database'));
+				reject( new Error('此浏览器不支持 Web SQL Database') );
 			}
 		});
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认配置
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return WEB_SQL_MODEL_CONFIG;
 	}
 
 	// ---------- 私有方法 ----------
@@ -278,15 +310,19 @@ class WebSQLModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]}   topic
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
+	 * @param   {String|String[]|...String} topic
+	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * */
 	removeData(topic){
-		let result
+		let argc = arguments.length
+			, result
 			;
 
 		if( Array.isArray(topic) ){
 			result = this._removeByArray( topic );
+		}
+		else if( argc > 1 ){
+			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
 			result = super.removeData( topic ).then(()=>{
@@ -345,28 +381,6 @@ class WebSQLModel extends Model{
 		});
 	}
 }
-
-/**
- * 默认配置
- * @const
- * @static
- * */
-WebSQLModel._CONFIG = {
-	dbName: 'storage'
-	, tableName: 'storage'
-	, dbVersion: 1
-	// 数据库可用空间大小，如果指定太大，浏览器会提示用户是否允许使用这么多空间
-	, dbSize: 2<<20
-	, sql: {
-		create:         'create table if not exists `{{tableName}}`(id integer primary key autoincrement,topic text unique,value text)'
-		, select:       'select * from `{{tableName}}` where topic=?'
-		, update:       'update `{{tableName}}` set value=? where topic=?'
-		, insert:       'insert into `{{tableName}}`(topic,value) values(?,?)'
-		, delete:       'delete from `{{tableName}}` where topic=?'
-		, clear:        'delete from `{{tableName}}`'
-		, createIndex:  'create index if not exists index_{{col}} on `{{tableName}}`(`{{col}}`)'
-	}
-};
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成

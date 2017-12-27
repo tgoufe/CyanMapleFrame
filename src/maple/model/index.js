@@ -42,6 +42,7 @@ import './localStorage.js';
 import './sessionStorage.js';
 import './indexedDB.js';
 import './webSQL.js';
+import './fileSystem.js';
 
 // 网络请求
 import './service.js';

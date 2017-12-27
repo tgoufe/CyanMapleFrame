@@ -4,6 +4,18 @@ import Model        from './model.js';
 import dateFormat   from '../util/dateFormat.js';
 
 /**
+ * 默认 cookie 设置参数
+ * @const
+ * */
+const COOKIE_DEFAULT = {
+		path: '/'
+		, domain: ''
+		, expires: ''
+		, secure: ''
+	}
+	;
+
+/**
  * @class
  * @classdesc   对 cookie 的使用进行封装，统一调用接口，在 Model.factory 工厂方法注册为 cookie，别名 c，将可以使用工厂方法生成
  * @extends     Model
@@ -50,20 +62,26 @@ class CookieModel extends Model{
 
 			date = date === 0 ? '' : new Date( Date.now() + date );
 		}
-		// else if( typeof date === 'number' ){
-		// 	temp = new Date();
-		// 	temp.setTime( +temp + CookieModel._SHORT_TIME_NUM.d * date );
-		// 	date = temp;
-		// }
-		// else if( temp = CookieModel._SHORT_TIME_EXPR.exec( date ) ){
-		// 	date = new Date();
-		// 	date.setTime( date.getTime() + Number( temp[1] ) * CookieModel._SHORT_TIME_NUM[temp[2]] );
-		// }
-		// else{
-		// 	date = '';
-		// }
 
 		return date && date.toUTCString();
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认 cookie 设置参数
+	 * @static
+	 * @const
+	 * */
+	static get _DEFAULT(){
+		return COOKIE_DEFAULT;
+	}
+	/**
+	 * @summary 设置默认参数的 domain 值
+	 * @static
+	 * @param   {String}    domain
+	 * */
+	static setDomain(domain){
+		COOKIE_DEFAULT.domain = domain;
 	}
 
 	// ---------- 私有方法 ----------
@@ -94,14 +112,11 @@ class CookieModel extends Model{
 		document.cookie = encodeURIComponent( topic ) +'='+
 			encodeURIComponent( this._stringify(value) ) +
 			Object.keys( CookieModel._DEFAULT ).reduce((a, d)=>{    // 整理配置
+				let t = options[d] || CookieModel._DEFAULT[d]
+					;
 
-				a += '; '+ d +'=';
-
-				if( d in options ){
-					a += options[d];
-				}
-				else{
-					a += CookieModel._DEFAULT[d];
+				if( t ){
+					a += '; '+ d +'='+ t;
 				}
 
 				return a;
@@ -293,15 +308,19 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]}   topic
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {String|String[]|...String} topic
+	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    调用 _setCookie 方法，过期时间为负值
 	 * */
 	removeData(topic){
-		let result
+		let argc = arguments.length
+			, result
 			;
 		if( Array.isArray(topic) ){
 			result = this._removeByArray( topic );
+		}
+		else if( argc > 1 ){
+			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
 			result = super.removeData( topic ).then(()=>{
@@ -326,36 +345,6 @@ class CookieModel extends Model{
 		return this._enabled ? document.cookie.length : 0;
 	}
 }
-
-/**
- * 默认 cookie 设置参数
- * @const
- * @static
- * */
-CookieModel._DEFAULT = {
-	path: '/'
-	, domain: ''
-	, expires: ''
-	, secure: ''
-};
-// /**
-//  * 简短时间设置格式
-//  * @const
-//  * @static
-//  * */
-// CookieModel._SHORT_TIME_EXPR = /^(-?\d+)(s|m|h|d|y)?$/i;
-// /**
-//  * 时间单位对应的毫秒数
-//  * @const
-//  * @static
-//  * */
-// CookieModel._SHORT_TIME_NUM = {
-// 	s: 1e3
-// 	, m: 6e4
-// 	, h: 36e5
-// 	, d: 864e5
-// 	, y: 31536e6
-// };
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成
