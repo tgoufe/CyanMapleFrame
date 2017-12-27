@@ -13,6 +13,23 @@
 import CONFIG       from '../config.js';
 import {listener}   from '../listener.js';
 
+const INDEX = ['source'
+		, 'protocol'
+		, 'origin'
+		, 'host'
+		, 'port'
+		, 'path'
+		, 'relative'
+		, 'file'
+		, 'dir'
+		, 'segments'
+		, 'params'
+		, 'query'
+		, 'hash'
+		, 'from'
+	]
+	;
+
 /**
  * @class
  * @classdesc   url 解析
@@ -50,6 +67,11 @@ class Url{
 		this.from       = document.referrer;
 
 		a = null;   // 释放内存
+	}
+
+	// ---------- 静态属性 ----------
+	static get _INDEX(){
+		return INDEX;
 	}
 
 	// ---------- 公有属性 ----------
@@ -143,6 +165,42 @@ class Url{
 		}
 
 		return this;
+	}
+	/**
+	 * @summary 将当前 url 实例的属性替换为目标 url 实例的属性
+	 * @param   {Url}    url
+	 * */
+	changeTo(url){
+		let source = this.source
+			;
+
+		Url._INDEX.filter( k => k !== 'query' ).forEach((k)=>{
+			this[k] = url[k];
+		});
+
+		this.from = source;
+	}
+
+	/**
+	 * @summary toString 方法
+	 * */
+	toString(){
+		return JSON.stringify( Url._INDEX.reduce((rs, k)=>{
+			rs[k] = this[k];
+
+			return rs;
+		}, {}) );
+	}
+	/**
+	 * @summary toJSON 方法
+	 * @desc    JSON.stringify 序列号 Model 及子类的实例对象时调用
+	 * */
+	toJSON(){
+		return Url._INDEX.reduce((rs, k)=>{
+			rs[k] = this[k];
+
+			return rs;
+		}, {});
 	}
 }
 
@@ -287,6 +345,8 @@ url.replacePage = function(href){
 url.pushHistory = function(href, state=null){
 	history.pushState(state, '', href);
 
+	this.changeTo( this.parseUrl(href) );
+
 	return this;
 };
 /**
@@ -299,6 +359,8 @@ url.pushHistory = function(href, state=null){
  * */
 url.replaceHistory = function(href, state=null){
 	history.replaceState(state, '', href);
+
+	this.changeTo( this.parseUrl(href) );
 
 	return this;
 };
@@ -346,16 +408,13 @@ url.popState = listener('popstate', (e, newUrl)=>{
 			state = JSON.parse( state );
 		}
 		catch(e){}
+
+		// todo state 做什么？
+		// console.log(state);
 	}
 
-	// todo state 做什么？
-	// console.log(state);
-
 	// 替换当期 url 对象属性
-	// todo 更好的实现？
-	Object.keys( temp ).forEach((k)=>{
-		url[k] = temp[k];
-	});
+	url.changeTo( temp );
 });
 
 /**
