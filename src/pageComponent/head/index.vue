@@ -83,7 +83,7 @@
 						placeholder : 'Search',
 						leftIcon    : 'search',
 						rightIcon   : 'voice',
-						display     : true
+						display     : false
 					}
 				}
 			},
