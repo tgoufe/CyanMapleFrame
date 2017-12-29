@@ -37,8 +37,10 @@ class Router{
 	/**
 	 * @constructor
 	 * @param   {Object}        [config={}]
+	 * @param   {String}        [config.baseUrl]
 	 * @param   {String}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式
 	 * @param   {RouteConfig[]} [config.routers]
+	 * @param   {Function}      [config.fallback]       当路由不存在时的回调函数，传入参数当前 location.href
 	 * */
 	constructor(config={}){
 		// this.listener = listener(this, 'routerChange', (e, newUrl, oldUrl)=>{
@@ -52,11 +54,14 @@ class Router{
 		if( this.config.mode === 'history' ){
 			url.popState.add((e)=>{
 				let tempUrl = url.parseUrl( location.href )
-					, rs = this._get( tempUrl )
 					;
 
-				if( !rs ){
+				if( this.has(tempUrl.path) ){
+					this._get( tempUrl );
+				}
+				else{
 					console.log('router 中不存在', location.href, e);
+					this.config.fallback && this.config.fallback( location.href );
 				}
 			});
 		}
@@ -71,6 +76,10 @@ class Router{
 
 				if( this.has( tempUrl.path ) ){
 					this._get( tempUrl );
+				}
+				else{
+					console.log('router 中不存在', location.href, e);
+					this.config.fallback && this.config.fallback( location.href );
 				}
 			});
 		}
@@ -141,12 +150,15 @@ class Router{
 		let tempUrl
 			;
 
-		if( url.hash ){
-			tempUrl = url.parseUrl( url.hash );
+		if( this.config === 'history' ){
+			tempUrl = url;
+		}
+		else if( this.config.mode === 'hash' ){
+			tempUrl = url.parseUrl( url.hash || '/' );
+		}
 
-			if( this.has(tempUrl.path) ){
-				this._get( tempUrl );
-			}
+		if( this.has(tempUrl.path) ){
+			this._get( tempUrl );
 		}
 	}
 	/**
