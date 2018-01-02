@@ -5,6 +5,7 @@ import log      from '../log.js';
 
 let router = new maple.Router({
 		mode: maple.device.weixin ? 'hash' : 'history'
+		// mode: 'hash'
 		, routers: [{
 			path: '/a/index.html'
 			, callback(params){

@@ -37,8 +37,10 @@ class Router{
 	/**
 	 * @constructor
 	 * @param   {Object}        [config={}]
+	 * @param   {String}        [config.baseUrl]
 	 * @param   {String}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式
 	 * @param   {RouteConfig[]} [config.routers]
+	 * @param   {Function}      [config.fallback]       当路由不存在时的回调函数，传入参数当前 location.href
 	 * */
 	constructor(config={}){
 		// this.listener = listener(this, 'routerChange', (e, newUrl, oldUrl)=>{
@@ -52,11 +54,14 @@ class Router{
 		if( this.config.mode === 'history' ){
 			url.popState.add((e)=>{
 				let tempUrl = url.parseUrl( location.href )
-					, rs = this._get( tempUrl )
 					;
 
-				if( !rs ){
+				if( this.has(tempUrl.path) ){
+					this._get( tempUrl );
+				}
+				else{
 					console.log('router 中不存在', location.href, e);
+					this.config.fallback && this.config.fallback( location.href );
 				}
 			});
 		}
@@ -67,15 +72,15 @@ class Router{
 					, newHash = tempUrl.hash
 					;
 
-				console.log( newHash );
-
 				tempUrl = url.parseUrl( newHash );
 
 				if( this.has( tempUrl.path ) ){
 					this._get( tempUrl );
 				}
-
-				console.log(e, 'hash change');
+				else{
+					console.log('router 中不存在', location.href, e);
+					this.config.fallback && this.config.fallback( location.href );
+				}
 			});
 		}
 
@@ -124,9 +129,6 @@ class Router{
 
 				temp = merge(temp, params);
 
-				// 替换当前参数
-				// targetUrl.changeParams( temp );
-
 				try{
 					// 执行路由回调
 					route.callback( temp );
@@ -148,12 +150,15 @@ class Router{
 		let tempUrl
 			;
 
-		if( url.hash ){
-			tempUrl = url.parseUrl( url.hash );
+		if( this.config === 'history' ){
+			tempUrl = url;
+		}
+		else if( this.config.mode === 'hash' ){
+			tempUrl = url.parseUrl( url.hash || '/' );
+		}
 
-			if( this.has(tempUrl.path) ){
-				this._get( tempUrl );
-			}
+		if( this.has(tempUrl.path) ){
+			this._get( tempUrl );
 		}
 	}
 	/**
@@ -252,6 +257,10 @@ class Router{
 			rs = this._get( targetUrl );
 		}
 		else if( this.config.mode === 'hash' ){ // hash 模式
+			// hash 模式下并不直接调用 _get 方法来执行路径跳转
+			// 使用 url.setHash 设置 hash 来触发 hashChange 事件来调用 _get 方法
+			// 因为 修改 hash 与 pushState 方法不同，pushState 方法不会触发 popState 事件
+			// 但 hash 的修改都会触发 hashChange 事件
 			rs = this.has( targetUrl.path );
 		}
 

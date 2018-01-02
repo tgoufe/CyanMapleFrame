@@ -18,9 +18,21 @@ module.exports = {
 		, new webpack.optimize.CommonsChunkPlugin({
 			name: 'base'
 		})
+
+		, new HtmlWebpackPlugin({
+			filename: 'index.html'
+			, template: path.resolve(__dirname, 'demo/src/tpl/index.html')
+			, minify: {    //压缩HTML文件
+				removeComments: true        //移除HTML中的注释
+				, collapseWhitespace: true  //删除空白符与换行符
+			}
+			, chunks: ['base', 'index']
+			, inject: 'body'
+		})
+
 		, new HtmlWebpackPlugin({
 			filename: 'debounce.html'
-			,  minify: {    //压缩HTML文件
+			, minify: {    //压缩HTML文件
 				removeComments: true        //移除HTML中的注释
 				, collapseWhitespace: true  //删除空白符与换行符
 			}
@@ -29,7 +41,7 @@ module.exports = {
 		})
 		, new HtmlWebpackPlugin({
 			filename: 'throttle.html'
-			,  minify: {    //压缩HTML文件
+			, minify: {    //压缩HTML文件
 				removeComments: true        //移除HTML中的注释
 				, collapseWhitespace: true  //删除空白符与换行符
 			}
@@ -38,7 +50,7 @@ module.exports = {
 		})
 		, new HtmlWebpackPlugin({
 			filename: 'listener.html'
-			,  minify: {    //压缩HTML文件
+			, minify: {    //压缩HTML文件
 				removeComments: true        //移除HTML中的注释
 				, collapseWhitespace: true  //删除空白符与换行符
 			}
@@ -47,7 +59,7 @@ module.exports = {
 		})
 		, new HtmlWebpackPlugin({
 			filename: 'router.html'
-			,  minify: {    //压缩HTML文件
+			, minify: {    //压缩HTML文件
 				removeComments: true        //移除HTML中的注释
 				, collapseWhitespace: true  //删除空白符与换行符
 			}
@@ -56,7 +68,7 @@ module.exports = {
 		})
 		, new HtmlWebpackPlugin({
 			filename: 'model.html'
-			,  minify: {    //压缩HTML文件
+			, minify: {    //压缩HTML文件
 				removeComments: true        //移除HTML中的注释
 				, collapseWhitespace: true  //删除空白符与换行符
 			}
@@ -67,11 +79,14 @@ module.exports = {
 	//页面入口文件配置
 	entry: {
 		base: [path.resolve(__dirname, 'src/maple/base.js')]
+
+		, index: [path.resolve(__dirname, 'demo/src/javascript/index.js')]
+
 		, debounce: [path.resolve(__dirname, 'demo/src/javascript/debounce.js')]
 		, throttle: [path.resolve(__dirname, 'demo/src/javascript/throttle.js')]
 		, listener: [path.resolve(__dirname, 'demo/src/javascript/listener.js')]
 		, router:   [path.resolve(__dirname, 'demo/src/javascript/router.js')]
-		, model:   [path.resolve(__dirname, 'demo/src/javascript/model.js')]
+		, model:    [path.resolve(__dirname, 'demo/src/javascript/model.js')]
 	},
 	//入口文件输出配置
 	output: {

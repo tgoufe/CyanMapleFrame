@@ -5,8 +5,9 @@
  * @function    notify
  * @param   {String}    title
  * @param   {String}    content
+ * @return  {Promise}
  * */
-let notify = function(title, content){}
+let notify
 	;
 
 if( 'Notification' in self ){
@@ -65,7 +66,7 @@ if( 'Notification' in self ){
 // }
 else{
 	notify = function(){
-		return Promise.reject();
+		return Promise.reject( new Error('浏览器不支持 Notification 功能') );
 	}
 }
 
