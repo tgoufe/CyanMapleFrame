@@ -1,9 +1,4 @@
 <style lang="scss">
-	.cmui-tabbar__head-item{
-		&.active{
-			color:red;
-		}
-	}
 </style>
 <script>
 	export default{
@@ -18,7 +13,7 @@
 				return h('div',{
 					'class':[
 						'cmui-tabbar__head-item flex1',
-						item.data.staticClass,
+						_.get(item,'data.staticClass'),
 						index===activeIndex?'active':''
 					],
 					style:itemStyle,
@@ -42,9 +37,9 @@
 		},
 		methods:{
 			itemEvent(event,item,index){
-				const activeIndex=this.$parent.activeIndex;
+				const oldIndex=this.$parent.activeIndex;
 				const model=_.get(item,'data.model.value');
-				this.$emit('nav-item',item,index,activeIndex,model);
+				this.$emit('nav-item',item,index,oldIndex,model);
 				this.$parent.changeToIndex(index);
 			}
 		}

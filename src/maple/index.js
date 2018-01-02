@@ -55,6 +55,7 @@ maple.confirm = confirm;
 maple.actions = actions;
 maple.mask=mask;
 maple.slider=slider;
+maple.tabbar=tabbar;
 maple.list=list;
 maple.form=form;
 maple.message=message;

@@ -53,6 +53,6 @@ export default {
 	}
 };
 </script>
-<style>
-@import '../../lib/swiper/swiper.css';
+<style lang="scss">
+@import './swiper.css';
 </style>

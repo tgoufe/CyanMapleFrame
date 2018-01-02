@@ -1,28 +1,28 @@
 import '../../src/pageComponent/head/index.js'
-new Vue({
+var count=0
+window.vm=new Vue({
 	el:'#main',
 	data:{
-		tabbarData:_.times(26,index=>{
+		tabbarData:_.times(5,index=>{
 			return {
-				title:String.fromCharCode(index+97)
+				title:'tab'+index
 			}
 		}),
-		name:'sdf'
+		tabPosition:'top',
+		tabNav:[false,false],
+		tabCol:'auto'
 	},
 	methods:{
 		add(){
 			this.tabbarData.push({
-				title:'new Tab'
+				title:'new Tab'+(++count)
 			})
 		},
 		extra(vm,item,index){
-			console.log(vm,item,index)
+			console.log(arguments)
 		},
 		navItem(){
-			// console.log(arguments)
-		},
-		xxx(){
-			// console.log(123)
+			console.log(arguments)
 		}
 	}
 })

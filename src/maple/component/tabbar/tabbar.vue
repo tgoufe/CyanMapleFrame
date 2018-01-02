@@ -1,5 +1,5 @@
 <style lang="scss">
-	
+	@import "theme";
 </style>
 <script>
 	import cmuiTabbarNav from './tabbar-nav.vue';
@@ -99,6 +99,10 @@
 				'class':{
 					'cmui-tabbar':true,
 					'flex-container vfull':this.isVertical,
+					'cmui-tabbar-top':this.position==='top',
+					'cmui-tabbar-left':this.position==='left',
+					'cmui-tabbar-bottom':this.position==='bottom',
+					'cmui-tabbar-right':this.position==='right'
 				},
 				style:{
 					'max-height':this.isVertical?'100%':'none'
@@ -144,7 +148,7 @@
 					})
 				}
 			},
-			changeToIndex(index){
+			changeToIndex(index=0){
 				if(_.inRange(index,this.items.length)){
 					this.activeIndex=index
 					this.$nextTick(()=>{
@@ -152,7 +156,7 @@
 					})
 				}
 			},
-			changeByStep(num){
+			changeByStep(num=1){
 				if(_.inRange(this.activeIndex+num,this.items.length)){
 					this.activeIndex+=num
 				}
@@ -166,8 +170,6 @@
 					this.items=this.getItems();
 				})
 			},
-			add(){},
-			remove(){},
 			extraEvent(event,item,index){
 				this.$emit('tab-extra',this,item,index)
 			},

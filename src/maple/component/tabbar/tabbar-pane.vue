@@ -25,6 +25,7 @@
 					'cmui-tabbar__pane':true
 				}
 			},items)
+			 
 		},
 		props:{
 			items:Array,
