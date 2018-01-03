@@ -5,6 +5,7 @@
 	import cmuiTabbarNav from './tabbar-nav.vue';
 	import cmuiTabbarPane from './tabbar-pane.vue';
 	import cmuiRender from '../base/render';
+	import list from './list.js';
 	export default{
 		name:'cmui-tabbar',
 		components:{
@@ -171,10 +172,10 @@
 				})
 			},
 			extraEvent(event,item,index){
-				this.$emit('tab-extra',this,item,index)
+				this.$emit('extra-click',this,item,index)
 			},
 			navItem(){
-				this.$emit('nav-item',this,...arguments)
+				this.$emit('item-click',this,...arguments)
 			}
 		},
 		watch:{
@@ -230,6 +231,12 @@
 			extras(){
 				return this.$slots.extra||[]
 			}
+		},
+		mounted(){
+			list.add(this)
+		},
+		destroyed(){
+			$(this.$el).remove();
 		}
 	}
 </script>

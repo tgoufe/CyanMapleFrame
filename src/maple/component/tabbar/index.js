@@ -1,11 +1,17 @@
 import cmuiTabbar from './tabbar.vue';
+import list from './list.js';
 Vue.component(cmuiTabbar.name,cmuiTabbar);
 function TabBar(){
+	if(!arguments.length){
+		return list;
+	}
 	let defaultOptions=_(cmuiTabbar.props).mapValues(o=>_.get(o,'default')).defaults({
 		items:[],
 		parent:'body',
 		className:'',
-		navItem:null
+		itemClick:null,
+		extra:'',
+		extraClick:null
 	}).value()
 	_.forEach(arguments,arg=>{
 		if(_.isArray(arg)){
@@ -27,7 +33,7 @@ function TabBar(){
 		}else if(arg instanceof jQuery){
 			defaultOptions.parent=arg
 		}else if(_.isFunction(arg)){
-			defaultOptions.navItem=arg
+			defaultOptions.itemClick=arg
 		}
 	})
 	const options=_.defaults(_.find(arguments,_.isPlainObject),defaultOptions)
@@ -38,27 +44,34 @@ function TabBar(){
 		position="${options.position}"
 		:nav="nav"
 		:col="col"
-		@nav-item="navItem">
+		:watch="list"
+		@item-click="itemClick"
+		@extra-click="extraClick"
+		>
+			<div slot="extra" v-for="item in extraList" v-html="item"></div>
 			<cmui-tabbar-item v-for="(item,index) in list" :key="index">
 				<div v-html="item.title"></div><div slot="content" v-html="item.content"></div>
 			</cmui-tabbar-item>
 		</cmui-tabbar>
 	`);
-	$(function(){
+	const parent=$(options.parent);
+	if(parent.length){
 		$(options.parent).append(tpl);
-		new Vue({
+		return new Vue({
 			el:tpl[0],
 			data:function(){
 				return {
 					list:options.items,
 					col:options.col,
-					nav:options.nav
+					nav:options.nav,
+					extraList:[].concat(options.extra)
 				}
 			},
 			methods:{
-				navItem:_.isFunction(options.navItem)?options.navItem:null
+				itemClick:_.isFunction(options.itemClick)?options.itemClick:null,
+				extraClick:_.isFunction(options.extraClick)?options.extraClick:null,
 			}
 		})
-	})
+	}
 }
 export default TabBar
