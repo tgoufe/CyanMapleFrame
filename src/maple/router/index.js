@@ -51,12 +51,22 @@ class Router{
 
 		this.config = merge(config, Router._CONFIG);
 
+		this._historyList = [{
+			url: url.source
+			, time: Date.now()
+		}];
+
 		if( this.config.mode === 'history' ){
 			url.popState.add((e)=>{
 				let tempUrl = url.parseUrl( location.href )
 					;
 
 				if( this.has(tempUrl.path) ){
+
+					this._historyList.push({
+						url: tempUrl.source
+						, time: Date.now()
+					});
 					this._get( tempUrl );
 				}
 				else{
@@ -75,6 +85,11 @@ class Router{
 				tempUrl = url.parseUrl( newHash );
 
 				if( this.has( tempUrl.path ) ){
+
+					this._historyList.push({
+						url: newUrl
+						, time: Date.now()
+					});
 					this._get( tempUrl );
 				}
 				else{
@@ -279,9 +294,11 @@ class Router{
 	pushHistory(targetUrl){
 		if( this.config.mode === 'history' ){
 			url.pushHistory( targetUrl.pack() );
+			this._historyList.push( targetUrl.pack() );
 		}
 		else if( this.config.mode === 'hash' ){
 			url.setHash( targetUrl.path + targetUrl.query );
+			this._historyList.push( url.source +'#'+ targetUrl.path + targetUrl.query );
 		}
 	}
 }

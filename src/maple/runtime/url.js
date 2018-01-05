@@ -137,7 +137,7 @@ class Url{
 	/**
 	 * @summary     替换当前的 params
 	 * @param       {Object|String[]|...String} params
-	 * @return      {Object}                    this
+	 * @return      {Url}                       this
 	 * @desc        当为多个 string 时，为删除当前 url 上参数，当为 object 时为设置当前 url 上参数
 	 * */
 	changeParams(params){
@@ -168,7 +168,8 @@ class Url{
 	}
 	/**
 	 * @summary 将当前 url 实例的属性替换为目标 url 实例的属性
-	 * @param   {Url}    url
+	 * @param   {Url}   url
+	 * @return  {Url}   this
 	 * */
 	changeTo(url){
 		let source = this.source
@@ -179,10 +180,13 @@ class Url{
 		});
 
 		this.from = source;
+
+		return this;
 	}
 
 	/**
 	 * @summary toString 方法
+	 * @return  {String}
 	 * */
 	toString(){
 		return JSON.stringify( Url._INDEX.reduce((rs, k)=>{
@@ -193,6 +197,7 @@ class Url{
 	}
 	/**
 	 * @summary toJSON 方法
+	 * @return  {Object}
 	 * @desc    JSON.stringify 序列号 Model 及子类的实例对象时调用
 	 * */
 	toJSON(){
@@ -211,7 +216,6 @@ let url = new Url()
  * @summary     Url 类对象
  * @type        {Url}
  * @memberOf    url
- *
  * */
 url.Url = Url;
 /**
@@ -240,7 +244,7 @@ url.parseUrl = (url)=>{
  * @return      {String}
  * */
 url.addProtocol = (url)=>{
-	return /^\/\//.test( url ) ? location.protocol + url : url;
+	return /^\/\//.test( url ) ? this.protocol + url : url;
 };
 
 /**
@@ -255,14 +259,26 @@ url.reload = ()=>{
  * @summary     页面后退
  * @method
  * @memberOf    url
+ * @return      {Url}   this
  * */
 url.back = ()=>{
 	history.back();
+
+	return this;
 };
 
+/**
+ * @summary     设置页面 hash
+ * @method
+ * @memberOf    url
+ * @param       {String}    hash
+ * @return      {Url}       this
+ * */
 url.setHash = function(hash){
 	this.hash = hash;
 	location.hash = hash;
+
+	return this;
 };
 
 // ---------- url 上的参数操作 ----------
@@ -277,7 +293,7 @@ url.setHash = function(hash){
  *              1.当 params 是 Object 类型时
  *              2.当不满足 1 条件时，参数中的最后一个为 Object 类型时，视为 pushState
  * */
-url.push = function(params, pushState){
+url.pushParams = function(params, pushState){
 	let argc = arguments.length
 		, argv = arguments
 		, state = null
@@ -285,11 +301,11 @@ url.push = function(params, pushState){
 
 	if( argc > 1 ){
 		if( typeof params === 'object' ){
-			state = arguments[1];
+			state = argv[1];
 		}
-		else if( typeof arguments[argc -1] === 'object' ){
-			state = arguments[argc -1];
-			argv = [].slice.call(arguments, 0, -1);
+		else if( typeof argv[argc -1] === 'object' ){
+			state = argv[argc -1];
+			argv = [].slice.call(argv, 0, -1);
 		}
 	}
 
@@ -305,35 +321,35 @@ url.push = function(params, pushState){
  * @method
  * @memberOf    url
  * @param       {Object|String[]|...String} params
+ * @param       {*|Object}                  [replaceState]
  * @return      {Url}                       this
+ * @desc        执行效果
  * */
-url.replace = function(params){
-	this.changeParams(...arguments);
+url.replaceParams = function(params, replaceState){
+	let argc = arguments.length
+		, argv = arguments
+		, state = null
+		;
+
+	if( argc > 1 ){
+		if( typeof params === 'object' ){
+			state = argv[1];
+		}
+		else if( typeof argv[argc -1] === 'object' ){
+			state = argv[argc -1];
+			argv = [].slice.call(argv, 0, -1);
+		}
+	}
+
+	this.changeParams(...argv);
 
 	// 将当前浏览器上 url 换为替换后组装出来的链接
-	history.replaceState(null, '', this.pack());
+	history.replaceState(state, '', this.pack());
 
 	return this;
 };
 
-// ---------- 页面跳转操作 ----------
-/**
- * @summary     跳转到目标页面，当前 url 添加到历史记录
- * @method
- * @memberOf    url
- * @param       {String}    href
- * */
-url.changePage = function(href){
-	location.assign( href );
-};
-/**
- * @summary     替换当前 url 为目标路径，页面刷新
- * */
-url.replacePage = function(href){
-	location.replace( href );
-};
-
-// ---------- 修改 url 状态 ----------
+// ---------- 修改 url 历史记录 ----------
 /**
  * @summary     将 url 指向目标路径，当前 url 添加到历史记录
  * @method
@@ -365,6 +381,23 @@ url.replaceHistory = function(href, state=null){
 	return this;
 };
 
+// ---------- 页面跳转操作 ----------
+/**
+ * @summary     跳转到目标页面，当前 url 添加到历史记录
+ * @method
+ * @memberOf    url
+ * @param       {String}    href
+ * */
+url.changePage = function(href){
+	location.assign( href );
+};
+/**
+ * @summary     替换当前 url 为目标路径，页面刷新
+ * */
+url.replacePage = function(href){
+	location.replace( href );
+};
+
 // ---------- 相关事件处理 ----------
 /**
  * @summary     监听 hashChange 事件
@@ -383,7 +416,8 @@ url.hashChange = listener('hashchange', (e, newUrl)=>{
 	}
 
 	if( temp ){
-		url.hash = temp.hash;
+		// 替换当前 url 对象属性
+		url.changeTo( temp );
 	}
 });
 /**
@@ -403,18 +437,16 @@ url.popState = listener('popstate', (e, newUrl)=>{
 		temp = url.parseUrl( location.href );
 	}
 
+	// 替换当前 url 对象属性
+	url.changeTo( temp );
+
+	// todo state 做什么？
 	if( typeof state === 'string' ){
 		try{
 			state = JSON.parse( state );
 		}
 		catch(e){}
-
-		// todo state 做什么？
-		// console.log(state);
 	}
-
-	// 替换当期 url 对象属性
-	url.changeTo( temp );
 });
 
 /**
