@@ -289,17 +289,6 @@ class Model{
 		}
 	}
 
-	/**
-	 * @summary     数据改变事件触发回调函数
-	 * @callback    ModelChangeEvent
-	 * @param       {Event}     event
-	 * @param       {String}    topic
-	 * @param       {*}         newValue
-	 * @param       {*}         [oldValue]
-	 * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
-	 *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
-	 * */
-
 	// /**
 	//  * @summary     在 Promise resolve 时调用的函数
 	//  * @callback    promiseResolve
@@ -365,20 +354,6 @@ class Model{
 	}
 
 	// ---------- 公有方法 ----------
-	/**
-	 * @summary 绑定数据监视事件
-	 * @param   {ModelChangeEvent}  callback
-	 * */
-	on(callback){
-		this._listener.add( callback );
-	}
-	/**
-	 * @summary 解除绑定数据监控回调函数
-	 * @param   {ModelChangeEvent}  callback
-	 * */
-	off(callback){
-		this._listener.off( callback );
-	}
 	/**
 	 * @summary 设置数据
 	 * @param   {String|Object} topic   主题
@@ -523,6 +498,33 @@ class Model{
 		this._value = {};
 
 		return Promise.resolve( true );
+	}
+
+	/**
+	 * @summary     数据改变事件触发回调函数
+	 * @callback    ModelChangeEvent
+	 * @param       {Event}     event
+	 * @param       {String}    topic
+	 * @param       {*}         newValue
+	 * @param       {*}         [oldValue]
+	 * @this        {Model}
+	 * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
+	 *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
+	 * */
+
+	/**
+	 * @summary 绑定数据监视事件
+	 * @param   {ModelChangeEvent}  callback
+	 * */
+	on(callback){
+		this._listener.add( callback );
+	}
+	/**
+	 * @summary 解除绑定数据监控回调函数
+	 * @param   {ModelChangeEvent}  callback
+	 * */
+	off(callback){
+		this._listener.off( callback );
 	}
 
 	/**

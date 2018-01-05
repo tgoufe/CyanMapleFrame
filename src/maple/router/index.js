@@ -1,6 +1,5 @@
 'use strict';
 
-import device       from '../runtime/device.js';
 import url          from '../runtime/url.js';
 import merge        from '../util/merge.js';
 import {listener}   from '../listener.js';
@@ -56,6 +55,8 @@ class Router{
 			, time: Date.now()
 		}];
 
+		this._listener = listener(this, 'routerChange');
+
 		if( this.config.mode === 'history' ){
 			url.popState.add((e)=>{
 				let tempUrl = url.parseUrl( location.href )
@@ -67,7 +68,10 @@ class Router{
 						url: tempUrl.source
 						, time: Date.now()
 					});
+
 					this._get( tempUrl );
+
+					this._trigger();
 				}
 				else{
 					console.log('router 中不存在', location.href, e);
@@ -90,7 +94,10 @@ class Router{
 						url: newUrl
 						, time: Date.now()
 					});
+
 					this._get( tempUrl );
+
+					this._trigger();
 				}
 				else{
 					console.log('router 中不存在', location.href, e);
@@ -155,6 +162,18 @@ class Router{
 
 			return !!result;
 		});
+	}
+
+	/**
+	 * @summary 触发路由改变事件
+	 * */
+	_trigger(){
+		let l = this._historyList.length
+			, from = l > 2 ? this._historyList[l -2] : this._historyList[0]
+			, to = this._historyList[l -1]
+		;
+
+		this._listener.trigger(from, to);
 	}
 
 	// ---------- 公有方法 ----------
@@ -270,6 +289,8 @@ class Router{
 
 		if( this.config.mode === 'history' ){   // history 模式
 			rs = this._get( targetUrl );
+
+			this._trigger();
 		}
 		else if( this.config.mode === 'hash' ){ // hash 模式
 			// hash 模式下并不直接调用 _get 方法来执行路径跳转
@@ -300,6 +321,25 @@ class Router{
 			url.setHash( targetUrl.path + targetUrl.query );
 			this._historyList.push( url.source +'#'+ targetUrl.path + targetUrl.query );
 		}
+	}
+
+	/**
+	 * @summary     数据改变事件触发回调函数
+	 * @callback    RouterChangeEvent
+	 * @param       {Event}     event
+	 * @param       {String}    form
+	 * @param       {String}    to
+	 * @this        {Url}
+	 * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
+	 *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
+	 * */
+
+	/**
+	 * @summary 添加事件监听
+	 * @param   {RouterChangeEvent} callback
+	 * */
+	on(callback){
+		this._listener.add( callback );
 	}
 }
 

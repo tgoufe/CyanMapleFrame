@@ -87,6 +87,7 @@ class Listener{
 	 * @callback    ListenerCallback
 	 * @param       {Object|Event}  event
 	 * @param       {...*}
+	 * @this        target
 	 * */
 
 	// ---------- 公有方法 ----------
