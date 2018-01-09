@@ -15,6 +15,11 @@ let scroll = listener('scroll', {
 		useDebounce: true
 	})
 	;
+let scrollTarget
+	, body = document.body
+	, doc = document.documentElement
+	, tempTop = body.scrollTop
+	;
 
 /**
  * @summary     禁止页面滚动
@@ -24,14 +29,30 @@ let scroll = listener('scroll', {
  * */
 scroll.disabled = function(disabled){
 	if( disabled ){
-		this._overflowState = window.getComputedStyle( document.body ).overflow || 'visible';
+		this._overflowState = window.getComputedStyle( body ).overflow || 'visible';
 
-		document.body.style.overflow = 'hidden';
+		body.style.overflow = 'hidden';
 	}
 	else{
-		document.body.style.overflow = this._overflowState || 'visible';
+		body.style.overflow = this._overflowState || 'visible';
 	}
 };
+
+/**
+ * 测试获取滚动条信息的对象为 document.body 还是 document.documentElement
+ * */
+
+body.scrollTop = tempTop +1;
+
+if( body.scrollTop === tempTop +1 ){    // document.body 可用
+	scrollTarget = body;
+
+	body.scrollTop = tempTop;
+}
+else{
+	scrollTarget = doc;
+}
+
 /**
  * @summary     设置或读取当前页面滚动条位置
  * @method
@@ -42,8 +63,6 @@ scroll.disabled = function(disabled){
  * */
 scroll.scrollBar = function(offset, value){
 	let argc = arguments.length
-		, body = document.body
-		, doc = document.documentElement
 		, curr = 0
 		, total = 1
 		, view = 1
@@ -55,24 +74,24 @@ scroll.scrollBar = function(offset, value){
 
 		switch( arguments[0] ){
 			case 'top':
-				total = body.scrollHeight;
-				curr = body.scrollTop;
+				total = scrollTarget.scrollHeight;
+				curr = scrollTarget.scrollTop;
 				view = doc.clientHeight;
 				break;
 			case 'bottom':
-				total = body.scrollHeight;
+				total = scrollTarget.scrollHeight;
 				view = doc.clientHeight;
-				curr = total - body.scrollTop - view;
+				curr = total - scrollTarget.scrollTop - view;
 				break;
 			case 'left':
-				total = body.scrollWidth;
-				curr = body.scrollLeft;
+				total = scrollTarget.scrollWidth;
+				curr = scrollTarget.scrollLeft;
 				view = doc.clientWidth;
 				break;
 			case 'right':
-				total = body.scrollWidth;
+				total = scrollTarget.scrollWidth;
 				view = doc.clientWidth;
-				curr = total - body.scrollLeft - view;
+				curr = total - scrollTarget.scrollLeft - view;
 				break;
 			default:
 				break;
@@ -93,55 +112,55 @@ scroll.scrollBar = function(offset, value){
 					curr = parseFloat(temp[1]);
 
 					if (temp[2] === '%') {  // 百分比
-						curr = curr * body.scrollHeight / 100;
+						curr = curr * scrollTarget.scrollHeight / 100;
 					}
 					else if (temp[2] === 'view') {  // 屏数
 						curr = curr * doc.clientHeight;
 					}
 
-					body.scrollTop = curr;
+					scrollTarget.scrollTop = curr;
 					break;
 				case 'bottom':
 					curr = parseFloat(temp[1]);
 
 					if (temp[2] === '%') {  // 百分比
-						curr = Math.max(body.scrollHeight * (1 - curr / 100), 0);
+						curr = Math.max(scrollTarget.scrollHeight * (1 - curr / 100), 0);
 					}
 					else if (temp[2] === 'view') {  // 屏数
-						curr = Math.max(body.scrollHeight - curr * doc.clientHeight, 0);
+						curr = Math.max(scrollTarget.scrollHeight - curr * doc.clientHeight, 0);
 					}
 					else{
-						curr = Math.max(body.scrollHeight - curr, 0);
+						curr = Math.max(scrollTarget.scrollHeight - curr, 0);
 					}
 
-					body.scrollTop = curr;
+					scrollTarget.scrollTop = curr;
 					break;
 				case 'left':
 					curr = parseFloat(temp[1]);
 
 					if (temp[2] === '%') {  // 百分比
-						curr = curr * body.scrollWidth / 100;
+						curr = curr * scrollTarget.scrollWidth / 100;
 					}
 					else if (temp[2] === 'view') {  // 屏数
 						curr = curr * doc.clientWidth;
 					}
 
-					body.scrollLeft = curr;
+					scrollTarget.scrollLeft = curr;
 					break;
 				case 'right':
 					curr = parseFloat(temp[1]);
 
 					if (temp[2] === '%') {  // 百分比
-						curr = Math.max(body.scrollWidth * (1 - curr / 100), 0);
+						curr = Math.max(scrollTarget.scrollWidth * (1 - curr / 100), 0);
 					}
 					else if (temp[2] === 'view') {  // 屏数
-						curr = Math.max(body.scrollWidth - curr * doc.clientWidth, 0);
+						curr = Math.max(scrollTarget.scrollWidth - curr * doc.clientWidth, 0);
 					}
 					else{
-						curr = Math.max(body.scrollWidth - curr, 0);
+						curr = Math.max(scrollTarget.scrollWidth - curr, 0);
 					}
 
-					body.scrollLeft = curr;
+					scrollTarget.scrollLeft = curr;
 					break;
 				default:
 					break;
