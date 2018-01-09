@@ -1,6 +1,6 @@
 'use strict';
 
-import maple    from '../../../src/maple/base.js';
+import maple    from 'maple';
 import log      from '../log.js';
 
 let router = new maple.Router({

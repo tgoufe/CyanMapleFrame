@@ -7,11 +7,9 @@
 </head>
 <body>
 
-<p><a href="./model.html">model 数据 Model 功能测试</a></p>
-<p><a href="./router.html">router 路由功能测试</a></p>
-<p><a href="./listener.html">listener 事件监听器功能测试</a></p>
-<p><a href="./debounce.html">debounce 工具方法测试</a></p>
-<p><a href="./throttle.html">throttle 工具方法测试</a></p>
+<div id="app">
+	<p v-for="item in list"><a :href="item.url" v-text="item.title"></a></p>
+</div>
 
 </body>
 </html>

@@ -1,6 +1,6 @@
 'use strict';
 
-import maple    from '../../../src/maple/base.js';
+import maple    from 'maple';
 import log      from '../log.js';
 
 document.body.style.height = '10000px';

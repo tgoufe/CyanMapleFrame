@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="cmn">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+	<title>Title</title>
+	<style>
+		[v-router]{
+			display: none;
+		}
+		.page{
+			height: 800px;
+			width: 500px;
+			border: 5px solid #c0c0c0;
+		}
+	</style>
+</head>
+<body>
+
+<div id="app">
+	<div class="page">
+		<div v-router="router('/static/bigDemo/test/routerPage.html')">index</div>
+		<div v-router="router('/a/1.html')">page 1</div>
+		<div v-router="router('/a/2.html')">page 2</div>
+		<div v-router="router('/a/3.html')">page 3</div>
+		<p v-router="!router('/a/1.html')"><a v-href="'/a/1.html'">go 1</a></p>
+		<p v-router="!router('/a/2.html')"><a v-href="'/a/2.html'">go 2</a></p>
+		<p v-router="!router('/a/3.html')"><a v-href="'/a/3.html'">go 3</a></p>
+	</div>
+
+	<!--<div class="page" v-router="router('/a/1.html')">-->
+		<!--page 1-->
+		<!--<p><a v-href="'/a/2.html'">go 2</a></p>-->
+		<!--<p><a v-href="'/a/3.html'">go 3</a></p>-->
+	<!--</div>-->
+	<!--<div class="page" v-router="router('/a/2.html')">-->
+		<!--page 2-->
+		<!--<p><a v-href="'/a/1.html'">go 1</a></p>-->
+		<!--<p><a v-href="'/a/3.html'">go 3</a></p>-->
+	<!--</div>-->
+	<!--<div class="page" v-router="router('/a/3.html')">-->
+		<!--page 3-->
+		<!--<p><a v-href="'/a/1.html'">go 1</a></p>-->
+		<!--<p><a v-href="'/a/3.html'">go 2</a></p>-->
+	<!--</div>-->
+</div>
+
+<!--<pre>-->
+	<!--<div class="page" v-router="router('/static/bigDemo/test/routerPage.html')">-->
+		<!--<div>index</div>-->
+		<!--<p><a v-href="'/a/1.html'">go 1</a></p>-->
+		<!--<p><a v-href="'/a/2.html'">go 2</a></p>-->
+		<!--<p><a v-href="'/a/3.html'">go 3</a></p>-->
+	<!--</div>-->
+
+	<!--<div class="page" v-router="router('/a/1.html')">-->
+		<!--<div>page 1</div>-->
+		<!--<p><a v-href="'/a/2.html'">go 2</a></p>-->
+		<!--<p><a v-href="'/a/3.html'">go 3</a></p>-->
+	<!--</div>-->
+	<!--<div class="page" v-router="router('/a/2.html')">-->
+		<!--<div>page 2</div>-->
+		<!--<p><a v-href="'/a/1.html'">go 1</a></p>-->
+		<!--<p><a v-href="'/a/3.html'">go 3</a></p>-->
+	<!--</div>-->
+	<!--<div class="page" v-router="router('/a/3.html')">-->
+		<!--<div>page 3</div>-->
+		<!--<p><a v-href="'/a/1.html'">go 1</a></p>-->
+		<!--<p><a v-href="'/a/3.html'">go 2</a></p>-->
+	<!--</div>-->
+<!--</pre>-->
+
+</body>
+</html>

@@ -58,6 +58,15 @@ module.exports = {
 			, inject: 'body'
 		})
 		, new HtmlWebpackPlugin({
+			filename: 'model.html'
+			, minify: {    //压缩HTML文件
+				removeComments: true        //移除HTML中的注释
+				, collapseWhitespace: true  //删除空白符与换行符
+			}
+			, chunks: ['base', 'model']
+			, inject: 'body'
+		})
+		, new HtmlWebpackPlugin({
 			filename: 'router.html'
 			, minify: {    //压缩HTML文件
 				removeComments: true        //移除HTML中的注释
@@ -67,26 +76,29 @@ module.exports = {
 			, inject: 'body'
 		})
 		, new HtmlWebpackPlugin({
-			filename: 'model.html'
+			filename: 'routerPage.html'
+			, template: path.resolve(__dirname, 'demo/src/tpl/routerPage.html')
 			, minify: {    //压缩HTML文件
 				removeComments: true        //移除HTML中的注释
 				, collapseWhitespace: true  //删除空白符与换行符
 			}
-			, chunks: ['base', 'model']
+			, chunks: ['base', 'routerPage']
 			, inject: 'body'
 		})
 	],
 	//页面入口文件配置
 	entry: {
-		base: [path.resolve(__dirname, 'src/maple/base.js')]
+		base: ['maple']
+		, 'vue-plugin/router': [path.resolve(__dirname, 'src/maple/vue-plugin/router.js')]
 
 		, index: [path.resolve(__dirname, 'demo/src/javascript/index.js')]
 
 		, debounce: [path.resolve(__dirname, 'demo/src/javascript/debounce.js')]
 		, throttle: [path.resolve(__dirname, 'demo/src/javascript/throttle.js')]
 		, listener: [path.resolve(__dirname, 'demo/src/javascript/listener.js')]
-		, router:   [path.resolve(__dirname, 'demo/src/javascript/router.js')]
 		, model:    [path.resolve(__dirname, 'demo/src/javascript/model.js')]
+		, router:   [path.resolve(__dirname, 'demo/src/javascript/router.js')]
+		, routerPage:   [path.resolve(__dirname, 'demo/src/javascript/routerPage.js')]
 	},
 	//入口文件输出配置
 	output: {
@@ -128,5 +140,10 @@ module.exports = {
 	},
 	resolve: {
 		modules: ["node_modules", __dirname]
+		, alias: {
+			vue$: 'vue/dist/vue.common.js'
+			, maple: 'src/maple/base.js'
+			, mapleRouter: 'src/maple/vue-plugin/router.js'
+		}
 	}
 };
