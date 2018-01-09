@@ -15,10 +15,14 @@ module.exports = {
 			},
 			sourceMap: true
 		})
+		, new webpack.optimize.CommonsChunkPlugin({
+			name: 'base'
+		})
 	],
 	//页面入口文件配置
 	entry: {
 		base: [path.resolve(__dirname, 'src/maple/base.js')]
+		, 'vue-plugin/router': [path.resolve(__dirname, 'src/maple/vue-plugin/router.js')]
 	},
 	//入口文件输出配置
 	output: {
