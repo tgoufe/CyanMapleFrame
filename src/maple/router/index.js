@@ -125,6 +125,17 @@ class Router{
 
 	// ---------- 私有方法 ----------
 	/**
+	 * @summary 触发路由改变事件
+	 * */
+	_trigger(){
+		let l = this._historyList.length
+			, from = l > 2 ? this._historyList[l -2] : this._historyList[0]
+			, to = this._historyList[l -1]
+			;
+
+		this._listener.trigger(from, to);
+	}
+	/**
 	 * @summary 跳转到路径
 	 * @private
 	 * @param   {Url}       targetUrl
@@ -163,17 +174,35 @@ class Router{
 			return !!result;
 		});
 	}
-
 	/**
-	 * @summary 触发路由改变事件
+	 * @summary history 模式下的 go 接口的逻辑调用
+	 * @param   {Url}   targetUrl
 	 * */
-	_trigger(){
-		let l = this._historyList.length
-			, from = l > 2 ? this._historyList[l -2] : this._historyList[0]
-			, to = this._historyList[l -1]
-		;
+	_goHistory(targetUrl){
+		this._get( targetUrl );
 
-		this._listener.trigger(from, to);
+		url.pushHistory( targetUrl.pack() );
+
+		this._historyList.push( targetUrl.pack() );
+
+		this._trigger();
+	}
+	/**
+	 * @summary hash 模式下的 go 接口的逻辑调用
+	 * @param   {Url}   targetUrl
+	 * */
+	_goHash(targetUrl){
+		this._historyList.push( url.source +'#'+ targetUrl.path + targetUrl.query );
+
+		url.setHash( targetUrl.path + targetUrl.query );
+	}
+
+
+	// ---------- 公有属性 ----------
+	get currentPath(){
+		let l = this._historyList.length
+			;
+		return url.parseUrl( this._historyList[l -1] ).path;
 	}
 
 	// ---------- 公有方法 ----------
@@ -184,7 +213,7 @@ class Router{
 		let tempUrl
 			;
 
-		if( this.config === 'history' ){
+		if( this.config.mode === 'history' ){
 			tempUrl = url;
 		}
 		else if( this.config.mode === 'hash' ){
@@ -197,9 +226,9 @@ class Router{
 	}
 	/**
 	 * @summary 注册路径
-	 * @param   {String|RegExp|RouteConfig} route       当 route 为 Object 类型时且不为 RegExp 视为路由配置对象
-	 * @param   {RouterEvent}               [callback]  当 route 为 String 或 RegExp 类型时有效
-	 * @return  {Router}                    this
+	 * @param   {String|RegExp|RouteConfig|RouteConfig[]}   route       当 route 为 Object 类型时且不为 RegExp 视为路由配置对象
+	 * @param   {RouterEvent}                               [callback]  当 route 为 String 或 RegExp 类型时有效
+	 * @return  {Router}                                    this
 	 * @desc    path 以 / 开始视为根目录开始，否则以当前路径目录下，不能带参数和 hash(? #)
 	 *          可以配置动态路由，参数名以 :name 的形式
 	 *          解析出来的路由参数将以组合到传入 RouterEvent 函数的参数 params 中
@@ -210,6 +239,15 @@ class Router{
 			, pattern = null
 			, path = ''
 			;
+
+		// route 是数组类型
+		if( Array.isArray(route) ){
+			route.forEach((config)=>{
+				this.register( config );
+			});
+
+			return this;
+		}
 
 		// 处理 path
 		if( typeof route === 'object' && !(route instanceof RegExp) ){
@@ -255,7 +293,7 @@ class Router{
 		}
 
 		// todo 子路由
-		if( typeof router === 'object' && ('children' in router) ){
+		if( typeof route === 'object' && ('children' in route) ){
 			// this.children = new Router({
 			// 	routers: router.children
 			// });
@@ -282,45 +320,32 @@ class Router{
 	 * */
 	go(path, params={}){
 		let targetUrl = url.parseUrl( path )
-			, rs
+			, rs = this.has( targetUrl.path )
 			;
 
-		targetUrl.changeParams( params );
-
-		if( this.config.mode === 'history' ){   // history 模式
-			rs = this._get( targetUrl );
-
-			this._trigger();
-		}
-		else if( this.config.mode === 'hash' ){ // hash 模式
-			// hash 模式下并不直接调用 _get 方法来执行路径跳转
-			// 使用 url.setHash 设置 hash 来触发 hashChange 事件来调用 _get 方法
-			// 因为 修改 hash 与 pushState 方法不同，pushState 方法不会触发 popState 事件
-			// 但 hash 的修改都会触发 hashChange 事件
-			rs = this.has( targetUrl.path );
-		}
-
 		if( rs ){
-			this.pushHistory( targetUrl );
+			targetUrl.changeParams( params );
+
+			if( this.config.mode === 'history' ){   // history 模式
+				this._goHistory( targetUrl );
+			}
+			else if( this.config.mode === 'hash' ){ // hash 模式
+				// hash 模式下并不直接调用 _get 方法来执行路径跳转
+				// 使用 url.setHash 设置 hash 来触发 hashChange 事件来调用 _get 方法
+				// 因为 修改 hash 与 pushState 方法不同，pushState 方法不会触发 popState 事件
+				// 但 hash 的修改都会触发 hashChange 事件
+				this._goHash( targetUrl );
+			}
 		}
 
 		return rs;
 	}
 	/**
-	 * @summary 对当前浏览器历史进行处理
-	 * @param   {Url}   targetUrl
-	 * @desc    在 history 模式下使用 url.pushHistory 接口
-	 *          在 hash 模式下使用 url.setHash 接口
+	 * @summary 后退
+	 * @desc    实际为调用 url.back 方法，该封装主要为了统一调用对象
 	 * */
-	pushHistory(targetUrl){
-		if( this.config.mode === 'history' ){
-			url.pushHistory( targetUrl.pack() );
-			this._historyList.push( targetUrl.pack() );
-		}
-		else if( this.config.mode === 'hash' ){
-			url.setHash( targetUrl.path + targetUrl.query );
-			this._historyList.push( url.source +'#'+ targetUrl.path + targetUrl.query );
-		}
+	back(){
+		url.back();
 	}
 
 	/**
