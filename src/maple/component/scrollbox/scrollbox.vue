@@ -39,8 +39,8 @@ export default {
 .cmui-scrollbox {
   overflow-x: scroll;
   -webkit-overflow-scrolling: touch;
-}
-.cmui-scrollbox::-webkit-scrollbar {
-  height: 0px;
+  &::-webkit-scrollbar{
+    display:none;
+  }
 }
 </style>

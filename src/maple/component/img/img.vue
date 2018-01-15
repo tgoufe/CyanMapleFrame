@@ -1,67 +1,98 @@
 <template>
-<img class="cmui-img" :src="realSrc" alt="" @click="imgClick()"/>
+<img class="cmui-img"
+:src="realSrc"
+alt=""
+@click="imgClick()"
+@error="srcError()"
+/>
 </template>
+<style lang="scss">
+    .cmui-image-preView{
+        z-index:9;
+        background-color:rgba(0,0,0,.7);
+        .swiper-slide{
+            width:100% !important;
+            text-align: center;
+        }
+        .swiper-pagination-bullet{
+            background: rgba(253, 250, 250, .5);
+            opacity: 1;
+        }
+        .swiper-pagination-bullet-active{
+            background: #007aff;
+        }
+    }
+</style>
 <script>
-import imageLazyLoad from './imageLazyLoad';
-var preViewVMList={}
+import imagePreView from './imagePreView';
+let lazyLoadList=[];
+let windowHeight=window.screen.availHeight;
+let windowWidth=window.screen.availWidth;
+const checkLazyLoadImage=_.debounce(function(){
+    for(let i=0;i<lazyLoadList.length;i++ ){
+        const dom=lazyLoadList[i].dom;
+        const pos=dom.getBoundingClientRect();
+        const canViewV=_.inRange(pos.top>0?pos.top:(pos.top+pos.height),windowHeight);
+        const canViewH=_.inRange(pos.left,windowWidth);
+        if( canViewV&&canViewH){
+            dom.src=lazyLoadList[i].imageUrl
+            lazyLoadList.splice(i--,1)
+        }
+        if(pos.top>windowHeight){
+            break;
+        }
+    }
+},500)
+$(function(){
+    $(window).on('scroll',checkLazyLoadImage);
+    $(window).on('resize',function(){
+        windowHeight=window.screen.availHeight;
+        windowWidth=window.screen.availWidth;
+    })
+})
+const base64_1x1='data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg=='
 export default {
         props:{
-            src:{type:String},
+            src:{type:String,default:base64_1x1},
             lazyLoad:{type:Boolean,default:false},
+            lazySrc:{type:String,default:base64_1x1},
+            errorSrc:{type:String,default:base64_1x1},
             preView:{type:Boolean,default:false},
             preViewList:{type:Array,default:[]},
-            preViewOptions:{type:Object},
-            target: {type:Object}
         },
         computed:{
-            realSrc:function(){
-                if(this.lazyLoad){
-                    return 'http://img.zcool.cn/community/01443f564897a432f87512f6eed753.gif'
-                }else{
-                    return this.src;
-                }
+            realSrc(){
+                return this.lazyLoad?this.lazySrc:this.src
             }
-        },
-        ready:function(){
-            imageLazyLoad.call(this)
         },
         methods:{
             imgClick:function(){
-                var _this=this;
                 if(this.preView){
-                    var preViewTpl='';
-                    var preViewTplId='preView_'+(Math.random()*1000|0);
-                    preViewTpl+='<div class="fixed-full bg-black" id="'+preViewTplId+'"style="z-index:9;">';
-                    preViewTpl+='    <cmui-slider :items="preViewList_temp" :auto="0" :options="'+this.preViewOptions+'" :loop="preViewList_temp.length>1">';
-                    preViewTpl+='        <cmui-slider-item v-for="item in preViewList_temp" >';
-                    preViewTpl+='            <img :src="item" alt="" @click="preViewListClick()">';
-                    preViewTpl+='        </cmui-slider-item>';
-                    preViewTpl+='    </cmui-slider>';
-                    preViewTpl+='</div>';
-                    $('body').append(preViewTpl);
-                    var inSlider=this.$parent.constructor.name=='CmuiSliderItem'
-                    preViewVMList[preViewTplId]=new Vue({
-                        el:'#'+preViewTplId,
-                        data:{
-                            preViewList_temp:this.preViewList.length?this.preViewList:[this.src]
-                        },
-                        methods:{
-                            preViewListClick:function(){
-                                $(this.$el).remove();
-                            }
-                        }
-                    })
-                    var $cmuiSlider=$(preViewVMList[preViewTplId].$el).find('>.cmui-slider');
-                    $cmuiSlider.css('margin-top',(index,num)=>{
-                        return (document.documentElement.clientHeight-$cmuiSlider.height())/2
-                    });
+                    imagePreView(this.preViewList.length?this.preViewList:this.src)
                 }
+            },
+            srcError(){
+                this[this.lazyLoad?'lazySrc':'src']=this.errorSrc
             }
         },
-        events:{
-            pageScroll:function(){
-                imageLazyLoad.call(this)
+        mounted(){
+            if(this.lazyLoad){
+                const dom=this.$el;
+                const imageUrl=this.src;
+                const DOMRect=dom.getBoundingClientRect();
+                const top=DOMRect.top;
+                const left=DOMRect.left;
+                const index=_.findLastIndex(lazyLoadList,item=>{
+                    return item.top<top
+                })
+                lazyLoadList.splice(index+1,0,{
+                    dom,
+                    imageUrl,
+                    top,
+                    left
+                })
             }
+            checkLazyLoadImage()
         }
 };
 </script>

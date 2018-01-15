@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+	<title>headComponent</title>
+	<script src="../../src/libs/flexible/flexible.js"></script>
+	<link rel="stylesheet" href="../../src/cyan/CMUI.css">
+</head>
+<body>
+	<div id="main">
+		<pc-head title="IMG组件展示"></pc-head>
+		<cmui-list :col="3" :border="true" :space="20">
+			<cmui-list-item v-for="item in list" class="bg-white">
+				<div class="ratio-container">
+					<cmui-img
+					:src="item.url"
+					:lazy-load="true"
+					:pre-view="true"
+					:pre-view-list="list.map(item=>item.url)"
+					lazy-src="../img/400-400-1.jpg"
+					error-src="https://img.yzcdn.cn/public_files/2017/12/18/fd78cf6bb5d12e2a119d0576bedfd230.png"
+					></cmui-img>
+				</div>
+			</cmui-list-item>
+		</cmui-list>
+	</div>
+	<script src="../../src/libs/jquery/jquery.min.js"></script>
+	<script src="../../src/libs/lodash/lodash.min.js"></script>
+	<script src="../../src/libs/vue/vue.min.js"></script>
+</body>
+</html>

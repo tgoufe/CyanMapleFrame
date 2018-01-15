@@ -2,11 +2,11 @@ let webpack = require('webpack')
     , path = require('path')
     , HtmlWebpackPlugin = require('html-webpack-plugin')
     , compiler = require('vue-template-compiler')
+    , fs=require('fs')
     //demo页面地址
-    , demoPgaeList=[
-        'headComponent.js',
-        'tabbarComponent.js'
-    ]
+    , demoPgaeList=fs.readdirSync(path.resolve(__dirname,'./demo/javascript')).filter(item=>{
+        return !fs.statSync(path.resolve(__dirname,'./demo/javascript/'+item)).isDirectory()
+    })
     //文件入口
     , entry={
         maple: [path.resolve(__dirname, './src/maple/index.js')]

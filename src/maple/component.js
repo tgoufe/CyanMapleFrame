@@ -7,7 +7,6 @@ import scrollboxItem from './component/scrollbox/scrollbox-item.vue';
 import collapse from './component/collapse/collapse.vue';
 import collapseItem from './component/collapse/collapse-item.vue';
 import affix from './component/affix/affix.vue';
-// import time from './component/time/time.vue';
 export default {
 		'cmui-number': number
 	,	'cmui-img': img

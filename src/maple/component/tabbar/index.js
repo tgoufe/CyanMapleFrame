@@ -1,10 +1,15 @@
 import cmuiTabbar from './tabbar.vue';
-import list from './list.js';
+import List from '../base/list.js';
 Vue.component(cmuiTabbar.name,cmuiTabbar);
 function TabBar(){
+	// get
 	if(!arguments.length){
-		return list;
+		return new List('tabbar');
 	}
+	if(arguments.length==1&&arguments[0]._isVue){
+		return new List('tabbar',arguments[0])
+	}
+	// set
 	let defaultOptions=_(cmuiTabbar.props).mapValues(o=>_.get(o,'default')).defaults({
 		items:[],
 		parent:'body',

@@ -14,7 +14,7 @@ import Swiper from './swiper';
 import sliderList from './sliderList';
 import thememaker from './themeMaker';
 export default {
-	created:function(){
+	mounted:function(){
 		var _this=this;
 		setTimeout(function(){
 			_this.swiper=new Swiper($('.swiper-container',_this.$el), thememaker.call(_this));
@@ -50,7 +50,12 @@ export default {
 		target: {type:Object},
 		autoHeight:{type:Boolean,default:false},
 		options:{type:Object}
+	},
+	destroyed(){
+		this.swiper && this.swiper.destroy(true, true);
+		$(this.$el).remove()
 	}
+
 };
 </script>
 <style lang="scss">
