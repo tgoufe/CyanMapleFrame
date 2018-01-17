@@ -5,7 +5,7 @@
 	import cmuiTabbarNav from './tabbar-nav.vue';
 	import cmuiTabbarPane from './tabbar-pane.vue';
 	import cmuiRender from '../base/render';
-	import list from './list.js';
+	import List from '../base/list.js';
 	export default{
 		name:'cmui-tabbar',
 		components:{
@@ -233,7 +233,7 @@
 			}
 		},
 		mounted(){
-			list.add(this)
+			new List('tabbar').add(this)
 		},
 		destroyed(){
 			$(this.$el).remove();
