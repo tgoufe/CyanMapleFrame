@@ -161,7 +161,7 @@ class HandlerQueue{
 
 		this.reset();
 
-		return this._queue.filter( d=>d !== null ).some( d=>d( ...args ) === false );
+		return !this._queue.filter( d=>d !== null ).some( d=>d( ...args ) === false );
 	}
 	/**
 	 * @summary 以指定上下文的方式顺序执行队列中的全部 handler，前一个 handler 的返回结果觉得下一个 handler 是否执行
@@ -176,7 +176,7 @@ class HandlerQueue{
 			args = [args];
 		}
 
-		return this._queue.filter( d=>d !== null ).some( d=>d.apply(context, args) === false );
+		return !this._queue.filter( d=>d !== null ).some( d=>d.apply(context, args) === false );
 	}
 	/**
 	 * @summary 用 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
