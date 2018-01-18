@@ -22,9 +22,9 @@ let vm = new Vue({
 			}, {
 				url: './throttle.html'
 				, title: 'throttle 工具方法测试'
-			// }, {
-			// 	url: ''
-			// 	, title: ''
+			}, {
+				url: './error.html'
+				, title: '异常捕获测试'
 			}]
 		}
 	})

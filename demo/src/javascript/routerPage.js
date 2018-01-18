@@ -4,7 +4,7 @@ import maple    from 'maple';
 
 import mapleRouter  from 'mapleRouter';
 
-import Vue from 'vue';
+import Vue      from 'vue';
 
 import log      from '../log.js';
 
