@@ -3,15 +3,16 @@
 /**
  * 显示桌面通知
  * @function    notify
- * @param   {String}    title
- * @param   {String}    content
- * @return  {Promise}
+ * @param       {String}    title
+ * @param       {String}    content
+ * @param       {String}    [icon]
+ * @return      {Promise}
  * */
 let notify
 	;
 
 if( 'Notification' in self ){
-	notify = function(title, content){
+	notify = function(title, content, icon){
 		let Notify = self.Notification
 			, notification
 			, permission
@@ -25,11 +26,11 @@ if( 'Notification' in self ){
 			permission = Notify.requestPermission();
 		}
 
-		permission.then(function(){
+		return permission.then(function(){
 
 			return new Promise((resolve)=>{
 				notification = new Notify(title, {
-					icon: '/image/favicon.ico'
+					icon: icon || '/image/favicon.ico'
 					, body: content
 				});
 

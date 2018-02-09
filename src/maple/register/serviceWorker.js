@@ -15,6 +15,7 @@ function registerServiceWorker(options={}){
 
 	return new Promise((resolve, reject)=>{
 		if( 'serviceWorker' in navigator ){
+			// 不存在已缓存文件
 			if( !(config.file in registerServiceWorker._CACHE) ){
 
 				registerServiceWorker._CACHE[config.file] = navigator.serviceWorker.register(config.file, {
@@ -35,13 +36,15 @@ function registerServiceWorker(options={}){
 
 					if( serviceWorker ){
 						// todo 用途
-						serviceWorker.addEventListener('statechange', function(e){
+						serviceWorker.addEventListener('statechange', (e)=>{
 							console.log(e);
 						});
 					}
 
 					return true;
-				}).catch(function(e){
+				}).catch((e)=>{
+					// 注册失败 todo 发送 log
+
 					console.log( e );
 				});
 
@@ -67,15 +70,13 @@ function registerServiceWorker(options={}){
 			reject( new Error('该浏览器不支持 Service Worker') );
 		}
 	});
-
-	// return result;
 }
 
 registerServiceWorker._CACHE = {};
 
 registerServiceWorker._CONFIG = {
-	file: 'sw.js'
-	, scope: './'
+	file: '/sw.js'
+	, scope: '/'
 };
 
 export default registerServiceWorker;

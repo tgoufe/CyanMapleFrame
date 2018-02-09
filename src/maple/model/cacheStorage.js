@@ -27,6 +27,7 @@ class CacheStorageModel extends Model{
 	 * @constructor
 	 * @param   {Object}    [config={}]
 	 * @param   {String}    [config.cacheName]
+	 * @param   {String}    [config.eventType]
 	 * */
 	constructor(config={}){
 		super( config );
@@ -73,31 +74,29 @@ class CacheStorageModel extends Model{
 	 * @summary 设置缓存
 	 * @param   {String|Request}    topic
 	 * @param   {Response}          response
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	setData(topic, response){
 		return this._store.then((caches)=>{
 			return caches.open( this._config.cacheName );
-		}).then(function(cache){
+		}).then((cache)=>{
 			console.log('缓存 '+ (typeof topic === 'string' ? topic : topic.url));
-			return cache.add(topic, response);
-		}).then(function(){
-			return true;
+
+			return cache.put(this._tranToRequest(topic), response);
 		});
 	}
 	/**
 	 * @summary 获取缓存
 	 * @param   {String|Request}    topic
+	 * @param   {Object}            [options={}]
 	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回查询到的缓存，reject 时传回 Error
 	 * */
-	getData(topic){
+	getData(topic, options={}){
 		topic = this._tranToRequest( topic );
 
 		return this._store.then((caches)=>{
-			return caches.open( this._config.cacheName );
-		}).then((cache)=>{
-			return cache.match( topic );
-		}).then(function(response){
+			return caches.match(topic, options);
+		}).then((response)=>{
 			let result
 				;
 
@@ -115,7 +114,7 @@ class CacheStorageModel extends Model{
 	 * @summary 将缓存删除
 	 * @param   {String|Request}    topic
 	 * @param   {Object}            [options={}]    cache.delete 的可选参数
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	removeData(topic, options={}){
 		topic = this._tranToRequest( topic );
@@ -124,33 +123,59 @@ class CacheStorageModel extends Model{
 			return caches.open( this._config.cacheName );
 		}).then(function(cache){
 			return cache.delete(topic, options);
-		}).then(function(){
-			return true;
 		});
 	}
 	/**
 	 * @summary 清空缓存
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	clearData(){
 		this._store.then((caches)=>{
 			return caches.delete( this._config.cacheName );
-		}).then(function(){
-			return true;
 		});
 	}
 
 	/**
+	 * @summary 添加缓存路径
+	 * @param   {String|Request}    topic
+	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回结果
+	 * */
+	addData(topic){
+		return this._store.then((caches)=>{
+			return caches.open( this._config.cacheName );
+		}).then((cache)=>{
+			return cache.add( topic );
+		});
+	}
+	/**
 	 * @summary 基于 addAll 方法的封装
 	 * @param   {Request[]} cacheArray
+	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	addAll(cacheArray){
 		return this._store.then((caches)=>{
 			return caches.open( this._config.cacheName );
-		}).then(function(cache){
+		}).then((cache)=>{
 			return cache.addAll( cacheArray );
-		}).then(function(){
-			return true;
+		});
+	}
+	/**
+	 * @summary 获取当前当前 caches 中的缓存列表
+	 * @return  {Promise}   返回一个Promise对象，在 resolve 时传回 Cache 对象 key 值组成的数组
+	 * */
+	keys(){
+		return this._store.then((caches)=>{
+			return caches.keys();
+		});
+	}
+	/**
+	 * @summary 删除缓存记录
+	 * @param   {String}    key
+	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回结果
+	 * */
+	cacheDelete(key){
+		return this._store.then((caches)=>{
+			return caches.delete( key );
 		});
 	}
 }
