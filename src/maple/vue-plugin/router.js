@@ -69,7 +69,7 @@ let install = {
 				, methods: {
 					router(path){
 						if( this.currentRouter ){
-							return this.currentRouter === path;
+							return Array.from( arguments ).indexOf( this.currentRouter ) !== -1;
 						}
 
 						return false;

@@ -89,6 +89,7 @@ class CacheStorageModel extends Model{
 	 * @summary 获取缓存
 	 * @param   {String|Request}    topic
 	 * @param   {Object}            [options={}]
+	 * @param   {Boolean}           [options.ignoreVary]    请求的 url 和 header 都一致才是相同的资源
 	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回查询到的缓存，reject 时传回 Error
 	 * */
 	getData(topic, options={}){

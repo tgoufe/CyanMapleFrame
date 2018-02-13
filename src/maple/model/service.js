@@ -30,6 +30,7 @@ const SERVICE_MODEL_CONFIG = {
 		req: new HandlerQueue()
 		, res: new HandlerQueue()
 	}
+	, XHR_HISTORY = new Model()
 	;
 
 /**
@@ -80,6 +81,12 @@ class ServiceModel extends Model{
 	static get interceptor(){
 		return INTERCEPTOR;
 	}
+	/**
+	 * @summary 请求发送方式
+	 * */
+	static use(){
+
+	}
 
 	// ---------- 私有方法 ----------
 	/**
@@ -127,7 +134,7 @@ class ServiceModel extends Model{
 		if( topic ){
 			
 			// 执行请求拦截器
-			result = this.reqInterceptor(topic, options).then((rs)=>{
+			result = this.reqInterceptor(topic, options).then(()=>{
 
 				// 发送请求，向服务器发送数据
 				console.log('发送 post 请求', topic);
@@ -140,7 +147,7 @@ class ServiceModel extends Model{
 			});
 		}
 		else{   // topic 无值不做任何处理
-			result = Promise.reject();
+			result = Promise.reject( new Error('缺少 topic 参数') );
 		}
 
 		return result;
@@ -222,7 +229,7 @@ class ServiceModel extends Model{
 			});
 		}
 		else{   // topic 无值不做任何处理
-			result = Promise.reject();
+			result = Promise.reject( new Error('缺少 topic 参数') );
 		}
 
 		return result;

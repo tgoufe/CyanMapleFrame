@@ -75,7 +75,7 @@ self.addEventListener('fetch', (event)=>{
 
 	event.respondWith( runtimeCache.getData( event.request ).then((response)=>{
 		let result
-		;
+			;
 
 		if( response ){
 			result = response;
@@ -92,24 +92,19 @@ self.addEventListener('fetch', (event)=>{
 
 		// 克隆该请求，Request 对象是 stream 类型的，只能读取一次
 		return fetch( event.request.clone() ).then((response)=>{
-			let result
-			;
 
 			// 判断是否为一个异常的响应
-			if( !response || response.status < 400 || response.type !== 'basic' ){
-				// 异常响应
-
-				result = Promise.resolve( response );
+			if( !response || response.status !== 200 || response.type !== 'basic' ){
+				// 异常响应，跨域资源，不缓存直接返回
+				// 跨域资源 response.status 会返回 0
 			}
 			else{
-				result = response;
-
 				runtimeCache.setData(event.request, response.clone()).then(()=>{
 					console.log('已缓存 '+ event.request.url);
 				});
 			}
 
-			return result;
+			return response;
 		});
 	}) );
 });

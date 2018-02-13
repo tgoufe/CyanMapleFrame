@@ -31,3 +31,25 @@ let request = (topic, options)=>{
 };
 
 export default request;
+
+let requestOriginal = (topic, options)=>{
+
+		return new Promise((resolve, reject)=>{
+			let xhr = new XMLHttpRequest()
+				, formData
+				;
+
+			if( options.data ){
+				if( typeof options.data === 'object' ){
+
+				}
+			}
+			else if( typeof options.data === 'string' ){
+
+			}
+
+			xhr.open(options.method || options.type || 'GET', topic, true);
+
+		});
+	}
+	;
