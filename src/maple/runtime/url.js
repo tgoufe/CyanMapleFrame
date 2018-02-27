@@ -37,7 +37,7 @@ const INDEX = ['source'
 class Url{
 	/**
 	 * @constructor
-	 * @param   {String}    [url]
+	 * @param   {string}    [url]
 	 * */
 	constructor(url){
 		let a = document.createElement('a', CONFIG.ceKey)
@@ -89,7 +89,7 @@ class Url{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary     解析 url 的 search 部分
-	 * @param       {String}    [search='']
+	 * @param       {string}    [search='']
 	 * @return      {Object}
 	 * */
 	parseSearch(search=''){
@@ -124,7 +124,7 @@ class Url{
 
 	/**
 	 * @summary     将现有参数组合成一个 url
-	 * @return      {String}
+	 * @return      {string}
 	 * */
 	pack(){
 		return this.protocol +'://'+
@@ -136,7 +136,7 @@ class Url{
 	}
 	/**
 	 * @summary     替换当前的 params
-	 * @param       {Object|String[]|...String} params
+	 * @param       {Object|string[]|...string} params
 	 * @return      {Url}                       this
 	 * @desc        当为多个 string 时，为删除当前 url 上参数，当为 object 时为设置当前 url 上参数
 	 * */
@@ -186,7 +186,7 @@ class Url{
 
 	/**
 	 * @summary toString 方法
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	toString(){
 		return JSON.stringify( Url._INDEX.reduce((rs, k)=>{
@@ -222,7 +222,7 @@ url.Url = Url;
  * @summary     对 url 进行解析
  * @method
  * @memberOf    url
- * @param       {String|Url}    url
+ * @param       {string|Url}    url
  * @return      {Url}           若出入的 url 参数是一个 Url 对象，则不做处理直接返回
  * */
 url.parseUrl = (url)=>{
@@ -240,8 +240,8 @@ url.parseUrl = (url)=>{
  * @summary     对没有协议头（以 // 开头）的路径加上协议头
  * @method
  * @memberOf    url
- * @param       {String}    url
- * @return      {String}
+ * @param       {string}    url
+ * @return      {string}
  * */
 url.addProtocol = (url)=>{
 	return /^\/\//.test( url ) ? this.protocol + url : url;
@@ -271,7 +271,7 @@ url.back = ()=>{
  * @summary     设置页面 hash
  * @method
  * @memberOf    url
- * @param       {String}    hash
+ * @param       {string}    hash
  * @return      {Url}       this
  * */
 url.setHash = function(hash){
@@ -286,7 +286,7 @@ url.setHash = function(hash){
  * @summary     调整参数并指向调整后的路径，当前 url 添加到历史记录
  * @method
  * @memberOf    url
- * @param       {Object|String[]|...String} params
+ * @param       {Object|string[]|...string} params
  * @param       {*|Object}                  [pushState]
  * @return      {Url}                       this
  * @desc        只有两种情况下 pushState 才有效：
@@ -320,7 +320,7 @@ url.pushParams = function(params, pushState){
  * @summary     替换当前 url 上的参数
  * @method
  * @memberOf    url
- * @param       {Object|String[]|...String} params
+ * @param       {Object|string[]|...string} params
  * @param       {*|Object}                  [replaceState]
  * @return      {Url}                       this
  * @desc        执行效果
@@ -354,7 +354,7 @@ url.replaceParams = function(params, replaceState){
  * @summary     将 url 指向目标路径，当前 url 添加到历史记录
  * @method
  * @memberOf    url
- * @param       {String}    href
+ * @param       {string}    href
  * @param       {Object}    [state=null]
  * @return      {Url}       this
  * */
@@ -369,7 +369,7 @@ url.pushHistory = function(href, state=null){
  * @summary     替换当前 url 为目标路径
  * @method
  * @memberOf    url
- * @param       {String}    href
+ * @param       {string}    href
  * @param       {Object}    [state=null]
  * @return      {Url}       this
  * */
@@ -386,7 +386,7 @@ url.replaceHistory = function(href, state=null){
  * @summary     跳转到目标页面，当前 url 添加到历史记录
  * @method
  * @memberOf    url
- * @param       {String}    href
+ * @param       {string}    href
  * */
 url.changePage = function(href){
 	location.assign( href );

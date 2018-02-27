@@ -10,10 +10,10 @@ import merge from './util/merge.js';
  * @summary     获取定位信息
  * @function    position
  * @param       {Object}    [options={}]                        定位接口的参数
- * @param       {Boolean}   [options.enableHighAccuracy=false]  是否浏览器获取高精度的位置
- * @param       {Number}    [options.timeout=2000]              超时时间，单位毫秒
- * @param       {Number}    [options.maximumAge=5000]           最长有效期
- * @return      {Promise}
+ * @param       {boolean}   [options.enableHighAccuracy=false]  是否浏览器获取高精度的位置
+ * @param       {number}    [options.timeout=2000]              超时时间，单位毫秒
+ * @param       {number}    [options.maximumAge=5000]           最长有效期
+ * @return      {Promise<Position, PositionError>}
  * */
 let position = function(options={}){
 	let result

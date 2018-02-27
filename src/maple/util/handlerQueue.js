@@ -13,7 +13,7 @@ class HandlerQueue{
 	/**
 	 * @summary 向队列中添加 handler
 	 * @param   {Function}  handler
-	 * @return  {Number}    handler 在队列中的 id，方便删除
+	 * @return  {number}    handler 在队列中的 id，方便删除
 	 * */
 	add(handler){
 		if( typeof handler === 'function' ){
@@ -26,14 +26,14 @@ class HandlerQueue{
 	/**
 	 * @summary 队列中是否存在该 handler
 	 * @param   {Function}  handler
-	 * @return  {Boolean}
+	 * @return  {boolean}
 	 * */
 	has(handler){
 		return this._queue.indexOf( handler ) !== -1;
 	}
 	/**
 	 * @summary 从队列中移除相应的 handler
-	 * @param   {Number|Function}   findBy
+	 * @param   {number|Function}   findBy
 	 * */
 	remove(findBy){
 
@@ -60,14 +60,14 @@ class HandlerQueue{
 	}
 	/**
 	 * @summary 队列中是否还有剩余
-	 * @return  {Boolean}
+	 * @return  {boolean}
 	 * */
 	remain(){
 		return this._currIndex < this._queue.length;
 	}
 	/**
 	 * @summary 按顺序返回队列中的 handler
-	 * @return  {Function|Null}
+	 * @return  {Function|null}
 	 * @desc    当队列为空时或到队列末尾时返回 null
 	 * */
 	next(){
@@ -152,7 +152,7 @@ class HandlerQueue{
 	/**
 	 * @summary 顺序执行队列中的全部 handler，前一个 handler 的返回结果觉得下一个 handler 是否执行
 	 * @param   {...*}
-	 * @return  {Boolean|Undefined}
+	 * @return  {boolean|undefined}
 	 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
 	 * */
 	fireLine(){

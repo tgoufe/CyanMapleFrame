@@ -40,14 +40,14 @@ class IndexedDBModel extends Model{
 	/**
 	 * @constructor
 	 * @param   {Object}    [config={}]
-	 * @param   {String}    [config.dbName]
-	 * @param   {String}    [config.tableName]
-	 * @param   {Number}    [config.dbVersion]
-	 * @param   {String}    [config.keyPath]
+	 * @param   {string}    [config.dbName]
+	 * @param   {string}    [config.tableName]
+	 * @param   {number}    [config.dbVersion]
+	 * @param   {string}    [config.keyPath]
 	 * @param   {Object[]}  [config.index]
-	 * @param   {String}    config.index[].name
-	 * @param   {String}    [config.index[].keyPath]    未设置时默认使用 name
-	 * @param   {Boolean}   [config.index[].unique=false]   默认值 false
+	 * @param   {string}    config.index[].name
+	 * @param   {string}    [config.index[].keyPath]    未设置时默认使用 name
+	 * @param   {boolean}   [config.index[].unique=false]   默认值 false
 	 * */
 	constructor(config={}){
 		super( config );
@@ -117,8 +117,8 @@ class IndexedDBModel extends Model{
 	/**
 	 * @summary 查询
 	 * @private
-	 * @param   {String}    topic
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回查询出来的 value
+	 * @param   {string}    topic
+	 * @return  {Promise<*, Error>} 返回一个 Promise 对象，在 resolve 时传回查询出来的 value
 	 * */
 	_select(topic){
 		return this._store.then((db)=>{
@@ -140,9 +140,9 @@ class IndexedDBModel extends Model{
 	/**
 	 * @summary 新建或更新
 	 * @private
-	 * @param   {String}    topic
-	 * @param   {String}    value
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {string}    topic
+	 * @param   {string}    value
+	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    add 接口要求数据库中不能已经有相同键的对象存在，因此统一使用 put 接口
 	 * */
 	_put(topic, value){
@@ -168,8 +168,8 @@ class IndexedDBModel extends Model{
 	/**
 	 * @summary 删除
 	 * @private
-	 * @param   {String}    topic
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {string}    topic
+	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	_delete(topic){
 		return this._store.then((db)=>{
@@ -191,7 +191,7 @@ class IndexedDBModel extends Model{
 	/**
 	 * @summary 清空
 	 * @private
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean, null>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	_clear(){
 		return this._store.then((db)=>{
@@ -214,9 +214,9 @@ class IndexedDBModel extends Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 设置数据
-	 * @param   {String|Object} topic
+	 * @param   {string|Object} topic
 	 * @param   {*}             value
-	 * @return  {Promise}       返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    保持值得时候，同时会保持在内存中
 	 * */
 	setData(topic, value){
@@ -236,8 +236,8 @@ class IndexedDBModel extends Model{
 	}
 	/**
 	 * @summary 获取数据
-	 * @param   {String|String[]|...String} topic
-	 * @return  {Promise}                   返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
+	 * @param   {string|string[]|...string} topic
+	 * @return  {Promise<*, null>}          返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
 	 * @desc    获取数据时会优先从内存中取值，若没有则从 indexedDB 中取值并将其存入内存中，当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
 	 * */
 	getData(topic){
@@ -283,8 +283,8 @@ class IndexedDBModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]|...String} topic
-	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {string|string[]|...string} topic
+	 * @return  {Promise<boolean>}          返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	removeData(topic){
 		let argc = arguments.length
@@ -307,7 +307,7 @@ class IndexedDBModel extends Model{
 	}
 	/**
 	 * @summary 清空数据
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	clearData(){
 		return super.clearData().then(()=>{
@@ -316,10 +316,10 @@ class IndexedDBModel extends Model{
 	}
 	/**
 	 * @summary 获取通过 range 获取数据
-	 * @param   {Number}            [min]
-	 * @param   {Number|Boolean}    [max]
-	 * @param   {Boolean}           [eqMin=true]
-	 * @param   {Boolean}           [eqMax=true]
+	 * @param   {number}            [min]
+	 * @param   {number|boolean}    [max]
+	 * @param   {boolean}           [eqMin=true]
+	 * @param   {boolean}           [eqMax=true]
 	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 cursor 列表
 	 * @todo    区间取值功能
 	 * */

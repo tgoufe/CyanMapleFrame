@@ -6,7 +6,7 @@ import merge from '../util/merge.js';
  * 运行 Web Worker
  * @function    registerWebWorker
  * @param   {Object}    [options={}]
- * @param   {String}    options.file
+ * @param   {string}    options.file
  * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传入生成的 Web Worker 实例
  * */
 function registerWebWorker(options={}){

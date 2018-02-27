@@ -81,7 +81,7 @@ class WebSocketModel extends Model{
 	 * @summary 检测 socket 是否还连接着
 	 * @private
 	 * @param   {WebSocket} socket
-	 * @return  {Boolean}   socket 是否连接着
+	 * @return  {boolean}   socket 是否连接着
 	 * */
 	_state(socket){
 		return socket.readyState === WebSocket.OPEN;
@@ -90,7 +90,7 @@ class WebSocketModel extends Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 获取数据
-	 * @param   {String}    topic
+	 * @param   {string}    topic
 	 * @param   {*}         data
 	 * @return  {Promise}   数据发送是否成功
 	 * */
@@ -130,8 +130,8 @@ class WebSocketModel extends Model{
 	clearData(){}
 	/**
 	 * @summary 关闭当前 socket 连接
-	 * @param   {Number}    [code]
-	 * @param   {String}    [reason]
+	 * @param   {number}    [code]
+	 * @param   {string}    [reason]
 	 * @return  {Promise}
 	 * */
 	close(code, reason){

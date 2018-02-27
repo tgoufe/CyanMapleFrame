@@ -9,7 +9,7 @@
  * @function    classify
  * @memberOf    maple.util
  * @param       {Object[]}  target
- * @param       {String}    key
+ * @param       {string}    key
  * @return      {Object}
  * @desc        如果对象不包含 key，则该对象不会出现在返回值中
  * */

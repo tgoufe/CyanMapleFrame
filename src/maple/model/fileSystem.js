@@ -23,9 +23,9 @@ class FileSystemModel extends Model{
 	/**
 	 * @constructor
 	 * @param   {Object}    [config={}]
-	 * @param   {String}    [config.fileName]
-	 * @param   {Number}    [config.fileSize]
-	 * @param   {Number}    [config.fileType]   文件的保存类型，0 为临时文件，1 为持久文件，可以使用 FileSystemModel.TEMPORARY 和 FileSystemModel.PERSISTENT 来替代
+	 * @param   {string}    [config.fileName]
+	 * @param   {number}    [config.fileSize]
+	 * @param   {number}    [config.fileType]   文件的保存类型，0 为临时文件，1 为持久文件，可以使用 FileSystemModel.TEMPORARY 和 FileSystemModel.PERSISTENT 来替代
 	 * */
 	constructor(config={}){
 		super( config );
@@ -81,8 +81,8 @@ class FileSystemModel extends Model{
 	 * @summary 获取 FileEntry 对象
 	 * @private
 	 * @param   {Object}    [options={}]
-	 * @param   {Boolean}   [options.create]    是否创建文件
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 fileEntry 对象
+	 * @param   {boolean}   [options.create]    是否创建文件
+	 * @return  {Promise<FileSystemFileEntry>}  返回一个 Promise 对象，在 resolve 时传回 fileEntry 对象
 	 * */
 	_getFileEntry(options={}){
 		return this._fs.then((fs)=>{
@@ -95,7 +95,7 @@ class FileSystemModel extends Model{
 	 * @summary 获取 FileWriter 对象
 	 * @private
 	 * @param   {FileSystemFileEntry}   fileEntry
-	 * @return  {Promise}               返回一个 Promise 对象，在 resolve 时传回 fileWriter 对象
+	 * @return  {Promise<FileWriter>}   返回一个 Promise 对象，在 resolve 时传回 fileWriter 对象
 	 * */
 	_getFileWriter(fileEntry){
 		return new Promise((resolve, reject)=>{
@@ -106,8 +106,8 @@ class FileSystemModel extends Model{
 	 * @summary 向文件写入内容
 	 * @private
 	 * @param   {FileWriter}    fileWriter
-	 * @param   {String}        content
-	 * @return  {Promise}       返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {string}        content
+	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	_writeFile(fileWriter, content){
 		return new Promise((resolve, reject)=>{
@@ -130,8 +130,8 @@ class FileSystemModel extends Model{
 	/**
 	 * @summary 向文件写入内容
 	 * @private
-	 * @param   {String}    content
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {string}    content
+	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	_write(content){
 		return this._getFileEntry().then((fileEntry)=>{
@@ -147,7 +147,7 @@ class FileSystemModel extends Model{
 	 * @summary 获取文件对象
 	 * @private
 	 * @param   {FileSystemFileEntry}   fileEntry
-	 * @return  {Promise}               返回一个 Promise 对象，在 resolve 时传回 file 对象
+	 * @return  {Promise<File>}         返回一个 Promise 对象，在 resolve 时传回 file 对象
 	 * */
 	_getFile(fileEntry){
 		return new Promise((resolve, reject)=>{
@@ -158,7 +158,7 @@ class FileSystemModel extends Model{
 	 * @summary 读取文件内容
 	 * @private
 	 * @param   {File}      file
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回文件内容字符串
+	 * @return  {Promise<string, Error>}    返回一个 Promise 对象，在 resolve 时传回文件内容字符串
 	 * */
 	_readFile(file){
 		return new Promise((resolve, reject)=>{
@@ -179,7 +179,7 @@ class FileSystemModel extends Model{
 	/**
 	 * @summary 获取文件的全部内容
 	 * @private
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回对文件内容解析后的 JSON 对象
+	 * @return  {Promise<Object, Error>}    返回一个 Promise 对象，在 resolve 时传回对文件内容解析后的 JSON 对象
 	 * */
 	_read(){
 		return this._getFileEntry({
@@ -211,9 +211,9 @@ class FileSystemModel extends Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 设置数据
-	 * @param   {String|Object} topic
+	 * @param   {string|Object} topic
 	 * @param   {*}             value
-	 * @return  {Promise}       返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean>}       返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    保持值得时候，同时会保持在内存中
 	 * */
 	setData(topic, value){
@@ -250,8 +250,8 @@ class FileSystemModel extends Model{
 	}
 	/**
 	 * @summary 获取数据
-	 * @param   {String|String[]|...String} topic
-	 * @return  {Promise}                   返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
+	 * @param   {string|string[]|...string} topic
+	 * @return  {Promise<*, null>}          返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
 	 * @desc    获取数据时会优先从内存中取值，若没有则从 file system 中取值并将其存入内存中，当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
 	 * */
 	getData(topic){
@@ -303,8 +303,8 @@ class FileSystemModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]|...String} topic
-	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {string|string[]|...string} topic
+	 * @return  {Promise<boolean>}          返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	removeData(topic){
 		let argc = arguments.length
@@ -355,7 +355,7 @@ class FileSystemModel extends Model{
 	}
 	/**
 	 * @summary 获取文件存储使用状况
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回查询结果
+	 * @return  {Promise<Object>}   返回一个 Promise 对象，在 resolve 时传回查询结果
 	 * @desc    返回结果为一个对象，包括 usage、all、percent 属性，对应为 已使用字节数、总字节数、已用百分比
 	 * */
 	getUsage(){

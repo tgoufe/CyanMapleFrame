@@ -52,8 +52,8 @@ class CookieModel extends Model{
 	/**
 	 * @summary 转换时间数据格式
 	 * @static
-	 * @param   {Date|Number|String}    date 为 Number 类型时默认单位为天
-	 * @return  {String}                返回一个 UTC 格式的时间字符串
+	 * @param   {Date|number|string}    date 为 Number 类型时默认单位为天
+	 * @return  {string}                返回一个 UTC 格式的时间字符串
 	 * */
 	static _transDate(date){
 		if( date instanceof Date ){}
@@ -78,7 +78,7 @@ class CookieModel extends Model{
 	/**
 	 * @summary 设置默认参数的 domain 值
 	 * @static
-	 * @param   {String}    domain
+	 * @param   {string}    domain
 	 * */
 	static setDomain(domain){
 		COOKIE_DEFAULT.domain = domain;
@@ -88,14 +88,14 @@ class CookieModel extends Model{
 	/**
 	 * @summary     设置 cookie
 	 * @protected
-	 * @param       {String}                topic
+	 * @param       {string}                topic
 	 * @param       {*}                     value
-	 * @param       {Object|Number|String}  [options]           相关配置
-	 * @param       {String}                [options.path]
-	 * @param       {String}                [options.domain]
-	 * @param       {Date|Number|String}    [options.expires]
-	 * @param       {String}                [options.secure]
-	 * @return      {Boolean}               在设置完成后返回 true
+	 * @param       {Object|number|string}  [options]           相关配置
+	 * @param       {string}                [options.path]
+	 * @param       {string}                [options.domain]
+	 * @param       {Date|number|string}    [options.expires]
+	 * @param       {string}                [options.secure]
+	 * @return      {boolean}               在设置完成后返回 true
 	 * @desc        因为设置 cookie 和删除 cookie 使用是相同的代码，只是传入的过期时间不同，所以提出一个共通方法
 	 * */
 	_setCookie(topic, value, options){
@@ -127,8 +127,8 @@ class CookieModel extends Model{
 	/**
 	 * @summary     设置 cookie
 	 * @protected
-	 * @param       {String|String[]}   topic
-	 * @return      {Object|String}
+	 * @param       {string|string[]}   topic
+	 * @return      {Object|string}
 	 * */
 	_getCookie(topic){
 		let cookies = document.cookie
@@ -180,14 +180,14 @@ class CookieModel extends Model{
 	 * @protected
 	 * @param       {Object}    topic
 	 * @param       {Object}    [options]
-	 * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return      {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc        因为设置 cookie 时有相关配置，故重写覆盖父类的 _setByObject 方法
 	 * */
 	_setByObject(topic, options){
 		return Promise.all( Object.keys(topic).map((d)=>{
 			return this.setData(d, topic[d], options);
-		}) ).then((data)=>{
-			return !!data;
+		}) ).then((resultList)=>{
+			return resultList.every( rs=>rs );
 		});
 	}
 
@@ -195,14 +195,14 @@ class CookieModel extends Model{
 	/**
 	 * @summary     设置数据
 	 * @override
-	 * @param       {String|Object}             topic
+	 * @param       {string|Object}             topic
 	 * @param       {*}                         value               当 topic 为 object 类型时，被视为 options
-	 * @param       {Object|Number|String}      [options]           相关配置
-	 * @param       {String}                    [options.path]
-	 * @param       {String}                    [options.domain]
-	 * @param       {Date|Number|String}        [options.expires]
-	 * @param       {String}                    [options.secure]
-	 * @return      {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param       {Object|number|string}      [options]           相关配置
+	 * @param       {string}                    [options.path]
+	 * @param       {string}                    [options.domain]
+	 * @param       {Date|number|string}        [options.expires]
+	 * @param       {string}                    [options.secure]
+	 * @return      {Promise<boolean>}          返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc        保存值得时候，同时会保持在内存中，当 topic 类型为 object 时，value 会视为 options
 	 * */
 	setData(topic, value, options){
@@ -226,8 +226,8 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 获取数据
-	 * @param   {String|String[]|...String} topic
-	 * @return  {Promise}                   返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
+	 * @param   {string|string[]|...string} topic
+	 * @return  {Promise<*, null>}          返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
 	 * @desc    获取数据时会优先从内存中取值，若没有则从 cookie 中取值并将其存入内存中，当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
 	 * */
 	getData(topic){
@@ -253,8 +253,8 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 以同步的方式获取 cookie 中的数据
-	 * @param   {String|String[]|...String} topic
-	 * @return  {Object|String}             若存在 topic 的值，返回查询出来的 value，否则返回 null
+	 * @param   {string|string[]|...string} topic
+	 * @return  {Object|string}             若存在 topic 的值，返回查询出来的 value，否则返回 null
 	 * @desc    获取数据时会优先从内存中取值，若没有则从 cookie 中取值并将其存入内存中，当 topic 的类型为数组的时候，返回结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
 	 * */
 	getDataSync(topic){
@@ -282,13 +282,21 @@ class CookieModel extends Model{
 					all[d] = this._value[d];
 				}
 				else{
-					all[d] = this._getCookie( d ) || null;
+					let temp = this._getCookie( d )
+						;
 
-					// 尝试解析
-					try{
-						all[d] = JSON.parse( all[d] );
+					if( temp instanceof Promise ){  // 不存在该 topic 的值
+						all[d] = null;
 					}
-					catch(e){}
+					else{
+						all[d] = temp;
+
+						// 尝试解析
+						try{
+							all[d] = JSON.parse( all[d] );
+						}
+						catch(e){}
+					}
 
 					super.setData(d, all[d]);
 				}
@@ -308,8 +316,8 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]|...String} topic
-	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {string|string[]|...string} topic
+	 * @return  {Promise<boolean>}          返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    调用 _setCookie 方法，过期时间为负值
 	 * */
 	removeData(topic){
@@ -331,7 +339,7 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 清空数据
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    只调用了父类的 clearData 方法，清楚了内存中的数据，对 cookie 实际没做任何处理
 	 * */
 	clearData(){
@@ -339,7 +347,7 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 获取 cookie 长度
-	 * @return  {Number}
+	 * @return  {number}
 	 * */
 	getCookieLength(){
 		return this._enabled ? document.cookie.length : 0;

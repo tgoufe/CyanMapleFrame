@@ -46,10 +46,10 @@ class ServiceModel extends Model{
 	/**
 	 * @constructor
 	 * @param   {Object}    [config={}]
-	 * @param   {String}    [config.baseUrl]
-	 // * @param   {Boolean}   [config.isCrossDomain]
-	 // * @param   {Boolean}   [config.useLock]
-	 * @param   {Number}    [config.timeout]
+	 * @param   {string}    [config.baseUrl]
+	 // * @param   {boolean}   [config.isCrossDomain]
+	 // * @param   {boolean}   [config.useLock]
+	 * @param   {number}    [config.timeout]
 	 * */
 	constructor(config={}){
 		super( config );
@@ -109,11 +109,11 @@ class ServiceModel extends Model{
 	/**
 	 * @summary     设置数据，默认视为发送 POST 请求到服务器，不会将返回结果保存到本地缓存
 	 * @override
-	 * @param       {String|Object} topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
-	 * @param       {String}        topic.url
+	 * @param       {string|Object} topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
+	 * @param       {string}        topic.url
 	 * @param       {Object}        [options={}]
 	 * @param       {Object}        [options.data]
-	 * @param       {String}        [options.method]
+	 * @param       {string}        [options.method]
 	 * @return      {Promise}
 	 * */
 	setData(topic, options={}){
@@ -155,11 +155,11 @@ class ServiceModel extends Model{
 	/**
 	 * @summary     获取数据，默认视为发送 GET 请求到服务器，可以将返回结果保存到本地缓存
 	 * @override
-	 * @param       {String|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
-	 * @param       {Object|Boolean}    [options={}]        对象类型为 ajax 参数，Boolean 类型时将其赋值给 isCache，自身设置为 {}
+	 * @param       {string|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
+	 * @param       {Object|boolean}    [options={}]        对象类型为 ajax 参数，boolean 类型时将其赋值给 isCache，自身设置为 {}
 	 * @param       {Object}            [options.data]
-	 * @param       {String}            [options.method]
-	 * @param       {Boolean}           [isCache=false]     是否优先从本地缓存中读取数据，同时发送请求后数据是否同步到本地缓存，默认为 false
+	 * @param       {string}            [options.method]
+	 * @param       {boolean}           [isCache=false]     是否优先从本地缓存中读取数据，同时发送请求后数据是否同步到本地缓存，默认为 false
 	 * @return      {Promise}
 	 * @todo    优先从本地 syncTo model 中读取数据，若没有则发送请求
 	 * */
@@ -237,7 +237,7 @@ class ServiceModel extends Model{
 	/**
 	 * @summary     删除数据
 	 * @override
-	 * @param       {String|Object} topic
+	 * @param       {string|Object} topic
 	 * @param       {Object}        [options]
 	 * @return      {Promise}
 	 * @todo        可以考虑支持 RESTful API，发送 delete 类型的请求
@@ -267,7 +267,7 @@ class ServiceModel extends Model{
 	}
 	/**
 	 * @summary 执行请求拦截器进行验证
-	 * @param   {String}    topic
+	 * @param   {string}    topic
 	 * @param   {Object}    options
 	 * @return  {Promise}
 	 * */

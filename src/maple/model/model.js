@@ -61,7 +61,7 @@ class Model{
 	/**
 	 * @constructor
 	 * @param   {Object}    [config={}]
-	 * @param   {String}    [config.eventType]
+	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
 		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 方法
@@ -79,7 +79,7 @@ class Model{
 	/**
 	 * @summary 注册子类
 	 * @static
-	 * @param   {String}    type
+	 * @param   {string}    type
 	 * @param   {Model}     model
 	 * @desc    若该子类已经被注册，并且缓存中没有该子类的实例，则覆盖
 	 * */
@@ -95,8 +95,8 @@ class Model{
 	/**
 	 * @summary 注册子类的别名
 	 * @static
-	 * @param   {String}            type        已注册的子类名
-	 * @param   {String|String[]}   aliasName   该子类的别名
+	 * @param   {string}            type        已注册的子类名
+	 * @param   {string|string[]}   aliasName   该子类的别名
 	 * */
 	static registerAlias(type, aliasName){
 
@@ -116,8 +116,8 @@ class Model{
 	/**
 	 * @summary 获取或生成 type 类型的 Model 子类的实例或 Model 类的实例
 	 * @static
-	 * @param   {String}            [type]
-	 * @param   {Boolean|Object}    [notCache=false] 为 boolean 类型时表示是否缓存，默认值为 false，设为 true 时既不从缓存中读取子类实例对象，生成的实例对象也不保存在缓存中；为 object 类型时将值赋给 options 并设置为 true
+	 * @param   {string}            [type]
+	 * @param   {boolean|Object}    [notCache=false] 为 boolean 类型时表示是否缓存，默认值为 false，设为 true 时既不从缓存中读取子类实例对象，生成的实例对象也不保存在缓存中；为 object 类型时将值赋给 options 并设置为 true
 	 * @param   {Object}            [options={}]
 	 * @return  {Model}             当 type 有意义的时候，为 Model 子类类的实例，否则为 Model 类的实例
 	 * */
@@ -204,7 +204,7 @@ class Model{
 	 * @summary     转为字符串，会将 null,undefined 转为空字符串
 	 * @protected
 	 * @param       {*}     value
-	 * @return      {String}
+	 * @return      {string}
 	 * */
 	_stringify(value){
 
@@ -217,7 +217,7 @@ class Model{
 	/**
 	 * @summary     获取上一次该 topic 最后记录
 	 * @protected
-	 * @param       {String}    topic
+	 * @param       {string}    topic
 	 * @return      {*}
 	 * @desc        任何 topic 记录的第一个值都为 null
 	 * */
@@ -234,7 +234,7 @@ class Model{
 	/**
 	 * @summary     记录数据的改变
 	 * @protected
-	 * @param       {String}    topic
+	 * @param       {string}    topic
 	 * @param       {*}         newVal
 	 * */
 	_trackData(topic, newVal){
@@ -252,7 +252,7 @@ class Model{
 	/**
 	 * @summary     触发绑定的数据监控事件
 	 * @protected
-	 * @param       {String}    topic
+	 * @param       {string}    topic
 	 * @param       {*}         newValue
 	 * @param       {*}         oldValue
 	 * */
@@ -262,7 +262,7 @@ class Model{
 	/**
 	 * @summary     数据同步的内部实现
 	 * @protected
-	 * @param       {String}    topic
+	 * @param       {string}    topic
 	 * @param       {*}         value
 	 * */
 	_sync(topic, value){
@@ -322,7 +322,7 @@ class Model{
 	/**
 	 * @summary     当 getData 传入一个数组时内部调用函数
 	 * @protected
-	 * @param       {String[]}  topic
+	 * @param       {string[]}  topic
 	 * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传回一个 json，key 为 topic 中的数据，value 为对应查找出来的值
 	 * @desc        其中如果任何一个 key 没有值，则返回 null
 	 * */
@@ -342,7 +342,7 @@ class Model{
 	/**
 	 * @summary     当 removeData 传入一个数组时内部调用函数
 	 * @protected
-	 * @param       {String[]}  topic
+	 * @param       {string[]}  topic
 	 * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	_removeByArray(topic){
@@ -356,9 +356,9 @@ class Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 设置数据
-	 * @param   {String|Object} topic   主题
+	 * @param   {string|Object} topic   主题
 	 * @param   {*}             [value] 为 null、undefined 时会被保存为空字符串，当 topic 为 object 类型时被忽略
-	 * @return  {Promise}       返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    设置数据的时候会使用 Object.defineProperty 定义该属性
 				目前子类的实现中都调用了 super.setData，若其它子类的实现中并没有调用，但需对数据监控，应在适当的时候调用 _trigger 方法
 	 * */
@@ -408,8 +408,8 @@ class Model{
 	}
 	/**
 	 * @summary 获取数据
-	 * @param   {String|String[]|...String} topic
-	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
+	 * @param   {string|string[]|...string} topic
+	 * @return  {Promise<*, null>}          返回一个 Promise 对象，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
 	 * @desc    当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值，当传入多个参数时视为传入数组的操作
 	 * */
 	getData(topic){
@@ -436,8 +436,8 @@ class Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {String|String[]|...String} topic
-	 * @return  {Promise}                   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {string|string[]|...string} topic
+	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    目前子类的实现中都调用了 super.removeData，若其它子类的实现中并没有调用，但需对数据监控，应在适当的时候调用 _trigger 方法
 	 * */
 	removeData(topic){
@@ -482,7 +482,7 @@ class Model{
 	}
 	/**
 	 * @summary 清空数据
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    清空操作将不触发监听事件
 	 * */
 	clearData(){
@@ -504,7 +504,7 @@ class Model{
 	 * @summary     数据改变事件触发回调函数
 	 * @callback    ModelChangeEvent
 	 * @param       {Event}     event
-	 * @param       {String}    topic
+	 * @param       {string}    topic
 	 * @param       {*}         newValue
 	 * @param       {*}         [oldValue]
 	 * @this        {Model}

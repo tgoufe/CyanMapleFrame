@@ -25,7 +25,7 @@ let scrollTarget
  * @summary     禁止页面滚动
  * @method
  * @memberOf    scroll
- * @param       {Boolean}   disabled
+ * @param       {boolean}   disabled
  * */
 scroll.disabled = function(disabled){
 	if( disabled ){
@@ -57,9 +57,9 @@ else{
  * @summary     设置或读取当前页面滚动条位置
  * @method
  * @memberOf    scroll
- * @param       {String}        offset  获取方位基准，取值为 'top','bottom','left','right' 中一个
- * @param       {String|Number} [value] 设置滚动条的位置
- * @return      {Object|Null}
+ * @param       {string}        offset  获取方位基准，取值为 'top','bottom','left','right' 中一个
+ * @param       {string|number} [value] 设置滚动条的位置
+ * @return      {Object|null}
  * */
 scroll.scrollBar = function(offset, value){
 	let argc = arguments.length

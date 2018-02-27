@@ -26,8 +26,8 @@ class CacheStorageModel extends Model{
 	/**
 	 * @constructor
 	 * @param   {Object}    [config={}]
-	 * @param   {String}    [config.cacheName]
-	 * @param   {String}    [config.eventType]
+	 * @param   {string}    [config.cacheName]
+	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
 		super( config );
@@ -56,7 +56,7 @@ class CacheStorageModel extends Model{
 	/**
 	 * @summary 将 url 字符串转换为 Request 对象
 	 * @private
-	 * @param   {String|Request}    url
+	 * @param   {string|Request}    url
 	 * @return  {Request}
 	 * */
 	_tranToRequest(url){
@@ -72,7 +72,7 @@ class CacheStorageModel extends Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 设置缓存
-	 * @param   {String|Request}    topic
+	 * @param   {string|Request}    topic
 	 * @param   {Response}          response
 	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
@@ -87,10 +87,10 @@ class CacheStorageModel extends Model{
 	}
 	/**
 	 * @summary 获取缓存
-	 * @param   {String|Request}    topic
+	 * @param   {string|Request}    topic
 	 * @param   {Object}            [options={}]
-	 * @param   {Boolean}           [options.ignoreVary]    请求的 url 和 header 都一致才是相同的资源
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回查询到的缓存，reject 时传回 Error
+	 * @param   {boolean}           [options.ignoreVary]    请求的 url 和 header 都一致才是相同的资源
+	 * @return  {Promise<Response, Error>}  返回一个 Promise 对象，在 resolve 时传回查询到的缓存，reject 时传回 Error
 	 * */
 	getData(topic, options={}){
 		topic = this._tranToRequest( topic );
@@ -113,9 +113,9 @@ class CacheStorageModel extends Model{
 	}
 	/**
 	 * @summary 将缓存删除
-	 * @param   {String|Request}    topic
+	 * @param   {string|Request}    topic
 	 * @param   {Object}            [options={}]    cache.delete 的可选参数
-	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回结果
+	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	removeData(topic, options={}){
 		topic = this._tranToRequest( topic );
@@ -128,7 +128,7 @@ class CacheStorageModel extends Model{
 	}
 	/**
 	 * @summary 清空缓存
-	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回结果
+	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	clearData(){
 		this._store.then((caches)=>{
@@ -138,7 +138,7 @@ class CacheStorageModel extends Model{
 
 	/**
 	 * @summary 添加缓存路径
-	 * @param   {String|Request}    topic
+	 * @param   {string|Request}    topic
 	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	addData(topic){
@@ -162,7 +162,7 @@ class CacheStorageModel extends Model{
 	}
 	/**
 	 * @summary 获取当前当前 caches 中的缓存列表
-	 * @return  {Promise}   返回一个Promise对象，在 resolve 时传回 Cache 对象 key 值组成的数组
+	 * @return  {Promise<Cache[]>}  返回一个Promise对象，在 resolve 时传回 Cache 对象 key 值组成的数组
 	 * */
 	keys(){
 		return this._store.then((caches)=>{
@@ -171,7 +171,7 @@ class CacheStorageModel extends Model{
 	}
 	/**
 	 * @summary 删除缓存记录
-	 * @param   {String}    key
+	 * @param   {string}    key
 	 * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	cacheDelete(key){

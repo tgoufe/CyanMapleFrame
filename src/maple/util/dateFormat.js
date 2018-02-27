@@ -11,8 +11,8 @@ import tools from './tools.js';
  * @function    dateFormat
  * @memberOf    maple.util
  * @param       {Date}      [date=new Date()]
- * @param       {String}    [format='YYYY-MM-DD']
- * @return      {String}
+ * @param       {string}    [format='YYYY-MM-DD']
+ * @return      {string}
  * */
 let dateFormat = function(date=new Date(), format='YYYY-MM-DD'){
 	return format.replace(/YYYY|YY|MM|DD|hh|mm|ss|星期|周|www|week/, function(str){
@@ -27,7 +27,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换 YYYY
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	YYYY(date){
 		return date.getFullYear() +'';
@@ -35,7 +35,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换 YY
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, YY(date){
 		return (date.getFullYear() +'').slice(2);
@@ -43,7 +43,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换 MM
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, MM(date){
 		return tools.fillZero(date.getMonth() +1, 2);
@@ -51,7 +51,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换 DD
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, DD(date){
 		return tools.fillZero(date.getDate(), 2);
@@ -59,7 +59,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换 hh
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, hh(date){
 		return tools.fillZero(date.getHours(), 2);
@@ -67,7 +67,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换 mm
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, mm(date){
 		return tools.fillZero(date.getMinutes(), 2);
@@ -75,7 +75,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换 ss
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, ss(date){
 		return tools.fillZero(date.getSeconds(), 2);
@@ -83,7 +83,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换 www
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, www(date){
 		return dateFormat._WEEK_EN[date.getDay()].slice(0, 3);
@@ -91,7 +91,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换 week
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, week(date){
 		return dateFormat._WEEK_EN[date.getDay()];
@@ -99,7 +99,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换星期
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, '星期': function(date){
 		return '星期'+ dateFormat._WEEK_CN[date.getDay()];
@@ -107,7 +107,7 @@ dateFormat._dateStrReplace = {
 	/**
 	 * @summary 替换周
 	 * @param   {Date}      date
-	 * @return  {String}
+	 * @return  {string}
 	 * */
 	, '周': function(date){
 		return '周'+ dateFormat._WEEK_CN[date.getDay()];
@@ -116,9 +116,9 @@ dateFormat._dateStrReplace = {
 
 /**
  * @summary 将字符串或数字转成毫秒数
- * @param   {Number|String} str
- * @param   {String}        [unit='d']
- * @return  {Number}
+ * @param   {number|string} str
+ * @param   {string}        [unit='d']
+ * @return  {number}
  * */
 dateFormat.formatTimeStr = function(str, unit='d'){
 	let result = 0

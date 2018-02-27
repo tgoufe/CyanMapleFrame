@@ -6,7 +6,7 @@ import merge    from '../util/merge.js';
  * @summary     注册 Service Worker
  * @function    registerServiceWorker
  * @param       {Object}    [options={}]
- * @param       {String}    options.file
+ * @param       {string}    options.file
  * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传入 true
  * */
 function registerServiceWorker(options={}){

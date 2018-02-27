@@ -6,9 +6,9 @@
 class Animator {
 	/**
 	 * @constructor
-	 * @param   {Number}            duration            运行时间，单位毫秒
+	 * @param   {number}            duration            运行时间，单位毫秒
 	 * @param   {Function}          progress            运行操作
-	 * @param   {String|Function}   [easing='linear']   变化速率
+	 * @param   {string|Function}   [easing='linear']   变化速率
 	 * */
 	constructor(duration, progress, easing='linear'){
 		this.duration = duration;
@@ -29,7 +29,7 @@ class Animator {
 	}
 
 	/**
-	 * @param   {Boolean|Function}  [finished]  Boolean 值时表示是否继续运行，Function 时为运行结束的回调函数
+	 * @param   {boolean|Function}  [finished]  boolean 值时表示是否继续运行，Function 时为运行结束的回调函数
 	 * @desc    运行动画
 	 * */
 	run(finished){

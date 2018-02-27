@@ -3,9 +3,9 @@
 /**
  * 显示桌面通知
  * @function    notify
- * @param       {String}    title
- * @param       {String}    content
- * @param       {String}    [icon]
+ * @param       {string}    title
+ * @param       {string}    content
+ * @param       {string}    [icon]
  * @return      {Promise}
  * */
 let notify

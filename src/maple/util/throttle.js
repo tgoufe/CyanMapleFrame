@@ -10,9 +10,9 @@
  * @function    throttle
  * @memberOf    maple.util
  * @param       {Function}  func
- * @param       {Number}    wait
+ * @param       {number}    wait
  * @param       {Function}  [cancelCB]  当前操作无法执行时的回调函数
- * @param       {Boolean}   [leading]   当值为 true 时函数在每个等待时延的开始被调用，否则函数在每个等待时延的结束被调用
+ * @param       {boolean}   [leading]   当值为 true 时函数在每个等待时延的开始被调用，否则函数在每个等待时延的结束被调用
  * @return      {Function}
  * @desc        在间隔时间中再次调用结果函数，将在间隔时间结束后立即执行
  * */

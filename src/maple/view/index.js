@@ -49,8 +49,8 @@ let needRefreshOn = false
 	 * @function
 	 * @memberOf    maple.view
 	 * @param       {Element}       target
-	 * @param       {String}        [key]
-	 * @return      {Object|Number}
+	 * @param       {string}        [key]
+	 * @return      {Object|number}
 	 * */
 	, offset = (target, key)=>{
 		let rs = null
@@ -73,7 +73,7 @@ let needRefreshOn = false
 	 * @memberOf    maple.view
 	 * @param       {Window|Worker} targetWindow
 	 * @param       {*}             message
-	 * @param       {String}        [targetOrigin='*']  * 表示无限制，也可以是一个 url
+	 * @param       {string}        [targetOrigin='*']  * 表示无限制，也可以是一个 url
 	 * @param       {*}             [transfer]
 	 * */
 	, postMessage = (targetWindow, message, targetOrigin='*', transfer)=>{

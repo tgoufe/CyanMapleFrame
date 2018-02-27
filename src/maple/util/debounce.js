@@ -10,9 +10,9 @@
  * @function    debounce
  * @memberOf    maple.util
  * @param       {Function}          func
- * @param       {Number}            wait
- * @param       {Function|Number}   [cancelCB]  上一次计时器取消时调用，若为 Number 类型视为 maxWait，cancelCB 设为 null
- * @param       {Number}            [maxWait]
+ * @param       {number}            wait
+ * @param       {Function|number}   [cancelCB]  上一次计时器取消时调用，若为 number 类型视为 maxWait，cancelCB 设为 null
+ * @param       {number}            [maxWait]
  * @return      {Function}
  * */
 let debounce = function(func, wait, cancelCB, maxWait){

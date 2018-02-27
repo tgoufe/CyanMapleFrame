@@ -12,7 +12,7 @@ import $    from 'jquery';
 
 /**
  * 发送请求方法
- * @param   {String}    topic
+ * @param   {string}    topic
  * @param   {Object}    options
  * @return  {Promise}
  * */

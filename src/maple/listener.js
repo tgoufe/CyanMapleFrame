@@ -29,10 +29,10 @@ class Listener{
 	/**
 	 * @constructor
 	 * @param   {Object}                    config
-	 * @param   {String}                    config.type
+	 * @param   {string}                    config.type
 	 * @param   {Window|Document|Object}    [config.target]
-	 * @param   {Boolean}                   [config.useCapture]
-	 * @param   {Boolean}                   [config.passive]
+	 * @param   {boolean}                   [config.useCapture]
+	 * @param   {boolean}                   [config.passive]
 	 * @todo    处理 passive 参数
 	 * */
 	constructor(config={}){
@@ -133,7 +133,7 @@ class Listener{
 	}
 	/**
 	 * @summary 取消监听
-	 * @param   {Boolean|Function}  [isAll=true]
+	 * @param   {boolean|Function}  [isAll=true]
 	 * @return  {Listener}          返回 this，可以使用链式操作
 	 * @desc    若传入参数为 true，则将将事件监听解除绑定，若传入参数类型为函数，则只将该函数从函数队列删除，不解除监听事件
 	 * */
@@ -179,12 +179,12 @@ class Listener{
 
 /**
  * @summary     快速监听函数
- * @param       {Window|Document|Object|String}     target                  监听对象，当类型为 String 时视为 type，将其赋值给 type，将 target 设置为 null
- * @param       {String|ListenerCallback}           [type]                  事件类型，当类型为 function 时视为 callback，将其赋值给 callback，将 type 设置为 null，若 target 不为字符串类型则会报错
+ * @param       {Window|Document|Object|string}     target                  监听对象，当类型为 string 时视为 type，将其赋值给 type，将 target 设置为 null
+ * @param       {string|ListenerCallback}           [type]                  事件类型，当类型为 function 时视为 callback，将其赋值给 callback，将 type 设置为 null，若 target 不为字符串类型则会报错
  * @param       {ListenerCallback|Object}           [callback={}]           回调函数，当类型为 object 时视为 options，将其赋值给 options，将 callback 设置为 null
  * @param       {Object}                            [options={}]            配置参数与 Listener 参数相同
- * @param       {Boolean}                           [options.useCapture]
- * @param       {Boolean}                           [options.passive]
+ * @param       {boolean}                           [options.useCapture]
+ * @param       {boolean}                           [options.passive]
  * @return      {Listener}
  * @desc        可以穿四个参数，最少传一个参数，若只传一个参数会视为 type
  * */

@@ -23,8 +23,8 @@ const alias = {
 /**
  * @summary     判断当前设备是否满足期望
  * @function
- * @param       {...String}
- * @return      {Boolean}
+ * @param       {...string}
+ * @return      {boolean}
  * @desc        可以传多个参数，当同时满足时，返回 true，否则 false
  * */
 let device = function(){

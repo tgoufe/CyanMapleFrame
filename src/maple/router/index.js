@@ -23,7 +23,7 @@ const CONFIG = {
 /**
  * @summary     路由信息
  * @typedef     {Object}        RouteConfig
- * @property    {String|RegExp} path
+ * @property    {string|RegExp} path
  * @property    {RouterEvent}   callback
  // * @property    {Array}         [route.children]    // todo 子路由功能
  * */
@@ -36,8 +36,8 @@ class Router{
 	/**
 	 * @constructor
 	 * @param   {Object}        [config={}]
-	 * @param   {String}        [config.baseUrl]
-	 * @param   {String}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式
+	 * @param   {string}        [config.baseUrl]
+	 * @param   {string}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式
 	 * @param   {RouteConfig[]} [config.routers]
 	 * @param   {Function}      [config.fallback]       当路由不存在时的回调函数，传入参数当前 location.href
 	 * */
@@ -139,7 +139,7 @@ class Router{
 	 * @summary 跳转到路径
 	 * @private
 	 * @param   {Url}       targetUrl
-	 * @return  {Boolean}   是否有匹配的路由执行成功
+	 * @return  {boolean}   是否有匹配的路由执行成功
 	 * */
 	_get(targetUrl){
 		let path = targetUrl.path
@@ -226,8 +226,8 @@ class Router{
 	}
 	/**
 	 * @summary 注册路径
-	 * @param   {String|RegExp|RouteConfig|RouteConfig[]}   route       当 route 为 Object 类型时且不为 RegExp 视为路由配置对象
-	 * @param   {RouterEvent}                               [callback]  当 route 为 String 或 RegExp 类型时有效
+	 * @param   {string|RegExp|RouteConfig|RouteConfig[]}   route       当 route 为 Object 类型时且不为 RegExp 视为路由配置对象
+	 * @param   {RouterEvent}                               [callback]  当 route 为 string 或 RegExp 类型时有效
 	 * @return  {Router}                                    this
 	 * @desc    path 以 / 开始视为根目录开始，否则以当前路径目录下，不能带参数和 hash(? #)
 	 *          可以配置动态路由，参数名以 :name 的形式
@@ -303,8 +303,8 @@ class Router{
 	}
 	/**
 	 * @summary 判断已注册的路由中是否有匹配该路径
-	 * @param   {String}    path
-	 * @return  {Boolean}
+	 * @param   {string}    path
+	 * @return  {boolean}
 	 * */
 	has(path){
 		return this.routers.some((route)=>{
@@ -313,9 +313,9 @@ class Router{
 	}
 	/**
 	 * @summary 页面前进到目标 path
-	 * @param   {String|Url}    path
+	 * @param   {string|Url}    path
 	 * @param   {Object}        [params={}]
-	 * @return  {Boolean}       是否存在对应 path
+	 * @return  {boolean}       是否存在对应 path
 	 * @desc    当为 hash 模式时，该方法实际并未直接执行 router 的 callback，仅仅调用 url.setHash 方法，来触发 hashChange 事件进而执行 router 的 callback，所以将会是异步
 	 * */
 	go(path, params={}){
@@ -352,8 +352,8 @@ class Router{
 	 * @summary     数据改变事件触发回调函数
 	 * @callback    RouterChangeEvent
 	 * @param       {Event}     event
-	 * @param       {String}    form
-	 * @param       {String}    to
+	 * @param       {string}    form
+	 * @param       {string}    to
 	 * @this        {Url}
 	 * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
 	 *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
