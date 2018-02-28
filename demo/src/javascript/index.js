@@ -25,6 +25,9 @@ let vm = new Vue({
 			}, {
 				url: './error.html'
 				, title: '异常捕获测试'
+			}, {
+				url: './eventSource.html'
+				, title: 'sse 实验'
 			}]
 		}
 	})

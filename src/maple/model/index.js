@@ -47,10 +47,6 @@ import './fileSystem.js';
 // 网络请求
 import './service.js';
 import './webSocket.js';
-
-/**
- * post message
- * todo 功能用途？
- * */
+import './eventSource.js';
 
 export default Model;

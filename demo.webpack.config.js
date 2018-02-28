@@ -95,6 +95,15 @@ module.exports = {
 			, chunks: ['base', 'error']
 			, inject: 'body'
 		})
+		, new HtmlWebpackPlugin({
+			filename: 'eventSource.html'
+			, minify: {    //压缩HTML文件
+				removeComments: true        //移除HTML中的注释
+				, collapseWhitespace: true  //删除空白符与换行符
+			}
+			, chunks: ['base', 'eventSource']
+			, inject: 'body'
+		})
 	],
 	//页面入口文件配置
 	entry: {
@@ -110,6 +119,7 @@ module.exports = {
 		, router:   [path.resolve(__dirname, 'demo/src/javascript/router.js')]
 		, routerPage:   [path.resolve(__dirname, 'demo/src/javascript/routerPage.js')]
 		, error:    [path.resolve(__dirname, 'demo/src/javascript/error.js')]
+		, eventSourceSend:    [path.resolve(__dirname, 'demo/src/javascript/eventSource.js')]
 	},
 	//入口文件输出配置
 	output: {

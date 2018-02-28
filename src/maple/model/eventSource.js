@@ -38,14 +38,15 @@ class EventSourceModel extends Model{
 				if( 'EventSource' in self ){
 					event = new EventSource(this._config.url, this._config);
 
-					event.onmessage = (e)=>{
+					event.onmessage = (e) =>{
+
 						let message = e.data
 							;
 
 						try{    // 尝试解析
-							message = JSON.parse( message );
+							message = JSON.parse(message);
 						}
-						catch(e){   // 纯字符串类型数据
+						catch( e ){   // 纯字符串类型数据
 							message = {
 								topic: this._config.url
 								, data: message
@@ -54,10 +55,11 @@ class EventSourceModel extends Model{
 
 						super.setData(message.topic, message.data);
 					};
-
-					event.onopen = ()=>{
-						resolve( event );
+					event.onopen = () =>{
+						resolve(event);
 					};
+
+					event.onerror = reject;
 				}
 				else{
 					reject( new Error('此浏览器不支持 Event Source') );
@@ -114,10 +116,13 @@ class EventSourceModel extends Model{
 
 	/**
 	 * @summary 关闭服务器端事件推送
+	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	close(){
 		this._event.then((event)=>{
 			event.close();
+
+			return true;
 		});
 	}
 }
@@ -129,6 +134,6 @@ Model.register('eventSource', EventSourceModel);
 /**
  * 注册别名
  * */
-Model.registerAlias('eventSource', ['ess', 'event']);
+Model.registerAlias('eventSource', ['sse', 'es', 'event']);
 
 export default EventSourceModel;
