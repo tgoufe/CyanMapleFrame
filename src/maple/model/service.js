@@ -30,7 +30,6 @@ const SERVICE_MODEL_CONFIG = {
 		req: new HandlerQueue()
 		, res: new HandlerQueue()
 	}
-	, XHR_HISTORY = new Model()
 	;
 
 /**
@@ -104,6 +103,51 @@ class ServiceModel extends Model{
 			}
 		});
 	}
+	/**
+	 * @summary 执行请求拦截器进行验证
+	 * @private
+	 * @param   {string}    topic
+	 * @param   {Object}    options
+	 * @return  {Promise}
+	 * */
+	_reqInterceptor(topic, options){
+		let condition = (rs)=>{
+				let result = rs.some((d)=>{
+						return d === false;
+					})
+					;
+
+				if( result ){
+					return Promise.reject();
+				}
+				else{
+					return Promise.resolve();
+				}
+			}
+			;
+
+		console.log('执行全局请求拦截器', topic);
+		return Promise.all( ServiceModel.interceptor.req.fireAll(topic, options) ).then( condition ).then(()=>{
+			console.log('执行局部请求拦截器', topic);
+
+			return Promise.all( this.interceptor.req.fireAll(topic, options) );
+		}).then( condition );
+	}
+	/**
+	 * @summary 执行响应拦截器进行验证
+	 * @private
+	 * @param   {Object}    res
+	 * @return  {Promise}
+	 * */
+	_resInterceptor(res){
+		console.log('执行全局响应拦截器');
+
+		return ServiceModel.interceptor.res.fireReduce( res ).then((res)=>{
+			console.log('执行局部响应拦截器');
+
+			return this.interceptor.res.fireReduce( res );
+		});
+	}
 
 	// ---------- 公有方法 ----------
 	/**
@@ -134,7 +178,7 @@ class ServiceModel extends Model{
 		if( topic ){
 			
 			// 执行请求拦截器
-			result = this.reqInterceptor(topic, options).then(()=>{
+			result = this._reqInterceptor(topic, options).then(()=>{
 
 				// 发送请求，向服务器发送数据
 				console.log('发送 post 请求', topic);
@@ -143,7 +187,7 @@ class ServiceModel extends Model{
 			}).then((res)=>{
 
 				// 执行响应拦截器
-				return this.resInterceptor( res );
+				return this._resInterceptor( res );
 			});
 		}
 		else{   // topic 无值不做任何处理
@@ -197,7 +241,7 @@ class ServiceModel extends Model{
 			result = result.catch(()=>{
 
 				// 执行请求拦截器
-				return this.reqInterceptor(topic, options).then(()=>{
+				return this._reqInterceptor(topic, options).then(()=>{
 
 					// 发送请求，从服务器获取数据
 					console.log('发送 get 请求', topic);
@@ -206,7 +250,7 @@ class ServiceModel extends Model{
 				}).then((res)=>{
 
 					// 执行响应拦截器
-					return this.resInterceptor( res );
+					return this._resInterceptor( res );
 				}).then((data)=>{   // 将数据同步
 					let result
 						;
@@ -239,7 +283,7 @@ class ServiceModel extends Model{
 	 * @override
 	 * @param       {string|Object} topic
 	 * @param       {Object}        [options]
-	 * @return      {Promise}
+	 * @return      {Promise<boolean>}  返回 resolve(true)
 	 * @todo        可以考虑支持 RESTful API，发送 delete 类型的请求
 	 * */
 	removeData(topic, options){
@@ -248,6 +292,7 @@ class ServiceModel extends Model{
 	}
 	/**
 	 * @summary 清空数据，实际不做任何处理
+	 * @return  {Promise<boolean>}  返回 resolve(true)
 	 * */
 	clearData(){
 		return Promise.resolve( true );
@@ -264,49 +309,6 @@ class ServiceModel extends Model{
 		if( (model instanceof Model) && !(model instanceof ServiceModel) ){
 			this._syncTo = model;
 		}
-	}
-	/**
-	 * @summary 执行请求拦截器进行验证
-	 * @param   {string}    topic
-	 * @param   {Object}    options
-	 * @return  {Promise}
-	 * */
-	reqInterceptor(topic, options){
-		let condition = (rs)=>{
-				let result = rs.some((d)=>{
-						return d === false;
-					})
-					;
-
-				if( result ){
-					return Promise.reject();
-				}
-				else{
-					return Promise.resolve();
-				}
-			}
-			;
-
-		console.log('执行全局请求拦截器', topic);
-		return Promise.all( ServiceModel.interceptor.req.fireAll(topic, options) ).then( condition ).then(()=>{
-			console.log('执行局部请求拦截器', topic);
-
-			return Promise.all( this.interceptor.req.fireAll(topic, options) );
-		}).then( condition );
-	}
-	/**
-	 * @summary 执行响应拦截器进行验证
-	 * @param   {Object}    res
-	 * @return  {Promise}
-	 * */
-	resInterceptor(res){
-		console.log('执行全局响应拦截器');
-
-		return ServiceModel.interceptor.res.fireReduce( res ).then((res)=>{
-			console.log('执行局部响应拦截器');
-			
-			return this.interceptor.res.fireReduce( res );
-		});
 	}
 }
 

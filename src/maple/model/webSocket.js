@@ -21,37 +21,74 @@ class WebSocketModel extends Model{
 	/**
 	 * @constructor
 	 * @param   {Object}    [config={}]
+	 * @param   {string}    config.url
+	 * @param   {string}    [config.binaryType] 设置收到的二进制数据类型
 	 * */
 	constructor(config={}){
 		super( config );
 
 		this._config = merge(config, WebSocketModel._CONFIG);
 
-		this._clinet = new Promise((resolve, reject)=>{
-			if( 'WebSocket' in self ){
-				let socket = new WebSocket(this._config.url)
-					;
+		this._client = new Promise((resolve, reject)=>{
+			let socket
+				;
 
-				socket.onopen = ()=>{
-					resolve( socket );
-				};
-				socket.onclose = ()=>{
-					this._clinet = Promise.reject( new Error('该 Web Socket 连接已经被关闭') );
-				};
-				socket.onmessage = (e)=>{
-					let data = e.data
-						;
+			if( this._config.url ){
+				if( 'WebSocket' in self ){
+					socket = new WebSocket(this._config.url, this._config);
 
-					if( data.topic && data.data ){
-						super.setData(data.topic, data.data);
+					socket.onopen = ()=>{
+						resolve( socket );
+					};
+					socket.onclose = ()=>{
+						this._client = Promise.reject( new Error('该 Web Socket 连接已经被关闭') );
+
+						reject();
+					};
+					socket.onmessage = (e)=>{
+						let data = e.data
+							;
+
+						if( data instanceof ArrayBuffer ){ // 二进制数据流
+							// todo 处理数据流
+						}
+						else{
+							if( typeof data === 'string' ){
+								try{
+									data = JSON.parse( data );
+								}
+								catch(e){
+									data = {
+										topic: this._config.url
+										, data
+									}
+								}
+							}
+							else if( typeof data !== 'object' ){
+								data = {};
+							}
+
+							if( data.topic && data.data ){
+								super.setData(data.topic, data.data);
+							}
+						}
+					};
+					socket.onerror = ()=>{
+						this._client = Promise.reject( new Error('该 Web Socket 出现异常进而关闭') );
+
+						reject();
+					};
+
+					if( this._config.binaryType ){
+						socket.binaryType = this._config.binaryType;
 					}
-				};
-				socket.onerror = ()=>{
-					this._client = Promise.reject( new Error('该 Web Socket 出现异常进而关闭') );
-				};
+				}
+				else{
+					reject( new Error('此浏览器不支持 Web Socket') );
+				}
 			}
 			else{
-				reject( new Error('此浏览器不支持 Web Socket') );
+				reject( new Error('缺少参数 url') );
 			}
 		});
 	}
@@ -95,7 +132,7 @@ class WebSocketModel extends Model{
 	 * @return  {Promise}   数据发送是否成功
 	 * */
 	setData(topic, data){
-		return this._clinet.then((socket)=>{
+		return this._client.then((socket)=>{
 			let result
 				;
 
@@ -115,27 +152,38 @@ class WebSocketModel extends Model{
 		});
 	}
 	/**
-	 *
+	 * @summary 重写覆盖父类 getData 方法
+	 * @return  {Promise}   返回 reject(null)
+	 * @desc    web socket 为单向，所以 getData 方法没有意义
 	 * */
-	getData(topic){
-		return this.setData(topic, {});
+	getData(){
+		return Promise.reject( null );
 	}
 	/**
-	 *
+	 * @summary 重写覆盖父类 removeData 方法
+	 * @return  {Promise}   返回 reject(false)
+	 * @desc    removeData 方法没有意义
 	 * */
-	removeData(topic){}
+	removeData(topic){
+		return Promise.reject( false );
+	}
 	/**
-	 * 
+	 * @summary 重写覆盖父类 clearData 方法
+	 * @return  {Promise}   返回 reject(false);
+	 * @desc    clearData 方法没有意义
 	 * */
-	clearData(){}
+	clearData(){
+		return Promise.reject( false );
+	}
+
 	/**
 	 * @summary 关闭当前 socket 连接
 	 * @param   {number}    [code]
 	 * @param   {string}    [reason]
-	 * @return  {Promise}
+	 * @return  {Promise<boolean>}      返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	close(code, reason){
-		return this._clinet.then((socket)=>{
+		return this._client.then((socket)=>{
 			socket.close();
 
 			return true

@@ -38,28 +38,30 @@ class EventSourceModel extends Model{
 				if( 'EventSource' in self ){
 					event = new EventSource(this._config.url, this._config);
 
-					event.onmessage = (e) =>{
-
-						let message = e.data
+					event.onopen = ()=>{
+						resolve( event );
+					};
+					event.onmessage = (e)=>{
+						let data = e.data
 							;
 
 						try{    // 尝试解析
-							message = JSON.parse(message);
+							data = JSON.parse( data );
 						}
 						catch( e ){   // 纯字符串类型数据
-							message = {
+							data = {
 								topic: this._config.url
-								, data: message
+								, data
 							};
 						}
 
-						super.setData(message.topic, message.data);
+						super.setData(data.topic, data.data);
 					};
-					event.onopen = () =>{
-						resolve(event);
-					};
+					event.onerror = ()=>{
+						this._event = Promise.reject( new Error('该 Web Socket 出现异常进而关闭') );
 
-					event.onerror = reject;
+						reject();
+					};
 				}
 				else{
 					reject( new Error('此浏览器不支持 Event Source') );

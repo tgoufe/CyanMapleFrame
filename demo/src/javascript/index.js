@@ -11,6 +11,9 @@ let vm = new Vue({
 				url: './model.html'
 				, title: 'model 数据 Model 功能测试'
 			}, {
+				url: './router.html'
+				, title: 'router 功能测试'
+			}, {
 				url: './routerPage.html'
 				, title: 'router + vue 测试'
 			}, {

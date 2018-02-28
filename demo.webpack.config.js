@@ -119,7 +119,7 @@ module.exports = {
 		, router:   [path.resolve(__dirname, 'demo/src/javascript/router.js')]
 		, routerPage:   [path.resolve(__dirname, 'demo/src/javascript/routerPage.js')]
 		, error:    [path.resolve(__dirname, 'demo/src/javascript/error.js')]
-		, eventSourceSend:    [path.resolve(__dirname, 'demo/src/javascript/eventSource.js')]
+		, eventSource:    [path.resolve(__dirname, 'demo/src/javascript/eventSource.js')]
 	},
 	//入口文件输出配置
 	output: {
