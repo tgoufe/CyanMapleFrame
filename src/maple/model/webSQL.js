@@ -126,7 +126,7 @@ class WebSQLModel extends Model{
 	 * @summary 查询
 	 * @private
 	 * @param   {string}    topic
-	 * @return  {Promise<String, Error>}    返回一个 Promise 对象，在 resolve 时传回查询出来的数组
+	 * @return  {Promise<String, ErrorEvent>}    返回一个 Promise 对象，在 resolve 时传回查询出来的数组
 	 * */
 	_select(topic){
 		return this._store.then((db)=>{
@@ -147,7 +147,7 @@ class WebSQLModel extends Model{
 	 * @private
 	 * @param   {string}    topic
 	 * @param   {string}    value
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * */
 	_update(topic, value){
 		return this._store.then((db)=>{
@@ -168,7 +168,7 @@ class WebSQLModel extends Model{
 	 * @private
 	 * @param   {string}    topic
 	 * @param   {string}    value
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回新插入行 id 的 boolean 值
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回新插入行 id 的 boolean 值
 	 * */
 	_insert(topic, value){
 		return this._store.then((db)=>{
@@ -188,7 +188,7 @@ class WebSQLModel extends Model{
 	 * @summary 删除
 	 * @private
 	 * @param   {string}    topic
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * */
 	_delete(topic){
 		return this._store.then((db)=>{
@@ -207,7 +207,7 @@ class WebSQLModel extends Model{
 	/**
 	 * @summary 清空表
 	 * @private
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * */
 	_clear(){
 		return this._store.then((db)=>{
@@ -229,7 +229,7 @@ class WebSQLModel extends Model{
 	 * @summary 设置数据
 	 * @param   {string|Object} topic
 	 * @param   {*}             value
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * @desc    保持值得时候，同时会保持在内存中
 	 * */
 	setData(topic, value){
@@ -265,7 +265,7 @@ class WebSQLModel extends Model{
 	/**
 	 * @summary 获取数据
 	 * @param   {string|string[]|...string} topic
-	 * @return  {Promise<*, Error>}         返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
+	 * @return  {Promise<*, ErrorEvent>}         返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
 	 * @desc    获取数据时会优先从内存中取值，若没有则从 WebSQL Database 中取值并将其存入内存中，当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
 	 * */
 	getData(topic){
@@ -311,7 +311,7 @@ class WebSQLModel extends Model{
 	/**
 	 * @summary 将数据从缓存中删除
 	 * @param   {string|string[]|...string} topic
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * */
 	removeData(topic){
 		let argc = arguments.length
@@ -334,7 +334,7 @@ class WebSQLModel extends Model{
 	}
 	/**
 	 * @summary 清空数据
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * */
 	clearData(){
 		return this.clearData().then(()=>{
@@ -346,7 +346,7 @@ class WebSQLModel extends Model{
 	 * @summary 独立执行 sql 方法
 	 * @param   {string}    sql
 	 * @param   {Array}     [value=[]]
-	 * @return  {Promise<*, Error>} 返回一个 Promise 对象，在 resolve 时传回 sql 语句的执行结果
+	 * @return  {Promise<*, ErrorEvent>} 返回一个 Promise 对象，在 resolve 时传回 sql 语句的执行结果
 	 * */
 	executeSql(sql, value=[]){
 		return this._store.then((db)=>{
@@ -365,7 +365,7 @@ class WebSQLModel extends Model{
 	/**
 	 * @summary 针对某列建立索引
 	 * @param   {string}    col
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 sql 语句的执行结果
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回 sql 语句的执行结果
 	 * */
 	createIndex(col){
 		return this._store.then((db)=>{

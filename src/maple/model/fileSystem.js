@@ -107,7 +107,7 @@ class FileSystemModel extends Model{
 	 * @private
 	 * @param   {FileWriter}    fileWriter
 	 * @param   {string}        content
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	_writeFile(fileWriter, content){
 		return new Promise((resolve, reject)=>{
@@ -158,7 +158,7 @@ class FileSystemModel extends Model{
 	 * @summary 读取文件内容
 	 * @private
 	 * @param   {File}      file
-	 * @return  {Promise<string, Error>}    返回一个 Promise 对象，在 resolve 时传回文件内容字符串
+	 * @return  {Promise<string, ErrorEvent>}    返回一个 Promise 对象，在 resolve 时传回文件内容字符串
 	 * */
 	_readFile(file){
 		return new Promise((resolve, reject)=>{

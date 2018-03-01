@@ -20,9 +20,10 @@ const WEB_SOCKET_CONFIG = {
 class WebSocketModel extends Model{
 	/**
 	 * @constructor
-	 * @param   {Object}    [config={}]
-	 * @param   {string}    config.url
-	 * @param   {string}    [config.binaryType] 设置收到的二进制数据类型
+	 * @param   {Object}            [config={}]
+	 * @param   {string|string[]}   config.url
+	 * @param   {string}            [config.protocol]   单个的协议名字字符串或者包含多个协议名字字符串的数组
+	 * @param   {string}            [config.binaryType] 设置收到的二进制数据类型
 	 * */
 	constructor(config={}){
 		super( config );
@@ -35,12 +36,19 @@ class WebSocketModel extends Model{
 
 			if( this._config.url ){
 				if( 'WebSocket' in self ){
-					socket = new WebSocket(this._config.url, this._config);
+
+					if( !/^wss?:\/\//.test( this._config.url ) ){
+						this._config.url = 'ws://'+ this._config.url;
+					}
+
+					socket = new WebSocket(this._config.url, this._config.protocol);
 
 					socket.onopen = ()=>{
+						console.log('建立 Web Socket 连接');
 						resolve( socket );
 					};
-					socket.onclose = ()=>{
+					socket.onclose = (e)=>{
+						console.log( e );
 						this._client = Promise.reject( new Error('该 Web Socket 连接已经被关闭') );
 
 						reject();
@@ -49,8 +57,29 @@ class WebSocketModel extends Model{
 						let data = e.data
 							;
 
+						if( typeof data === 'string' ){
+							try{
+								data = JSON.parse( data );
+							}
+							catch(e){
+								data = {
+									topic: this._config.url
+									, data
+								}
+							}
+						}
+						else if( typeof data === 'object' ){
+							if( data instanceof ArrayBuffer ){
+								
+							}
+							else if( data instanceof Blob ){
+
+							}
+						}
+
 						if( data instanceof ArrayBuffer ){ // 二进制数据流
 							// todo 处理数据流
+							console.log(data)
 						}
 						else{
 							if( typeof data === 'string' ){
@@ -73,9 +102,11 @@ class WebSocketModel extends Model{
 							}
 						}
 					};
-					socket.onerror = ()=>{
+					socket.onerror = (e)=>{
 						this._client = Promise.reject( new Error('该 Web Socket 出现异常进而关闭') );
 
+						 console.log( e );
+						
 						reject();
 					};
 
@@ -137,10 +168,10 @@ class WebSocketModel extends Model{
 				;
 
 			if( this._state(socket) ){
-				socket.send({
+				socket.send( JSON.stringify({
 					topic
 					, data
-				});
+				}) );
 
 				result = true;
 			}

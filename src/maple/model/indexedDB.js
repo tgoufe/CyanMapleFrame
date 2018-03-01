@@ -118,7 +118,7 @@ class IndexedDBModel extends Model{
 	 * @summary 查询
 	 * @private
 	 * @param   {string}    topic
-	 * @return  {Promise<*, Error>} 返回一个 Promise 对象，在 resolve 时传回查询出来的 value
+	 * @return  {Promise<*, ErrorEvent>} 返回一个 Promise 对象，在 resolve 时传回查询出来的 value
 	 * */
 	_select(topic){
 		return this._store.then((db)=>{
@@ -142,7 +142,7 @@ class IndexedDBModel extends Model{
 	 * @private
 	 * @param   {string}    topic
 	 * @param   {string}    value
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    add 接口要求数据库中不能已经有相同键的对象存在，因此统一使用 put 接口
 	 * */
 	_put(topic, value){
@@ -169,7 +169,7 @@ class IndexedDBModel extends Model{
 	 * @summary 删除
 	 * @private
 	 * @param   {string}    topic
-	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	_delete(topic){
 		return this._store.then((db)=>{

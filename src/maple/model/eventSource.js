@@ -57,7 +57,9 @@ class EventSourceModel extends Model{
 
 						super.setData(data.topic, data.data);
 					};
-					event.onerror = ()=>{
+					event.onerror = (e)=>{
+						console.log( e );
+
 						this._event = Promise.reject( new Error('该 Web Socket 出现异常进而关闭') );
 
 						reject();

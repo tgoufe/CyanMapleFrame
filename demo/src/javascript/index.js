@@ -31,6 +31,9 @@ let vm = new Vue({
 			}, {
 				url: './eventSource.html'
 				, title: 'sse 实验'
+			}, {
+				url: './socket.html'
+				, title: 'socket 功能测试'
 			}]
 		}
 	})
