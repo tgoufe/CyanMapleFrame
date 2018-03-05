@@ -7,3 +7,5 @@ demo/javascript/maple.js
 demo/javascript/base.js
 
 demo/dist
+
+.DS_Store
