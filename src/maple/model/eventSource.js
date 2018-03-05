@@ -106,7 +106,7 @@ class EventSourceModel extends Model{
 	 * @return  {Promise}   返回 reject(false)
 	 * @desc    SSE 只支持服务器到客户端单向的事件推送，所以 removeData 方法没有意义
 	 * */
-	removeData(topic){
+	removeData(){
 		return Promise.reject( false );
 	}
 	/**

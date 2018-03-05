@@ -48,8 +48,8 @@ class Url{
 		this.source     = a.href;
 		this.protocol   = a.protocol.replace(':', '');
 		this.origin     = a.origin;
-		this.host       = a.hostname;
-		this.port       = a.port;
+		this.port       = a.port || '80';
+		this.host       = a.hostname + (a.port ? ':'+ a.port : '');
 		this.path       = a.pathname.replace(/^([^\/])/, '$1');
 		// 相对路径
 		this.relative   = (a.href.match(/tps?:\/\/[^\/]+(.*)/) || ['', ''])[1];

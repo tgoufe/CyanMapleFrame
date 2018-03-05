@@ -195,7 +195,7 @@ class WebSocketModel extends Model{
 	 * @return  {Promise}   返回 reject(false)
 	 * @desc    removeData 方法没有意义
 	 * */
-	removeData(topic){
+	removeData(){
 		return Promise.reject( false );
 	}
 	/**

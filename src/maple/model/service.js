@@ -205,7 +205,7 @@ class ServiceModel extends Model{
 	 * @param       {string}            [options.method]
 	 * @param       {boolean}           [isCache=false]     是否优先从本地缓存中读取数据，同时发送请求后数据是否同步到本地缓存，默认为 false
 	 * @return      {Promise}
-	 * @todo    优先从本地 syncTo model 中读取数据，若没有则发送请求
+	 * @desc        优先从本地 syncTo model 中读取数据，若没有则发送请求
 	 * */
 	getData(topic, options={}, isCache=false){
 		let result
@@ -306,6 +306,7 @@ class ServiceModel extends Model{
 	syncTo(model){
 
 		// 判断 model 是继承自 Model 的类但并不继承自 ServiceModel
+		// todo 新加了子类 WebSocketMode 和 EventSourceModel 子类，是否需要判断
 		if( (model instanceof Model) && !(model instanceof ServiceModel) ){
 			this._syncTo = model;
 		}

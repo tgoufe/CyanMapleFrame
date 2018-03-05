@@ -13,7 +13,6 @@ import scroll       from './scroll.js';
 import deviceMotion from './deviceMotion.js';
 import message      from './message.js';
 
-// todo ? 实现页面回退刷新
 // import pageShow     from './pageShow.js';
 
 /**

@@ -37,7 +37,7 @@ function registerServiceWorker(options={}){
 					if( serviceWorker ){
 						// todo 用途
 						serviceWorker.addEventListener('statechange', (e)=>{
-							console.log(e);
+							console.log( e );
 						});
 					}
 
