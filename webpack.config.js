@@ -9,8 +9,9 @@ let webpack = require('webpack')
     })
     //文件入口
     , entry={
-        maple: [path.resolve(__dirname, './src/maple/index.js')]
-		, base: [path.resolve(__dirname, './src/maple/base.js')]
+        // maple: [path.resolve(__dirname, './src/maple/index.js')]
+        // ,
+		base: [path.resolve(__dirname, './src/maple/base.js')]
 		// , 'debounce': [path.resolve(__dirname, './demo/src/javascript/debounce.js')]
 		// , 'throttle': [path.resolve(__dirname, './demo/src/javascript/throttle.js')]
 		// , 'listener': [path.resolve(__dirname, './demo/src/javascript/listener.js')]
@@ -28,7 +29,9 @@ demoPgaeList.forEach(function(i) {
 			collapseWhitespace: true //删除空白符与换行符
 		},
 		template: './demo/html/'+path+'.html',
-		chunks: ['maple', path],
+		chunks: [
+			// 'maple',
+			path],
 		filename: './demo/html/'+path+'.html'
 	}))
 });
