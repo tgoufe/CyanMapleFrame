@@ -5,15 +5,15 @@ let webpack = require('webpack')
 	;
 
 module.exports = {
-	devtool: 'cheap-module-source-map',
+	devtool: 'cheap-module-source-map'
 	//插件项
-	plugins: [
+	, plugins: [
 		// new webpack.optimize.CommonsChunkPlugin({name:'base'}),//提取公共文件
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
 				warnings: false
-			},
-			sourceMap: true
+			}
+			, sourceMap: true
 		}) //压缩JS
 		, new webpack.optimize.CommonsChunkPlugin({
 			name: 'base'
@@ -113,11 +113,11 @@ module.exports = {
 			, chunks: ['base', 'socket']
 			, inject: 'body'
 		})
-	],
+	]
 	//页面入口文件配置
-	entry: {
+	, entry: {
 		base: ['maple']
-		, 'vue-plugin/router': [path.resolve(__dirname, 'src/maple/vue-plugin/router.js')]
+		, 'vue-plugin/router': [path.resolve(__dirname, 'src/vue-plugin/router.js')]
 
 		, index: [path.resolve(__dirname, 'demo/src/javascript/index.js')]
 
@@ -130,51 +130,51 @@ module.exports = {
 		, error:    [path.resolve(__dirname, 'demo/src/javascript/error.js')]
 		, eventSource:    [path.resolve(__dirname, 'demo/src/javascript/eventSource.js')]
 		, socket:    [path.resolve(__dirname, 'demo/src/javascript/socket.js')]
-	},
+	}
 	//入口文件输出配置
-	output: {
-		path: path.resolve(__dirname, 'demo/dist/'),
-		filename: '[name].js'
-	},
-	module: {
+	, output: {
+		path: path.resolve(__dirname, 'demo/dist/')
+		, filename: '[name].js'
+	}
+	, module: {
 		//加载器配置
 		rules: [{
-			test: /\.css$/,
-			loader: 'style-loader!css-loader!sass-loader'
+			test: /\.css$/
+			, loader: 'style-loader!css-loader!sass-loader'
 		}, {
-			test: /\.js$/,
-			loader: 'babel-loader'
+			test: /\.js$/
+			, loader: 'babel-loader'
 		}, {
-			test: /\.scss$/,
-			loader: 'style-loader!css-loader!sass-loader?sourceMap'
+			test: /\.scss$/
+			, loader: 'style-loader!css-loader!sass-loader?sourceMap'
 		}, {
-			test: /\.(png|jpg)$/,
-			loader: 'url-loader?limit=8192'
+			test: /\.(png|jpg)$/
+			, loader: 'url-loader?limit=8192'
 		}, {
-			test: /\.vue$/,
-			loader: 'vue-loader',
-			options: {
+			test: /\.vue$/
+			, loader: 'vue-loader'
+			, options: {
 				loaders: {
-					js: 'babel-loader',
-					css: 'vue-style-loader!css-loader',
-					scss: 'style-loader!css-loader!sass-loader',
-					sass: 'style-loader!css-loader!sass-loader?indentedSyntax'
+					js: 'babel-loader'
+					, css: 'vue-style-loader!css-loader'
+					, scss: 'style-loader!css-loader!sass-loader'
+					, sass: 'style-loader!css-loader!sass-loader?indentedSyntax'
 				}
 			}
 		}, {
-			test: /\.json$/,
-			loader: 'json-loader'
+			test: /\.json$/
+			, loader: 'json-loader'
 		}]
-	},
-	externals:{
+	}
+	, externals:{
 		Vue:'Vue'
-	},
-	resolve: {
+	}
+	, resolve: {
 		modules: ["node_modules", __dirname]
 		, alias: {
 			vue$: 'vue/dist/vue.common.js'
-			, maple: 'src/maple/base.js'
-			, mapleRouter: 'src/maple/vue-plugin/router.js'
+			, maple: 'src/index.js'
+			, mapleRouter: 'src/vue-plugin/router.js'
 		}
 	}
 };

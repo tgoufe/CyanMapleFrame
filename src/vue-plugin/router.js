@@ -6,7 +6,7 @@
  *          提供 v-href 用于替代 a 标签的 href 属性，该命令仅作用于 a 标签上
  * */
 
-import maple from '../base.js';
+import maple from '../index.js';
 
 let router = new maple.Router({
 		mode: maple.device.weixin ? 'hash' : 'history'

@@ -43,12 +43,11 @@
     "lodash": "~4.17.4",
     "vue": "~2.5.13"
   },
-  "main": "dist/base.js",
-  "module": "src/maple/base.js",
+  "main": "dist/",
+  "module": "src/",
   "scripts": {
     "dev": "webpack-dev-server",
     "build": "webpack",
-    "bulidBase": "webpack --config base.webpack.config.js",
     "bulidDemo": "webpack --config demo.webpack.config.js",
     "runDemoServer": "node demo/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

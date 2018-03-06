@@ -7,7 +7,7 @@ import merge    from '../util/merge.js';
  * @function    registerServiceWorker
  * @param       {Object}    [options={}]
  * @param       {string}    options.file
- * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传入 true
+ * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传入注册后的结果
  * */
 function registerServiceWorker(options={}){
 	let config = merge(options, registerServiceWorker._CONFIG)
