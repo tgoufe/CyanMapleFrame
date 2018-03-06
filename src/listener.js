@@ -13,7 +13,7 @@ import HandlerQueue from './util/handlerQueue.js';
  * */
 const LISTENER_CONFIG = {
 		type: ''
-		, target: window || self || null
+		, target: self || null
 		, useCapture: true
 		, passsive: true
 	}
