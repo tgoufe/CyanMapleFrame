@@ -126,72 +126,71 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 	 * */
 	self.addEventListener('push', (event)=>{
 		let data
+			, tag
 			;
 
 		if( event.data ){
 			try{
 				data = event.data.json();
+
+				data.body = data.body || data.message || data.value;
+
+				tag = data.tag = data.tag || Date.now();
 			}
 			catch(e){
+				tag = Date.now();
+
 				data = {
 					title: 'Push'
 					, message: event.data.text()
+					, tag
 				};
 			}
+
+			/**
+			 * self.Notification 方法使用报错，只能使用 showNotification 方法显示桌面通知，但返回值的 Promise resolve 中并没有出入 Notification 实例
+			 * */
+
+			event.waitUntil( self.registration.showNotification(data.title, data).then(()=>{   // 未出入 Notification 实例，所以使用 getNotifications 方法获取对应实例
+
+				self.registration.getNotifications({
+					tag
+				}).then((notifyList)=>{
+					let notify
+						;
+
+					if( notifyList.length === 1 && data.url ){  // 如果推送信息中有 url，为桌面通知添加点击事件，浏览器打开 url 页面
+
+						notify = notifyList[0];
+
+						// todo 添加的事件并没有执行，原因未知
+						notify.addEventListener('click', (e)=>{
+						});
+						notify.addEventListener('notificationclick', (e)=>{
+						});
+
+						notify.onclick = (e)=>{
+							// self.clients.matchAll({
+							// 	type: 'window'
+							// }).then((clientList)=>{
+							// 	let client = clientList.find((client)=>{
+							// 			return client.url === data.url && 'focus' in client;
+							// 		})
+							// 		;
+							//
+							// 	if( client ){
+							// 		return client.focus();
+							// 	}
+							//
+							// 	if( clientList.openWindow ){
+							// 		return clientList.openWindow( data.url );
+							// 	}
+							// });
+						};
+					}
+				});
+			}) );
 		}
-		else{
-			data = {};
-		}
-
-		let timestamp = Date.now()
-			;
-
-		/**
-		 * self.Notification 方法使用报错，只能使用 showNotification 方法显示桌面通知，但返回值的 Promise resolve 中并没有出入 Notification 实例
-		 * */
-
-		event.waitUntil( self.registration.showNotification(data.title, {
-			body: data.message
-			, tag: timestamp
-		}).then(()=>{   // 未出入 Notification 实例，所以使用 getNotifications 方法获取对应实例
-
-			self.registration.getNotifications({
-				tag: timestamp
-			}).then((notifyList)=>{
-				let notify
-					;
-
-				if( notifyList.length === 1 && data.url ){  // 如果推送信息中有 url，为桌面通知添加点击事件，浏览器打开 url 页面
-
-					notify = notifyList[0];
-
-					// todo 添加的事件并没有执行，原因未知
-					notify.addEventListener('click', (e)=>{
-					});
-					notify.addEventListener('notificationclick', (e)=>{
-					});
-
-					notify.onclick = (e)=>{
-						// self.clients.matchAll({
-						// 	type: 'window'
-						// }).then((clientList)=>{
-						// 	let client = clientList.find((client)=>{
-						// 			return client.url === data.url && 'focus' in client;
-						// 		})
-						// 		;
-						//
-						// 	if( client ){
-						// 		return client.focus();
-						// 	}
-						//
-						// 	if( clientList.openWindow ){
-						// 		return clientList.openWindow( data.url );
-						// 	}
-						// });
-					};
-				}
-			});
-		}) );
 	});
 
 	/**
