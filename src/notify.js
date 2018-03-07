@@ -23,22 +23,34 @@ if( 'Notification' in self ){
 			permission = Promise.resolve();
 		}
 		else{	// 用户未设置
-			permission = Notify.requestPermission();
+			if( 'requestPermission' in Notify ){
+				permission = Notify.requestPermission();
+			}
+			else{
+				permission = Promise.reject();
+			}
 		}
 
 		return permission.then(function(){
 
-			return new Promise((resolve)=>{
-				notification = new Notify(title, {
-					icon: icon || '/image/favicon.ico'
-					, body: content
-				});
+			return new Promise((resolve, reject)=>{
+				try{
+					notification = new Notify(title, {
+						icon: icon || '/image/favicon.ico'
+						, body: content
+					});
 
-				notification.onclick = function(){
-					notification.close();
+					notification.onclick = function(){
+						notification.close();
 
-					resolve();
-				};
+						resolve();
+					};
+				}
+				catch(e){
+					console.log( e );
+
+					reject( e );
+				}
 			});
 		});
 	};

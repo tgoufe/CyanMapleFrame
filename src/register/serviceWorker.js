@@ -48,10 +48,18 @@ function registerServiceWorker(options={}){
 					console.log( e );
 				});
 
-				navigator.serviceWorker.ready.then((reg)=>{
-					reg.pushManager.getSubscription().then((res)=>{
+				Notification.requestPermission().then((result)=>{
+					if( result === 'granted' ){
+						navigator.serviceWorker.ready.then((regist)=>{
+							regist.showNotification('您已经开启了信息通知');
+						})
+					}
+				});
+
+				navigator.serviceWorker.ready.then((regist)=>{
+					regist.pushManager.getSubscription().then((res)=>{
 						if( !res ){
-							reg.pushManager.subscribe({
+							regist.pushManager.subscribe({
 								userVisibleOnly: true
 							}).then((sub)=>{
 								console.log('Subscribed! Endpoint', sub.endpoint);

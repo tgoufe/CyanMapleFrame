@@ -5,7 +5,7 @@
  * */
 
 import CacheStorageModel    from '../model/cacheStorage.js';
-import notify               from '../notify.js';
+// import notify               from '../notify.js';
 
 /**
  * @summary     执行 Service Worker 监听事件
@@ -129,29 +129,71 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 			;
 
 		if( event.data ){
-			data = event.data.json();
+			try{
+				data = event.data.json();
+			}
+			catch(e){
+				data = {
+					title: 'Push'
+					, message: event.data.text()
+				};
+			}
 		}
 		else{
 			data = {};
 		}
 
-		let {title, message} = data
+		let timestamp = Date.now()
 			;
 
-		notify(title, message).then(()=>{
-			if( self.clients.openWindow ){
-				// todo 返回路径
+		/**
+		 * self.Notification 方法使用报错，只能使用 showNotification 方法显示桌面通知，但返回值的 Promise resolve 中并没有出入 Notification 实例
+		 * */
 
-				return self.clients.openWindow('');
-			}
-		});
+		event.waitUntil( self.registration.showNotification(data.title, {
+			body: data.message
+			, tag: timestamp
+		}).then(()=>{   // 未出入 Notification 实例，所以使用 getNotifications 方法获取对应实例
 
-		// event.waitUntil( self.registration.showNotification('123123', {
-		// 	body: 'asdfsadfasdf'
-		// }) );
+			self.registration.getNotifications({
+				tag: timestamp
+			}).then((notifyList)=>{
+				let notify
+					;
+
+				if( notifyList.length === 1 && data.url ){  // 如果推送信息中有 url，为桌面通知添加点击事件，浏览器打开 url 页面
+
+					notify = notifyList[0];
+
+					// todo 添加的事件并没有执行，原因未知
+					notify.addEventListener('click', (e)=>{
+					});
+					notify.addEventListener('notificationclick', (e)=>{
+					});
+
+					notify.onclick = (e)=>{
+						// self.clients.matchAll({
+						// 	type: 'window'
+						// }).then((clientList)=>{
+						// 	let client = clientList.find((client)=>{
+						// 			return client.url === data.url && 'focus' in client;
+						// 		})
+						// 		;
+						//
+						// 	if( client ){
+						// 		return client.focus();
+						// 	}
+						//
+						// 	if( clientList.openWindow ){
+						// 		return clientList.openWindow( data.url );
+						// 	}
+						// });
+					};
+				}
+			});
+		}) );
 	});
 
-	// todo 用途
 	/**
 	 * 通知点击事件
 	 * */
@@ -159,28 +201,34 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 
 		event.notification.close();
 
-		event.waitUntil( self.clients.matchAll({
-			type: 'window'
-		}).then((clientList)=>{
-			let client = clientList.find((client)=>{
-					return client.url === '/' && 'focus' in client;
-				})
-				;
+		console.log('桌面通知被点击')
 
-			if( client ){
-				return client.focus();
-			}
+		// todo 统计桌面通知被点击
 
-			if( clientList.openWindow ){
-				return clientList.openWindow('/');
-			}
-		}) );
+		// event.waitUntil( self.clients.matchAll({
+		// 	type: 'window'
+		// }).then((clientList)=>{
+		// 	let client = clientList.find((client)=>{
+		// 			return client.url === '/' && 'focus' in client;
+		// 		})
+		// 		;
+		//
+		// 	if( client ){
+		// 		return client.focus();
+		// 	}
+		//
+		// 	if( clientList.openWindow ){
+		// 		return clientList.openWindow('/');
+		// 	}
+		// }) );
 	});
 	/**
 	 * 通知关闭事件
 	 * */
 	self.addEventListener('notificationclose', (event)=>{
-		console.log('桌面通知关闭');
+		console.log('桌面通知被关闭');
+
+		// todo 统计桌面通知被点击
 	});
 }
 
