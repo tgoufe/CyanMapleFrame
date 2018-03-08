@@ -43,6 +43,10 @@
     "lodash": "~4.17.4",
     "vue": "~2.5.13"
   },
+  "files": [
+    "src/",
+    "dist/"
+  ],
   "main": "dist/",
   "module": "src/",
   "scripts": {
