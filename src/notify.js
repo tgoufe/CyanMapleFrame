@@ -27,7 +27,7 @@ if( 'Notification' in self ){
 				permission = Notify.requestPermission();
 			}
 			else{
-				permission = Promise.reject();
+				permission = Promise.reject('需要请求允许');
 			}
 		}
 

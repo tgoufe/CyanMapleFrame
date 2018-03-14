@@ -49,9 +49,12 @@ class WebSocketModel extends Model{
 					};
 					socket.onclose = (e)=>{
 						console.log( e );
-						this._client = Promise.reject( new Error('该 Web Socket 连接已经被关闭') );
 
-						reject();
+						let error = new Error('该 Web Socket 连接已经被关闭')
+
+						this._client = Promise.reject( error );
+
+						reject( error );
 					};
 					socket.onmessage = (e)=>{
 						let data = e.data
@@ -103,11 +106,14 @@ class WebSocketModel extends Model{
 						}
 					};
 					socket.onerror = (e)=>{
-						this._client = Promise.reject( new Error('该 Web Socket 出现异常进而关闭') );
+						console.log( e );
 
-						 console.log( e );
-						
-						reject();
+						let error = new Error('该 Web Socket 出现异常进而关闭')
+							;
+
+						this._client = Promise.reject( error );
+
+						reject( error );
 					};
 
 					if( this._config.binaryType ){

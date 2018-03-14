@@ -111,41 +111,30 @@ class ServiceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	_reqInterceptor(topic, options){
-		let condition = (rs)=>{
-				let result = rs.some((d)=>{
-						return d === false;
-					})
-					;
-
-				if( result ){
-					return Promise.reject();
-				}
-				else{
-					return Promise.resolve();
-				}
-			}
-			;
-
 		console.log('执行全局请求拦截器', topic);
-		return Promise.all( ServiceModel.interceptor.req.fireAll(topic, options) ).then( condition ).then(()=>{
+
+		return ServiceModel.interceptor.req.fireReduce({topic, options}).then(({topic, options})=>{
 			console.log('执行局部请求拦截器', topic);
 
-			return Promise.all( this.interceptor.req.fireAll(topic, options) );
-		}).then( condition );
+			return this.interceptor.req.fireReduce({topic, options});
+		});
 	}
 	/**
 	 * @summary 执行响应拦截器进行验证
 	 * @private
-	 * @param   {Object}    res
+	 * @param   {Object}    result
+	 * @param   {String}    result.topic
+	 * @param   {Object}    result.options
+	 * @param   {Object}    result.res
 	 * @return  {Promise}
 	 * */
-	_resInterceptor(res){
-		console.log('执行全局响应拦截器');
+	_resInterceptor({topic, options, res}){
+		console.log('执行全局响应拦截器', topic);
 
-		return ServiceModel.interceptor.res.fireReduce( res ).then((res)=>{
-			console.log('执行局部响应拦截器');
+		return ServiceModel.interceptor.res.fireReduce({topic, options, res}).then(({topic, options, res})=>{
+			console.log('执行局部响应拦截器', topic);
 
-			return this.interceptor.res.fireReduce( res );
+			return this.interceptor.res.fireReduce({topic, options, res});
 		});
 	}
 
@@ -178,16 +167,18 @@ class ServiceModel extends Model{
 		if( topic ){
 			
 			// 执行请求拦截器
-			result = this._reqInterceptor(topic, options).then(()=>{
+			result = this._reqInterceptor(topic, options).then(({topic, options})=>{
 
 				// 发送请求，向服务器发送数据
 				console.log('发送 post 请求', topic);
 
 				return request(topic, options);
-			}).then((res)=>{
+			}).then((result)=>{
 
 				// 执行响应拦截器
-				return this._resInterceptor( res );
+				return this._resInterceptor( result );
+			}).then((result)=>{
+				return result.res;
 			});
 		}
 		else{   // topic 无值不做任何处理
@@ -228,7 +219,7 @@ class ServiceModel extends Model{
 				result = this._syncTo.getData( topic );
 			}
 			else{
-				result = Promise.reject();
+				result = Promise.reject('没有同步缓存');
 
 				topic = this._config.baseUrl + topic;
 
@@ -247,10 +238,12 @@ class ServiceModel extends Model{
 					console.log('发送 get 请求', topic);
 
 					return request(topic, options);
-				}).then((res)=>{
+				}).then((result)=>{
 
 					// 执行响应拦截器
-					return this._resInterceptor( res );
+					return this._resInterceptor( result );
+				}).then((result)=>{
+					return result.res;
 				}).then((data)=>{   // 将数据同步
 					let result
 						;

@@ -14,12 +14,16 @@ import $    from 'jquery';
  * 发送请求方法
  * @param   {string}    topic
  * @param   {Object}    options
- * @return  {Promise}
+ * @return  {Promise}   在 resolve 时返回由 topic, options, response 所组成的对象
  * */
 let request = (topic, options)=>{
 	try{
 		return $.ajax(topic, options).then((res)=>{
-			return res;
+			return {
+				topic
+				, options
+				, res
+			};
 		}, (msg)=>{
 			return Promise.reject( msg );
 		});
