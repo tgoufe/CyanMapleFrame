@@ -125,16 +125,17 @@ class ServiceModel extends Model{
 	 * @param   {Object}    result
 	 * @param   {String}    result.topic
 	 * @param   {Object}    result.options
-	 * @param   {Object}    result.res
+	 * @param   {Object}    [result.res]
+	 * @param   {Error}     [result.error]
 	 * @return  {Promise}
 	 * */
-	_resInterceptor({topic, options, res}){
-		console.log('执行全局响应拦截器', topic);
+	_resInterceptor(result){
+		console.log('执行全局响应拦截器', result.topic);
 
-		return ServiceModel.interceptor.res.fireReduce({topic, options, res}).then(({topic, options, res})=>{
-			console.log('执行局部响应拦截器', topic);
+		return ServiceModel.interceptor.res.fireReduce( result ).then((result)=>{
+			console.log('执行局部响应拦截器', result.topic);
 
-			return this.interceptor.res.fireReduce({topic, options, res});
+			return this.interceptor.res.fireReduce( result );
 		});
 	}
 
@@ -185,6 +186,8 @@ class ServiceModel extends Model{
 					return Promise.reject( result.error );
 				}
 				else{
+					console.log('未知错误', result.topic);
+
 					return Promise.reject( new Error('未知错误') );
 				}
 			});
@@ -251,7 +254,17 @@ class ServiceModel extends Model{
 					// 执行响应拦截器
 					return this._resInterceptor( result );
 				}).then((result)=>{
-					return result.res;
+					if( 'res' in result ){
+						return result.res;
+					}
+					else if( 'error' in result ){
+						return Promise.reject( result.error );
+					}
+					else{
+
+						return Promise.reject( new Error('未知错误') );
+					}
+
 				}).then((data)=>{   // 将数据同步
 					let result
 						;
