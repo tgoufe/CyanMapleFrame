@@ -24,8 +24,21 @@ let request = (topic, options)=>{
 				, options
 				, res
 			};
-		}, (msg)=>{
-			return Promise.reject( msg );
+		}, (xhr, textStatus, msg)=>{
+			let error = new Error( msg )
+				;
+
+			error.textStatus = textStatus;
+			error.xhr = xhr;
+
+			console.log( error );
+
+			return {
+				topic
+				, options
+				, error
+			};
+			// return Promise.reject( msg );
 		});
 	}
 	catch(e){
