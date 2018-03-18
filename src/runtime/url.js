@@ -49,7 +49,7 @@ class Url{
 		this.protocol   = a.protocol.replace(':', '');
 		this.origin     = a.origin;
 		this.port       = a.port || '80';
-		this.host       = a.hostname + (a.port ? ':'+ a.port : '');
+		this.host       = a.hostname + (a.port !== '80' ? ':'+ a.port : '');
 		this.path       = a.pathname.replace(/^([^\/])/, '$1');
 		// 相对路径
 		this.relative   = (a.href.match(/tps?:\/\/[^\/]+(.*)/) || ['', ''])[1];
@@ -129,7 +129,6 @@ class Url{
 	pack(){
 		return this.protocol +'://'+
 			this.host +
-			(!this.port || this.port === '80' ? '' : ':'+ this.port) +
 			this.path +
 			this.query +
 			(this.hash ? '#'+ this.hash : '');
