@@ -5,11 +5,12 @@ import merge    from '../util/merge.js';
 /**
  * @summary     注册 Service Worker
  * @function    registerServiceWorker
- * @param       {Object}    [options={}]
- * @param       {string}    options.file
+ * @param       {Object}        [options={}]
+ * @param       {string}        options.file
+ * @param       {string|Object} [welcome='']
  * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传入注册后的结果
  * */
-function registerServiceWorker(options={}){
+function registerServiceWorker(options={}, welcome=''){
 	let config = merge(options, registerServiceWorker._CONFIG)
 		;
 
@@ -51,8 +52,18 @@ function registerServiceWorker(options={}){
 				Notification.requestPermission().then((result)=>{
 					if( result === 'granted' ){
 						navigator.serviceWorker.ready.then((regist)=>{
-							regist.showNotification('您已经开启了信息通知');
-						})
+							if( !welcome ){
+								return;
+							}
+
+							if( typeof welcome === 'string' ){
+
+								welcome && regist.showNotification(welcome);
+							}
+							else if( typeof welcome === 'object' ){
+								welcome.title && regist.showNotification(welcome.title, welcome);
+							}
+						});
 					}
 				});
 
