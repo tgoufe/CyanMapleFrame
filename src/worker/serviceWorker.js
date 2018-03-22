@@ -32,7 +32,11 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 		console.log('Service Worker 安装完成，install event', event);
 
 		// 预加载
-		event.waitUntil( preCache.addAll( cacheUrls ).then(self.skipWaiting(), (e)=>{
+		event.waitUntil( preCache.addAll( cacheUrls ).then(()=>{
+			console.log('已预缓存', cacheUrls);
+
+			return self.skipWaiting();
+		}, (e)=>{
 			// 安装失败  todo 发送记录
 			console.log( e );
 		}) );
@@ -100,6 +104,7 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 
 				// 判断是否为一个异常的响应
 				if( !response || response.status !== 200 || response.type !== 'basic' ){
+					console.log('不缓存', event.request.url, 'status: ', response.status, 'type: ', response.type);
 					// 异常响应，跨域资源，不缓存直接返回
 					// 跨域资源 response.status 会返回 0
 				}
@@ -142,7 +147,7 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 
 				data = {
 					title: 'Push'
-					, message: event.data.text()
+					, body: event.data.text()
 					, tag
 				};
 			}
