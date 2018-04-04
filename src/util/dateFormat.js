@@ -15,8 +15,8 @@ import tools from './tools.js';
  * @return      {string}
  * */
 let dateFormat = function(date=new Date(), format='YYYY-MM-DD'){
-	return format.replace(/YYYY|YY|MM|DD|hh|mm|ss|星期|周|www|week/, function(str){
-		return str in dateFormat._dateStrReplace ? dateFormat[str]( date ) : '';
+	return format.replace(/(YYYY|YY|MM|DD|hh|mm|ss|星期|周|www|week)/g, function(str){
+		return str in dateFormat._dateStrReplace ? dateFormat._dateStrReplace[str]( date ) : '';
 	});
 };
 
