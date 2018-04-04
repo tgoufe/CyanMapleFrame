@@ -14,8 +14,9 @@ import HandlerQueue from './util/handlerQueue.js';
 const LISTENER_CONFIG = {
 		type: ''
 		, target: self || null
-		, useCapture: true
-		, passsive: true
+		, capture: true
+		, passsive: false
+		, once: false
 	}
 	;
 
@@ -31,9 +32,9 @@ class Listener{
 	 * @param   {Object}                    config
 	 * @param   {string}                    config.type
 	 * @param   {Window|Document|Object}    [config.target]
-	 * @param   {boolean}                   [config.useCapture]
+	 * @param   {boolean}                   [config.capture]
 	 * @param   {boolean}                   [config.passive]
-	 * @todo    处理 passive 参数
+	 * @param   {boolean}                   [config.once]
 	 * */
 	constructor(config={}){
 
@@ -124,7 +125,7 @@ class Listener{
 		this._listener = this._queueExecute();
 
 		if( 'addEventListener' in this._config.target ){
-			this._config.target.addEventListener(this._config.type, this._listener, this._config.useCapture);
+			this._config.target.addEventListener(this._config.type, this._listener, this._config);
 		}
 
 		this._isListening = true;
@@ -146,7 +147,7 @@ class Listener{
 		if( typeof isAll === 'boolean' && isAll ){
 
 			if( 'removeEventListener' in this._config.target ){
-				this._config.target.removeEventListener(this._config.type, this._listener, this._config.useCapture);
+				this._config.target.removeEventListener(this._config.type, this._listener, this._config);
 			}
 
 			this._isListening = false;
@@ -174,6 +175,10 @@ class Listener{
 		argv.unshift( event );
 
 		this._listener.apply(context, argv);
+
+		if( this._config.once ){    // 事件只执行一次，接触事件绑定
+			this.off();
+		}
 	}
 }
 
@@ -183,8 +188,9 @@ class Listener{
  * @param       {string|ListenerCallback}           [type]                  事件类型，当类型为 function 时视为 callback，将其赋值给 callback，将 type 设置为 null，若 target 不为字符串类型则会报错
  * @param       {ListenerCallback|Object}           [callback={}]           回调函数，当类型为 object 时视为 options，将其赋值给 options，将 callback 设置为 null
  * @param       {Object}                            [options={}]            配置参数与 Listener 参数相同
- * @param       {boolean}                           [options.useCapture]
+ * @param       {boolean}                           [options.capture]
  * @param       {boolean}                           [options.passive]
+ * @param       {boolean}                           [options.once]
  * @return      {Listener}
  * @desc        可以穿四个参数，最少传一个参数，若只传一个参数会视为 type
  * */

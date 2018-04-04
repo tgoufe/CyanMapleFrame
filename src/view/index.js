@@ -35,11 +35,11 @@ let needRefreshOn = false
 		}
 
 		window.onunload = ()=>{};
-		// window.onpagehide = ()=>{
-		// 	window.onpageshow = ()=>{
-		// 		location.reload();
-		// 	}
-		// };
+		window.onpagehide = ()=>{
+			window.onpageshow = ()=>{
+				location.reload();
+			}
+		};
 
 		needRefreshOn = true;
 	}
@@ -70,10 +70,11 @@ let needRefreshOn = false
 	 * @summary     向其它窗口 或 Web Worker 发送消息
 	 * @function
 	 * @memberOf    maple.view
-	 * @param       {Window|Worker} targetWindow
-	 * @param       {*}             message
-	 * @param       {string}        [targetOrigin='*']  * 表示无限制，也可以是一个 url
-	 * @param       {*}             [transfer]
+	 * @param       {Window|Worker|MessageHandler}  targetWindow
+	 * @param       {*}                             message
+	 * @param       {string}                        [targetOrigin='*']  * 表示无限制，也可以是一个 url
+	 * @param       {*}                             [transfer]
+	 * @desc        MessageHandler 为 iOS 下原生与 JS 交互的接口
 	 * */
 	, postMessage = (targetWindow, message, targetOrigin='*', transfer)=>{
 		targetWindow.postMessage(message, targetOrigin, transfer);

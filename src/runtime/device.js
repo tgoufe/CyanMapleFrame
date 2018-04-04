@@ -122,13 +122,6 @@ device.webView = (iphone || ipad || ipod) && ua.match(/.*AppleWebKit(?!.*Safari)
 // 		$metaViewport.attr('content').indexOf('minimal-ui') >= 0;
 // }
 
-// Check for status bar and fullscreen app mode
-let windowHeight = document.documentElement.clientHeight
-	, windowWidth = document.documentElement.clientWidth
-	;
-
-device.statusBar = device.webView && (windowWidth * windowHeight === screen.width * screen.height);
-
 // Pixel Ratio
 device.pixelRatio = window.devicePixelRatio || 1;
 
@@ -148,6 +141,15 @@ device.alipay = ua.indexOf("AlipayClient") > 0;
  * @memberOf    maple
  * */
 export default device;
+
+
+// todo 更换位置，期望与 document 解耦
+// Check for status bar and fullscreen app mode
+let windowHeight = document.documentElement.clientHeight
+	, windowWidth = document.documentElement.clientWidth
+	;
+
+device.statusBar = device.webView && (windowWidth * windowHeight === screen.width * screen.height);
 
 // /**
 //  * todo 更换位置

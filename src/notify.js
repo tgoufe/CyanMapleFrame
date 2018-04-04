@@ -3,9 +3,11 @@
 /**
  * 显示桌面通知
  * @function    notify
- * @param       {string}    title
- * @param       {string}    content
- * @param       {string}    [icon]
+ * @param       {string}        title
+ * @param       {string|Object} content
+ * @param       {string}        content.body
+ * @param       {string}        [content.icon]
+ * @param       {string}        [icon]
  * @return      {Promise}
  * */
 let notify
@@ -35,10 +37,15 @@ if( 'Notification' in self ){
 
 			return new Promise((resolve, reject)=>{
 				try{
-					notification = new Notify(title, {
-						icon: icon || '/image/favicon.ico'
-						, body: content
-					});
+					if( typeof content === 'object' ){
+						notification = new Notify(title, content);
+					}
+					else{
+						notification = new Notify(title, {
+							icon: icon || '/image/favicon.ico'
+							, body: content
+						});
+					}
 
 					notification.onclick = function(){
 						notification.close();

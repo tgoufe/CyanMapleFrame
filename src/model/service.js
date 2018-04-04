@@ -315,6 +315,7 @@ class ServiceModel extends Model{
 	 * @summary     将数据同步到本地存储，一次只能设置一个本地缓存
 	 * @override
 	 * @param       {Model}     model
+	 * @return      {Model}     返回 this
 	 * @todo        目前只能将数据同步到一个本地缓存中，是否考虑可以同步到多个本地缓存，亦或由本地缓存之间设置同步
 	 * */
 	syncTo(model){
@@ -324,6 +325,8 @@ class ServiceModel extends Model{
 		if( (model instanceof Model) && !(model instanceof ServiceModel) ){
 			this._syncTo = model;
 		}
+
+		return this;
 	}
 }
 

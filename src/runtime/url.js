@@ -174,9 +174,18 @@ class Url{
 		let source = this.source
 			;
 
-		Url._INDEX.filter( k => k !== 'query' ).forEach((k)=>{
-			this[k] = url[k];
-		});
+		Url._INDEX.reduce((target, k)=>{
+			
+			if( k !== 'query' ){
+				target[k] = url[k];
+			}
+
+			return target;
+		}, this);
+
+		// Url._INDEX.filter( k => k !== 'query' ).forEach((k)=>{
+		// 	this[k] = url[k];
+		// });
 
 		this.from = source;
 

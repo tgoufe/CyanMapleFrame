@@ -7,6 +7,7 @@ import merge    from '../util/merge.js';
  * @function    registerServiceWorker
  * @param       {Object}        [options={}]
  * @param       {string}        options.file
+ * @param       {string}        options.applicationServerKey
  * @param       {string|Object} [welcome='']
  * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传入注册后的结果
  * */
@@ -36,9 +37,9 @@ function registerServiceWorker(options={}, welcome=''){
 					}
 
 					if( serviceWorker ){
-						// todo 用途
+						// 监听 Service Worker 状态变化
 						serviceWorker.addEventListener('statechange', (e)=>{
-							console.log( e );
+							console.log('state chagne:', e.target.state);
 						});
 					}
 
@@ -49,9 +50,12 @@ function registerServiceWorker(options={}, welcome=''){
 					console.log( e );
 				});
 
-				Notification.requestPermission().then((result)=>{
-					if( result === 'granted' ){
-						navigator.serviceWorker.ready.then((regist)=>{
+				navigator.serviceWorker.ready.then((regist)=>{
+					/**
+					 * 注册成功显示桌面提示
+					 * */
+					Notification.requestPermission().then((result)=>{
+						if( result === 'granted' ){
 							if( !welcome ){
 								return;
 							}
@@ -63,27 +67,49 @@ function registerServiceWorker(options={}, welcome=''){
 							else if( typeof welcome === 'object' ){
 								welcome.title && regist.showNotification(welcome.title, welcome);
 							}
-						});
-					}
-				});
+						}
+					});
 
-				navigator.serviceWorker.ready.then((regist)=>{
-					regist.pushManager.getSubscription().then((res)=>{
-						if( !res ){
-							regist.pushManager.subscribe({
+					/**
+					 * 订阅推送信息
+					 * */
+					regist.pushManager.getSubscription().then((subscription)=>{ // 获取当前已订阅
+						if( !subscription ){    // 未订阅
+							subscription = regist.pushManager.subscribe({
 								userVisibleOnly: true
 							}).then((sub)=>{
-								console.log('Subscribed! Endpoint', sub.endpoint);
+								console.log('订阅成功', sub.endpoint);
+
+								return subscription;
+							}).catch((e)=>{
+								// 订阅失败 todo 发送请求
+								console.log('订阅失败', e);
+
+								return Promise.reject( new Error('订阅失败') );
 							});
 						}
 						else{
-							console.log('remain endpoint', res.endpoint);
+							console.log('已经订阅', subscription.endpoint);
 						}
+
+						return subscription;
+					}).then(({endpoint})=>{
+						// 将 endpoint 订阅信息发送到服务器端保存
 					});
+
+					/**
+					 * 当 Service Worker 未注册成功时
+					 * navigator.serviceWorker.controller 的值为 null
+					 * */
+					if( navigator.serviceWorker.controller ){
+						resolve( navigator.serviceWorker.controller );
+					}
+					else{
+						reject();
+					}
+					// resolve( registerServiceWorker._CACHE[config.file] );
 				});
 			}
-
-			resolve( registerServiceWorker._CACHE[config.file] );
 		}
 		else{
 			reject( new Error('该浏览器不支持 Service Worker') );

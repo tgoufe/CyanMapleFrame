@@ -7,14 +7,27 @@
 import CacheStorageModel    from '../model/cacheStorage.js';
 // import notify               from '../notify.js';
 
+const IMAGE_EXT = [
+		'png'
+		, 'jpg'
+		, 'jpeg'
+		, 'gif'
+		, 'bmp'
+		, 'webp'
+	]
+	;
+
 /**
  * @summary     执行 Service Worker 监听事件
  * @function
- * @param       {string[]}  [cacheUrls=[]]
- * @param       {string}    [preCacheName='precache']
- * @param       {string}    [runtimeCacheName='runtime']
+ * @param       {string[]}      [cacheUrls=[]]
+ * @param       {string}        [preCacheName='precache']
+ * @param       {string}        [runtimeCacheName='runtime']
+ * @param       {Object}        [errorHandler=[]]
+ * @param       {string|Array}  [errorHandler[].ext]
+ * @param       {Function}      [errorHandler[].handler]
  * */
-function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheName='runtime'){
+function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheName='runtime', errorHandler=[]){
 	const preCache = new CacheStorageModel({
 			cacheName: preCacheName
 		})
@@ -35,6 +48,10 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 		event.waitUntil( preCache.addAll( cacheUrls ).then(()=>{
 			console.log('已预缓存', cacheUrls);
 
+			/**
+			 * self.skipWaiting 跳过等待激活新的 Service Worker
+			 * 让 Service Worker 进入 activate 状态
+			 * */
 			return self.skipWaiting();
 		}, (e)=>{
 			// 安装失败  todo 发送记录
@@ -54,21 +71,31 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 			, [preCacheName, runtimeCacheName]
 		]).then(([keyList, cacheNames])=>{
 
+			return Promise.all( keyList.reduce((all, key)=>{
+				if( cacheNames.indexOf(key) === -1 ){
+					all.push( preCache.cacheDelete(key) );
+				}
+
+				return all;
+			}, []) );
+
 			return Promise.all( keyList.filter((key)=>{
 				return cacheNames.indexOf(key) === -1;
 			}).map((key)=>{
 				return preCache.cacheDelete( key );
 			}) );
 		}).then(()=>{
-			// todo ?
+			/**
+			 * self.clients.claim 设置本身为 active 的 Service Worker
+			 * */
 			return self.clients.claim();
 
 			// self.clients.claim().then(()=>{
 			// 	return self.clients.matchAll({
 			// 		type: 'window'
 			// 	});
-			// }).then((clientList)=>{
-			// 	return clientList.filter((client)=>{
+			// }).then((clients)=>{
+			// 	return clients.filter((client)=>{
 			// 		return 'navigate' in client;
 			// 	}).map((client)=>{
 			// 		return client.navigate('activated.html');
@@ -81,17 +108,38 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 	 * 请求拦截
 	 * */
 	self.addEventListener('fetch', (event)=>{
+		let request = event.request
+			;
 
-		event.respondWith( runtimeCache.getData( event.request ).then((response)=>{
+		// 判断为跨域请求
+		if( request.url.search(location.host) === -1 ){
+			request = new Request(request.url, {
+				mode: 'cors'
+			});
+		}
+
+		// 克隆该请求，Request 对象是 stream 类型的，只能读取一次
+		event.respondWith( runtimeCache.getData( request.clone() ).then((response)=>{
 			let result
 				;
 
 			if( response ){
+
+				// // todo 判断是否需要更新资源
+				// if( isNeedRefresh ){
+				// 	result = Promise.reject({
+				// 		message: '需要更新资源'
+				// 	});
+				// }
+				// else{
+				// 	result = response;
+				// }
+
 				result = response;
 			}
 			else{
 				result = Promise.reject({
-					message: '不存在 '+ event.request.url +' 的相关缓存'
+					message: '不存在 '+ request.url +' 的相关缓存'
 				});
 			}
 
@@ -99,18 +147,88 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 		}).catch((e)=>{
 			console.log( e && e.message );
 
-			// 克隆该请求，Request 对象是 stream 类型的，只能读取一次
-			return fetch( event.request.clone() ).then((response)=>{
+			return fetch( request ).then((response)=>{
+				let isCache = false
+					;
 
 				// 判断是否为一个异常的响应
 				if( !response || response.status !== 200 || response.type !== 'basic' ){
-					console.log('不缓存', event.request.url, 'status: ', response.status, 'type: ', response.type);
+
+					if( response.status > 200 && response.status < 400 ){
+
+					}
+
+					console.log('不缓存', request.url, 'status: ', response.status, 'type: ', response.type);
 					// 异常响应，跨域资源，不缓存直接返回
 					// 跨域资源 response.status 会返回 0
+					// response.type:
+					// basic    标准值
+					// cors     跨域请求
+					// error    网络错误
+					// opaque   响应 no-cors 的跨域请求
+
+					// todo 离线时处理
+					if( errorHandler && Array.isArray(errorHandler) && errorHandler.length ){
+						let index = errorHandler.findIndex((d)=>{
+								if( typeof d.ext === 'string' ){
+									return event.request.endsWith('.'+ d.ext);
+								}
+								else if( Array.isArray( d.ext ) ){
+									return d.ext.some((ext)=>{
+										return event.request.endsWith('.'+ ext);
+									});
+								}
+								else if( d.ext instanceof RegExp ){
+									return d.ext.test( event.request.url );
+								}
+
+								return false;
+							})
+							, result = null
+							;
+
+						if( index !== -1 ){
+							result = errorHandler[index].handler(request, response);
+						}
+
+						if( result instanceof Response ){
+							response = result;
+						}
+					}
+					/**
+					 * 当为图片时
+					 * */
+					// let isImg = IMAGE_EXT.some((ext)=>{
+					// 		return request.endsWith('.'+ ext);
+					// 	})
+					// 	;
+					//
+					// if( isImg ){
+					// 	/**
+					// 	 * 返回占位图
+					// 	 * */
+					// 	response = new Response('', {
+					// 		headers: {
+					// 			'Content-Type': 'image/svg+xml'
+					// 			, 'Cache-Control': 'no-store'
+					// 		}
+					// 	})
+					// }
 				}
 				else{
-					runtimeCache.setData(event.request, response.clone()).then(()=>{
-						console.log('已缓存 '+ event.request.url);
+					// todo 判断哪些请求需要缓存
+
+					if( request.method === 'GET' ){   // GET 类请求
+						/**
+						 * CacheStorage 只能缓存 GET 请求
+						 * */
+						isCache = true;
+					}
+				}
+
+				if( isCache ){
+					runtimeCache.setData(request, response.clone()).then(()=>{
+						console.log('已缓存 '+ request.url);
 					});
 				}
 
@@ -123,7 +241,14 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 	 * 收到消息事件
 	 * */
 	self.addEventListener('message', (event)=>{
+		// todo 消息处理
+		self.clients.matchAll().then((clients)=>{
+			clients.forEach((client)=>{
 
+				// event.source 为消息来源的页面
+				client.postMessage( event.data );
+			});
+		});
 	});
 
 	/**
@@ -156,46 +281,58 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 			 * self.Notification 方法使用报错，只能使用 showNotification 方法显示桌面通知，但返回值的 Promise resolve 中并没有出入 Notification 实例
 			 * */
 
-			event.waitUntil( self.registration.showNotification(data.title, data).then(()=>{   // 未出入 Notification 实例，所以使用 getNotifications 方法获取对应实例
-
-				self.registration.getNotifications({
-					tag
-				}).then((notifyList)=>{
-					let notify
-						;
-
-					if( notifyList.length === 1 && data.url ){  // 如果推送信息中有 url，为桌面通知添加点击事件，浏览器打开 url 页面
-
-						notify = notifyList[0];
-
-						// todo 添加的事件并没有执行，原因未知
-						notify.addEventListener('click', (e)=>{
-						});
-						notify.addEventListener('notificationclick', (e)=>{
-						});
-
-						notify.onclick = (e)=>{
-							// self.clients.matchAll({
-							// 	type: 'window'
-							// }).then((clientList)=>{
-							// 	let client = clientList.find((client)=>{
-							// 			return client.url === data.url && 'focus' in client;
-							// 		})
-							// 		;
-							//
-							// 	if( client ){
-							// 		return client.focus();
-							// 	}
-							//
-							// 	if( clientList.openWindow ){
-							// 		return clientList.openWindow( data.url );
-							// 	}
-							// });
-						};
-					}
-				});
-			}) );
+			/**
+			 * event.waitUntil 接收 Promise 类型参数，等到 Promise 完成时，事件才最终完成
+			 * */
+			event.waitUntil( self.registration.showNotification(data.title, data)
+			// 	.then(()=>{   // 未传入 Notification 实例，所以使用 getNotifications 方法获取对应实例
+			//
+			// 	self.registration.getNotifications({
+			// 		tag
+			// 	}).then((notifyList)=>{
+			// 		let notify
+			// 			;
+			//
+			// 		if( notifyList.length === 1 && data.url ){  // 如果推送信息中有 url，为桌面通知添加点击事件，浏览器打开 url 页面
+			//
+			// 			notify = notifyList[0];
+			//
+			// 			// todo 添加的事件并没有执行，原因未知
+			// 			notify.addEventListener('click', (e)=>{
+			// 			});
+			// 			notify.addEventListener('notificationclick', (e)=>{
+			// 			});
+			//
+			// 			notify.onclick = (e)=>{
+			// 				// self.clients.matchAll({
+			// 				// 	type: 'window'
+			// 				// }).then((clients)=>{
+			// 				// 	let client = clients.find((client)=>{
+			// 				// 			return client.url === data.url && 'focus' in client;
+			// 				// 		})
+			// 				// 		;
+			// 				//
+			// 				// 	if( client ){
+			// 				// 		return client.focus();
+			// 				// 	}
+			// 				//
+			// 				// 	if( clients.openWindow ){
+			// 				// 		return clients.openWindow( data.url );
+			// 				// 	}
+			// 				// });
+			// 			};
+			// 		}
+			// 	});
+			// })
+			);
 		}
+	});
+
+	/**
+	 * 订阅状态改变事件
+	 * */
+	self.addEventListener('pushsubscriptionchange', (event)=>{
+		// todo 重新订阅
 	});
 
 	/**
@@ -205,14 +342,19 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 
 		event.notification.close();
 
-		console.log('桌面通知被点击')
+		console.log('桌面通知被点击');
+
+		if( event.notification.data ){
+			// 打开新窗口
+			event.waitUntil( self.clients.openWindow(event.notification.data) );
+		}
 
 		// todo 统计桌面通知被点击
 
 		// event.waitUntil( self.clients.matchAll({
 		// 	type: 'window'
-		// }).then((clientList)=>{
-		// 	let client = clientList.find((client)=>{
+		// }).then((clients)=>{
+		// 	let client = clients.find((client)=>{
 		// 			return client.url === '/' && 'focus' in client;
 		// 		})
 		// 		;
@@ -221,8 +363,8 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 		// 		return client.focus();
 		// 	}
 		//
-		// 	if( clientList.openWindow ){
-		// 		return clientList.openWindow('/');
+		// 	if( clients.openWindow ){
+		// 		return clients.openWindow('/');
 		// 	}
 		// }) );
 	});

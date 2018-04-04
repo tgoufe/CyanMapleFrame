@@ -4,9 +4,26 @@ let express = require('express')
 	, web   = express()
 	, webServer
 
+	, bodyParser    = require('body-parser')
+	, cookie        = require('cookie')
+	, cookieParser  = require('cookie-parser')
+	, session       = require('express-session')
+	, sessionStore  = new session.MemoryStore()
+
 	, WebSocket = require('ws')
 	, webSocketServer
 	;
+
+web.use( bodyParser.json() );
+web.use( bodyParser.urlencoded({extended: true}) );
+web.use( cookieParser() );
+web.use( session({
+	store: sessionStore
+	, secret: 'secret'
+	, key: 'express.sid'
+	, resave: false
+	, saveUninitialized: true
+}) );
 
 web.use('/', express.static(__dirname +'/../dist/'));
 
@@ -29,7 +46,7 @@ web.get('/test/sse', function(req, res){
 				}
 			}) +'\n\n' );
 		}, 5000)
-	;
+		;
 
 	req.connection.on('end', function(){
 		console.log('浏览器关闭或客户端断开连接');
@@ -52,6 +69,20 @@ webSocketServer = new WebSocket.Server({
 
 webSocketServer.on('connection', (ws, req)=>{
 	console.log('浏览器建立连接');
+
+	ws.req = req;
+
+	let cookies = cookie.parse( req.headers.cookie )
+		, sid = cookieParser.signedCookie(cookies['express.sid'], 'secret')
+		;
+
+	sessionStore.get(sid, function(err, ss){
+		if( err ){
+			return;
+		}
+		
+		sessionStore.createSession(req, ss);
+	});
 
 	ws.on('message', (message)=>{
 		console.log('收到浏览器端发送信息', message);

@@ -6,6 +6,7 @@
  *          该接口并不会被暴露为框架接口，仅作为二次开发时覆盖用
  *          框架发送 ajax 仍然应使用 ServiceModel 的实例来进行发送
  * @todo    替换为自开发请求类库
+ * @todo    优先使用 fetch 接口，降级使用 XMLHttpRequest
  * */
 
 import $    from 'jquery';

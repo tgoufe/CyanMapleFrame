@@ -515,9 +515,12 @@ class Model{
 	/**
 	 * @summary 绑定数据监视事件
 	 * @param   {ModelChangeEvent}  callback
+	 * @return  {Model}             返回 this
 	 * */
 	on(callback){
 		this._listener.add( callback );
+
+		return this;
 	}
 	/**
 	 * @summary 解除绑定数据监控回调函数
@@ -525,11 +528,14 @@ class Model{
 	 * */
 	off(callback){
 		this._listener.off( callback );
+
+		return this;
 	}
 
 	/**
 	 * @summary 将当前 model 的数据同步到其它 model
-	 * @param   {Model|Model[]}   model
+	 * @param   {Model|Model[]} model
+	 * @return  {Model}         返回 this
 	 * */
 	syncTo(model){
 		if( !Array.isArray(model) ){
@@ -548,10 +554,13 @@ class Model{
 				console.log('该实例类型已经存在');
 			}
 		});
+
+		return this;
 	}
 	/**
 	 * @summary 清除数据同步
 	 * @param   {Model} model
+	 * @return  {Model} 返回 this
 	 * */
 	cleanSync(model){
 		let i = this._syncList.indexOf( model )
@@ -560,6 +569,8 @@ class Model{
 		if( i !== -1 ){
 			this._syncList.splice(i, 1);
 		}
+
+		return this;
 	}
 
 	/**

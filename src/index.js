@@ -86,11 +86,8 @@ import unHandledRejection   from './errorHandler/unHandledRejection.js';
 import position from './position.js';
 
 /**
- * todo 实验性功能
- * */
-
-/**
  * ---------- 动画库 ----------
+ * todo 实验性功能
  * */
 import * as animate from './animate/index.js';
 
