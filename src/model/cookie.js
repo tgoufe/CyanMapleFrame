@@ -352,6 +352,16 @@ class CookieModel extends Model{
 	getCookieLength(){
 		return this._enabled ? document.cookie.length : 0;
 	}
+
+	/**
+	 * @summary 类构造失败时的回调接口
+	 * @param   {Function}  callback
+	 * */
+	catch(callback){
+		if( typeof callback === 'function' ){
+			this._store.catch( callback );
+		}
+	}
 }
 
 /**

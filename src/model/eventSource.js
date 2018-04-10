@@ -132,6 +132,16 @@ class EventSourceModel extends Model{
 			return true;
 		});
 	}
+
+	/**
+	 * @summary 类构造失败时的回调接口
+	 * @param   {Function}  callback
+	 * */
+	catch(callback){
+		if( typeof callback === 'function' ){
+			this._event.catch( callback );
+		}
+	}
 }
 
 /**
