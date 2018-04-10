@@ -1,5 +1,6 @@
 'use strict';
 
+import url      from '../runtime/url.js';
 import Model from './model.js';
 import merge from '../util/merge.js';
 
@@ -38,7 +39,7 @@ class WebSocketModel extends Model{
 				if( 'WebSocket' in self ){
 
 					if( !/^wss?:\/\//.test( this._config.url ) ){
-						this._config.url = 'ws://'+ this._config.url;
+						this._config.url = (url.protocol === 'https'? 'wss' :'ws') +'://'+ this._config.url;
 					}
 
 					socket = new WebSocket(this._config.url, this._config.protocol);

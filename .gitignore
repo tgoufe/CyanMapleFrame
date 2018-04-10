@@ -1,10 +1,8 @@
 node_modules/
 
-.idea/.name
 .idea
-*.map
-demo/javascript/maple.js
-demo/javascript/base.js
+.iml
+.map
 
 demo/dist
 

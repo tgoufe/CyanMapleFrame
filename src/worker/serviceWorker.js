@@ -336,6 +336,14 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 	});
 
 	/**
+	 * 同步数据事件
+	 * */
+	self.addEventListener('sync', (event)=>{
+		// todo do something
+		console.log(event.tag, event.lastChance);
+	});
+
+	/**
 	 * 通知点击事件
 	 * */
 	self.addEventListener('notificationclick', (event)=>{
