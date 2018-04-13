@@ -1,7 +1,7 @@
 node_modules/
 
 .idea
-.iml
+maple.iml
 .map
 
 demo/dist

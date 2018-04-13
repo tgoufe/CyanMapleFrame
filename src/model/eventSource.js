@@ -145,7 +145,7 @@ class EventSourceModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	close(){
-		this._conn.then((conn)=>{
+		return this._conn.then((conn)=>{
 			try{
 				conn.close();
 			}
