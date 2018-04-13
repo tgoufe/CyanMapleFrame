@@ -169,14 +169,14 @@ class EventSourceModel extends Model{
 	}
 	/**
 	 * @summary 重置请求
-	 * @return  {Promise}
+	 * @return  {Promise<boolean>}
 	 * */
 	reset(){
 		console.log('重置当前 Event Source 连接');
 		this.close().then(()=>{
-			return this._createConn();
-		}).then((conn)=>{
-			this._conn = conn;
+			this._conn = this._createConn();
+
+			return true;
 		});
 	}
 }
