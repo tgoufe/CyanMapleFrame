@@ -17,6 +17,7 @@ const EVENT_SOURCE_MODEL_CONFIG = {
  * @classdesc   对 EventSource 接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 eventSource，别名 ess，将可以使用工厂方法生成
  *              非实时，默认 3 秒延迟
  *              SSE 只支持服务器到客户端单向的事件推送
+ *              使用 SSE 时，服务器需要要对 sse 的路径设置为 Cache-Control: no-transform，不使用 Gzip 压缩等
  * @extends     Model
  * */
 class EventSourceModel extends Model{
@@ -30,18 +31,37 @@ class EventSourceModel extends Model{
 
 		this._config = merge(config, EventSourceModel._CONFIG);
 
-		this._event = new Promise((resolve, reject)=>{
-			let event
+		this._conn = this._createConn();
+	}
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认配置
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return EVENT_SOURCE_MODEL_CONFIG;
+	}
+
+	// ---------- 私有方法 ----------
+	/**
+	 * @summary 建立连接
+	 * @private
+	 * @return  {Promise}
+	 * */
+	_createConn(){
+		return new Promise((resolve, reject)=>{
+			let conn
 				;
 
 			if( this._config.url ){
 				if( 'EventSource' in self ){
-					event = new EventSource(this._config.url, this._config);
+					conn = new EventSource(this._config.url, this._config);
 
-					event.onopen = ()=>{
-						resolve( event );
+					conn.onopen = ()=>{
+						resolve( conn );
 					};
-					event.onmessage = (e)=>{
+					conn.onmessage = (e)=>{
 						let data = e.data
 							;
 
@@ -57,16 +77,24 @@ class EventSourceModel extends Model{
 
 						super.setData(data.topic, data.data);
 					};
-					event.onerror = (e)=>{
-						console.log( e );
-
-						let error = new Error('该 Web Socket 出现异常进而关闭')
+					conn.onerror = (e)=>{
+						let error = new Error('该 Event Source 出现异常进而关闭')
 							;
 
-						this._event = Promise.reject( error );
+						console.log( e );
+						this._conn = Promise.reject( error );
 
 						reject( error );
 					};
+					conn.onclose = (e)=>{
+						let error = new Error('该 Event Source 连接已被关闭')
+							;
+
+						console.log( e );
+						this._conn = Promise.reject( error );
+
+						reject( error );
+					}
 				}
 				else{
 					reject( new Error('此浏览器不支持 Event Source') );
@@ -76,15 +104,6 @@ class EventSourceModel extends Model{
 				reject( new Error('缺少参数 url') );
 			}
 		});
-	}
-	// ---------- 静态属性 ----------
-	/**
-	 * @summary 默认配置
-	 * @static
-	 * @const
-	 * */
-	static get _CONFIG(){
-		return EVENT_SOURCE_MODEL_CONFIG;
 	}
 
 	// ---------- 公有方法 ----------
@@ -126,8 +145,13 @@ class EventSourceModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	close(){
-		this._event.then((event)=>{
-			event.close();
+		this._conn.then((conn)=>{
+			try{
+				conn.close();
+			}
+			catch(e){
+				// 失败不做处理
+			}
 
 			return true;
 		});
@@ -139,8 +163,19 @@ class EventSourceModel extends Model{
 	 * */
 	catch(callback){
 		if( typeof callback === 'function' ){
-			this._event.catch( callback );
+			this._conn.catch( callback );
 		}
+	}
+	/**
+	 * @summary 重置请求
+	 * @return  {Promise}
+	 * */
+	reset(){
+		this.close().then(()=>{
+			return this._createConn();
+		}).then((conn)=>{
+			this._conn = conn;
+		});
 	}
 }
 

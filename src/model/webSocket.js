@@ -31,104 +31,7 @@ class WebSocketModel extends Model{
 
 		this._config = merge(config, WebSocketModel._CONFIG);
 
-		this._client = new Promise((resolve, reject)=>{
-			let socket
-				;
-
-			if( this._config.url ){
-				if( 'WebSocket' in self ){
-
-					if( !/^wss?:\/\//.test( this._config.url ) ){
-						this._config.url = (url.protocol === 'https'? 'wss' :'ws') +'://'+ this._config.url;
-					}
-
-					socket = new WebSocket(this._config.url, this._config.protocol);
-
-					socket.onopen = ()=>{
-						console.log('建立 Web Socket 连接');
-						resolve( socket );
-					};
-					socket.onclose = (e)=>{
-						console.log( e );
-
-						let error = new Error('该 Web Socket 连接已经被关闭')
-
-						this._client = Promise.reject( error );
-
-						reject( error );
-					};
-					socket.onmessage = (e)=>{
-						let data = e.data
-							;
-
-						if( typeof data === 'string' ){
-							try{
-								data = JSON.parse( data );
-							}
-							catch(e){
-								data = {
-									topic: this._config.url
-									, data
-								}
-							}
-						}
-						else if( typeof data === 'object' ){
-							if( data instanceof ArrayBuffer ){
-								
-							}
-							else if( data instanceof Blob ){
-
-							}
-						}
-
-						if( data instanceof ArrayBuffer ){ // 二进制数据流
-							// todo 处理数据流
-							console.log(data)
-						}
-						else{
-							if( typeof data === 'string' ){
-								try{
-									data = JSON.parse( data );
-								}
-								catch(e){
-									data = {
-										topic: this._config.url
-										, data
-									}
-								}
-							}
-							else if( typeof data !== 'object' ){
-								data = {};
-							}
-
-							if( data.topic && data.data ){
-								super.setData(data.topic, data.data);
-							}
-						}
-					};
-					socket.onerror = (e)=>{
-						console.log( e );
-
-						let error = new Error('该 Web Socket 出现异常进而关闭')
-							;
-
-						this._client = Promise.reject( error );
-
-						reject( error );
-					};
-
-					if( this._config.binaryType ){
-						socket.binaryType = this._config.binaryType;
-					}
-				}
-				else{
-					reject( new Error('此浏览器不支持 Web Socket') );
-				}
-			}
-			else{
-				reject( new Error('缺少参数 url') );
-			}
-		});
+		this._conn = this._createConn();
 	}
 
 	// // ---------- 静态方法 ----------
@@ -153,6 +56,93 @@ class WebSocketModel extends Model{
 
 	// ---------- 私有方法 ----------
 	/**
+	 * @summary 建立连接
+	 * @private
+	 * @return  {Promise}
+	 * */
+	_createConn(){
+		return new Promise((resolve, reject)=>{
+			let conn
+				;
+
+			if( this._config.url ){
+				if( 'WebSocket' in self ){
+
+					if( !/^wss?:\/\//.test( this._config.url ) ){
+						this._config.url = (url.protocol === 'https'? 'wss' :'ws') +'://'+ this._config.url;
+					}
+
+					conn = new WebSocket(this._config.url, this._config.protocol);
+
+					conn.onopen = ()=>{
+						console.log('建立 Web Socket 连接');
+						resolve( conn );
+					};
+					conn.onmessage = (e)=>{
+						let data = e.data
+							;
+
+						if( data instanceof ArrayBuffer ){ // 二进制数据流
+							// todo 处理数据流
+							console.log(data)
+						}
+						else if( data instanceof Blob ){
+							//
+						}
+						else{
+							if( typeof data === 'string' ){
+								try{
+									data = JSON.parse( data );
+								}
+								catch(e){
+									data = {
+										topic: this._config.url
+										, data
+									}
+								}
+							}
+							else if( typeof data !== 'object' ){
+								data = {};
+							}
+
+							if( data.topic && data.data ){
+								super.setData(data.topic, data.data);
+							}
+						}
+					};
+					conn.onerror = (e)=>{
+						let error = new Error('该 Web Socket 出现异常进而关闭')
+							;
+
+						console.log( e );
+						this._conn = Promise.reject( error );
+
+						reject( error );
+					};
+					conn.onclose = (e)=>{
+						let error = new Error('该 Web Socket 连接已经被关闭')
+							;
+
+						console.log( e );
+						this._conn = Promise.reject( error );
+
+						reject( error );
+					};
+
+					if( this._config.binaryType ){
+						conn.binaryType = this._config.binaryType;
+					}
+				}
+				else{
+					reject( new Error('此浏览器不支持 Web Socket') );
+				}
+			}
+			else{
+				reject( new Error('缺少参数 url') );
+			}
+		});
+	}
+	/**
 	 * @summary 检测 socket 是否还连接着
 	 * @private
 	 * @param   {WebSocket} socket
@@ -170,7 +160,7 @@ class WebSocketModel extends Model{
 	 * @return  {Promise}   数据发送是否成功
 	 * */
 	setData(topic, data){
-		return this._client.then((socket)=>{
+		return this._conn.then((socket)=>{
 			let result
 				;
 
@@ -221,10 +211,15 @@ class WebSocketModel extends Model{
 	 * @return  {Promise<boolean>}      返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	close(code, reason){
-		return this._client.then((socket)=>{
-			socket.close();
+		return this._conn.then((socket)=>{
+			try{
+				socket.close();
+			}
+			catch(e){
+				// 失败不做处理
+			}
 
-			return true
+			return true;
 		});
 	}
 
@@ -234,8 +229,18 @@ class WebSocketModel extends Model{
 	 * */
 	catch(callback){
 		if( typeof callback === 'function' ){
-			this._client.catch( callback );
+			this._conn.catch( callback );
 		}
+	}
+	/**
+	 * @summary 重置链接
+	 * */
+	reset(){
+		this.close().then(()=>{
+			return this._createConn();
+		}).then((conn)=>{
+			this._conn = conn;
+		});
 	}
 }
 
