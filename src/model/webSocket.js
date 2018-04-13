@@ -211,6 +211,7 @@ class WebSocketModel extends Model{
 	 * @return  {Promise<boolean>}      返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	close(code, reason){
+		console.log('关闭当前 Web Socket 连接');
 		return this._conn.then((socket)=>{
 			try{
 				socket.close();
@@ -236,6 +237,7 @@ class WebSocketModel extends Model{
 	 * @summary 重置链接
 	 * */
 	reset(){
+		console.log('重置当前 Web Socket 连接');
 		this.close().then(()=>{
 			return this._createConn();
 		}).then((conn)=>{

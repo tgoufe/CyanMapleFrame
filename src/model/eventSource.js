@@ -145,6 +145,7 @@ class EventSourceModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	close(){
+		console.log('关闭当前 Event Source 连接');
 		return this._conn.then((conn)=>{
 			try{
 				conn.close();
@@ -171,6 +172,7 @@ class EventSourceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	reset(){
+		console.log('重置当前 Event Source 连接');
 		this.close().then(()=>{
 			return this._createConn();
 		}).then((conn)=>{
