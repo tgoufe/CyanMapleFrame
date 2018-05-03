@@ -36,7 +36,7 @@ let debounce = function(func, wait, cancelCB, maxWait){
 			if( maxWait && maxWait > wait ){  // 设置最大等待时间
 
 				if( !maxWaitTimeout ){  // 当前不在最大等待时间中
-					maxWaitTimeout = setTimeout(function(){console.log('max')
+					maxWaitTimeout = setTimeout(function(){
 						func.apply(maxWaitOpts.that, maxWaitOpts.argv);
 
 						if( timeout ){
@@ -50,7 +50,7 @@ let debounce = function(func, wait, cancelCB, maxWait){
 			}
 
 			timeout = setTimeout(function(){
-				func.apply(that, argv || []);
+				func.apply(that, argv);
 
 				if( maxWaitTimeout ){
 					clearTimeout( maxWaitTimeout );

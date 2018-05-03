@@ -1,9 +1,12 @@
 node_modules/
 
 .idea
-maple.iml
+*.iml
 .map
 
 demo/dist
 
 .DS_Store
+
+
+test/unit/coverage

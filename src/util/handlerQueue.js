@@ -13,7 +13,7 @@ class HandlerQueue{
 	/**
 	 * @summary 向队列中添加 handler
 	 * @param   {Function}  handler
-	 * @return  {number}    handler 在队列中的 id，方便删除
+	 * @return  {number}    handler 队列的长度，删除时使用该值 -1
 	 * */
 	add(handler){
 		if( typeof handler === 'function' ){
@@ -132,7 +132,13 @@ class HandlerQueue{
 
 		this.reset();
 
-		return this._queue.filter( d=>d !== null ).map( d=>d( ...args ) );
+		return this._queue.reduce((all, h)=>{
+			if( h !== null ){
+				all.push( h(...args) );
+			}
+
+			return all;
+		}, []);
 	}
 	/**
 	 * @summary 以指定上下文的方式执行队列中的全部 handler，将返回一个结果数组
@@ -147,7 +153,13 @@ class HandlerQueue{
 			args = [args];
 		}
 
-		return this._queue.filter( d=>d !== null ).map( d=>d.apply(context, args) );
+		return this._queue.reduce((all, h)=>{
+			if( h !== null ){
+				all.push( h.apply(context, args) );
+			}
+
+			return all;
+		}, []);
 	}
 	/**
 	 * @summary 顺序执行队列中的全部 handler，前一个 handler 的返回结果觉得下一个 handler 是否执行
@@ -161,7 +173,13 @@ class HandlerQueue{
 
 		this.reset();
 
-		return !this._queue.filter( d=>d !== null ).some( d=>d( ...args ) === false );
+		return !this._queue.some((h)=>{
+			if( h !== null ){
+				return h( ...args ) === false;
+			}
+
+			return false;
+		});
 	}
 	/**
 	 * @summary 以指定上下文的方式顺序执行队列中的全部 handler，前一个 handler 的返回结果觉得下一个 handler 是否执行
@@ -176,7 +194,13 @@ class HandlerQueue{
 			args = [args];
 		}
 
-		return !this._queue.filter( d=>d !== null ).some( d=>d.apply(context, args) === false );
+		return !this._queue.some((h)=>{
+			if( h !== null ){
+				return h.apply(context, args) === false;
+			}
+
+			return false;
+		});
 	}
 	/**
 	 * @summary 用 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
@@ -190,9 +214,13 @@ class HandlerQueue{
 		
 		this.reset();
 
-		return this._queue.filter( d=>d !== null ).reduce((promise, d)=>{
-			return promise.then( rs=>d( rs ) );
-		}, Promise.resolve( init ));
+		return this._queue.reduce((promise, h)=>{
+			if( h !== null ){
+				return promise.then( rs=>h( rs ) );
+			}
+
+			return promise;
+		}, Promise.resolve(init));
 	}
 	/**
 	 * @summary 以指定上下文的方式用 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
@@ -208,9 +236,13 @@ class HandlerQueue{
 		this.reset();
 
 
-		return this._queue.filter( d=>d !== null ).reduce((promise, d)=>{
-			return promise.then( rs=>d.call(context, rs) );
-		}, Promise.resolve( init ));
+		return this._queue.reduce((promise, h)=>{
+			if( h !== null ){
+				return promise.then( rs=>h.call(context, rs) );
+			}
+			
+			return promise;
+		}, Promise.resolve(init));
 	}
 }
 

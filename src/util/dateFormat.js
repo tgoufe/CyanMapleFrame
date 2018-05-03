@@ -16,7 +16,7 @@ import tools from './tools.js';
  * */
 let dateFormat = function(date=new Date(), format='YYYY-MM-DD'){
 	return format.replace(/(YYYY|YY|MM|DD|hh|mm|ss|星期|周|www|week)/g, function(str){
-		return str in dateFormat._dateStrReplace ? dateFormat._dateStrReplace[str]( date ) : '';
+		return dateFormat._dateStrReplace[str]( date );
 	});
 };
 
@@ -153,7 +153,7 @@ dateFormat._WEEK_CN = ['日', '一', '二', '三', '四', '五', '六'];
  * @const
  * @static
  * */
-dateFormat._SHORT_TIME_EXPR = /^(-?\d+)(s|m|h|d|y)?$/i;
+dateFormat._SHORT_TIME_EXPR = /^(-?\d+)([smhdy])?$/i;
 /**
  * 时间单位对应的毫秒数
  * @const

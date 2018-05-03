@@ -26,7 +26,7 @@ let throttle = function(func, wait, cancelCB, leading){
 				;
 
 			if( !timeout ){
-				func.apply(that, argv || []);
+				func.apply(that, argv);
 
 				timeout = setTimeout(function(){
 					clearTimeout( timeout );
