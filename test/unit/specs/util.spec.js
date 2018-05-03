@@ -378,10 +378,8 @@ describe('util', ()=>{
 			expect( queue._queue.length ).to.be.equal( 0 );
 		});
 
-		it('handlerQueue fire', ()=>{
+		it('handlerQueue fire fireAll', ()=>{
 			let queue = new util.HandlerQueue()
-				, queueWith = new util.HandlerQueue()
-
 				, testExample1 = (a=0)=>{
 					return a +1;
 				}
@@ -391,18 +389,6 @@ describe('util', ()=>{
 				, testExample3 = (a=0)=>{
 					return a +3;
 				}
-				, testExample4 = function(a=0){
-					return this.a + a + 1;
-				}
-				, testExample5 = function(a=0){
-					return this.a + a + 2;
-				}
-				, testExample6 = function(a=0){
-					return this.a + a + 3;
-				}
-				, testTarget = {
-					a: 3
-				}
 				;
 
 			expect( queue.next() ).to.be.null;
@@ -410,10 +396,6 @@ describe('util', ()=>{
 			queue.add( testExample1 );
 			queue.add( testExample2 );
 			queue.add( testExample3 );
-
-			queueWith.add( testExample4 );
-			queueWith.add( testExample5 );
-			queueWith.add( testExample6 );
 
 			expect( queue.next() ).to.be.equal( testExample1 );
 			expect( queue._currIndex ).to.be.equal( 1 );
@@ -425,9 +407,6 @@ describe('util', ()=>{
 			expect( queue._currIndex ).to.be.equal( 0 );
 
 			expect( queue.fire() ).to.be.equal( 1 );
-			expect( queueWith.fireWith(testTarget) ).to.be.equal( 4 );
-			expect( queueWith.fireWith(testTarget, 1) ).to.be.equal( 6 );
-			expect( queueWith.fireWith(testTarget, [1]) ).to.be.equal( 7 );
 
 			expect( queue.remain() ).to.be.true;
 
@@ -441,8 +420,6 @@ describe('util', ()=>{
 			queue.add( testExample2 );
 			queue.add( testExample3 );
 
-			queueWith.reset();
-
 			expect( queue.fireAll() ).to.deep.equal([1, 2, 3]);
 			expect( queue.fireAll(2) ).to.deep.equal([3, 4, 5]);
 
@@ -450,15 +427,237 @@ describe('util', ()=>{
 
 			expect( queue.fireAll() ).to.deep.equal([1, 3]);
 			expect( queue.fireAll(2) ).to.deep.equal([3, 5]);
+		});
 
-			expect( queue.fireAllWith(null, 5) ).to.deep.equal([6, 8]);
-			expect( queueWith.fireAllWith(testTarget, 4) ).to.deep.equal([8, 9, 10]);
-			expect( queueWith.fireAllWith(testTarget, [4]) ).to.deep.equal([8, 9, 10]);
+		it('handlerQueue fireLine', ()=>{
+			let queue = new util.HandlerQueue()
+				, testExample1 = ()=>{
+					return true;
+				}
+				, testExample2 = ()=>{
+					return false;
+				}
+				, testExample3 = ()=>{
+					return true;
+				}
+				;
 
-			queueWith.remove( 1 );
+			queue.add( testExample1 );
+			queue.add( testExample2 );
+			queue.add( testExample3 );
 
-			expect( queueWith.fireAllWith(testTarget, 4) ).to.deep.equal([8, 10]);
+			expect( queue.fireLine() ).to.be.false;
+			expect( queue.fireLine(1) ).to.be.false;
 
+			queue.remove( 1 );
+			expect( queue.fireLine() ).to.be.true;
+		});
+
+		it('handlerQueue fireReduce', (done)=>{
+			let queue = new util.HandlerQueue()
+				, testExample1 = (a=0)=>{
+					return a +1;
+				}
+				, testExample2 = (a=0)=>{
+					return a +2;
+				}
+				, testExample3 = (a=0)=>{
+					return a +3;
+				}
+				;
+
+			queue.add( testExample1 );
+			queue.add( testExample2 );
+			queue.add( testExample3 );
+
+			expect( queue.fireReduce() ).to.be.an('promise');
+			queue.fireReduce().then((rs)=>{
+				expect( rs ).to.be.equal( 6 );
+				done();
+			});
+		});
+		it('handlerQueue fireReduce 2', (done)=>{
+			let queue = new util.HandlerQueue()
+				, testExample1 = (a=0)=>{
+					return a +1;
+				}
+				, testExample2 = (a=0)=>{
+					return a +2;
+				}
+				, testExample3 = (a=0)=>{
+					return a +3;
+				}
+				;
+
+			queue.add( testExample1 );
+			queue.add( testExample2 );
+			queue.add( testExample3 );
+
+			queue.fireReduce( 5 ).then((rs)=>{
+				expect( rs ).to.be.equal( 11 );
+				done();
+			});
+		});
+		it('handlerQueue fireReduce 3', (done)=>{
+			let queue = new util.HandlerQueue()
+				, testExample1 = (a=0)=>{
+					return a +1;
+				}
+				, testExample2 = (a=0)=>{
+					return a +2;
+				}
+				, testExample3 = (a=0)=>{
+					return a +3;
+				}
+				;
+
+			queue.add( testExample1 );
+			queue.add( testExample2 );
+			queue.add( testExample3 );
+
+			queue.remove( 1 );
+			queue.fireReduce().then((rs)=>{
+				expect( rs ).to.be.equal( 4 );
+				done();
+			});
+		});
+
+		it('handlerQueue fireWith fireAllWith', ()=>{
+			let queue = new util.HandlerQueue()
+				, testExample1 = function(a=0){
+					return this.a + a + 1;
+				}
+				, testExample2 = function(a=0){
+					return this.a + a + 2;
+				}
+				, testExample3 = function(a=0){
+					return this.a + a + 3;
+				}
+				, testTarget = {
+					a: 3
+				}
+				;
+
+			queue.add( testExample1 );
+			queue.add( testExample2 );
+			queue.add( testExample3 );
+
+			expect( queue.fireWith(testTarget) ).to.be.equal( 4 );
+			expect( queue.fireWith(testTarget, 1) ).to.be.equal( 6 );
+			expect( queue.fireWith(testTarget, [1]) ).to.be.equal( 7 );
+
+			queue.reset();
+
+			expect( queue.fireAllWith(testTarget, 4) ).to.deep.equal([8, 9, 10]);
+			expect( queue.fireAllWith(testTarget, [4]) ).to.deep.equal([8, 9, 10]);
+
+			queue.remove( 1 );
+			expect( queue.fireAllWith(testTarget, 4) ).to.deep.equal([8, 10]);
+		});
+
+		it('handlerQueue fireLineWith', ()=>{
+			let queue = new util.HandlerQueue()
+				, testExample1 = function(a=0){
+					return !!((this.a + a + 1) % 2);
+				}
+				, testExample2 = function(a=0){
+					return !!((this.a + a + 2) % 2);
+				}
+				, testExample3 = function(a=0){
+					return !!((this.a + a + 3) % 2);
+				}
+				, testTarget = {
+					a: 4
+				}
+				;
+
+			queue.add( testExample1 );
+			queue.add( testExample2 );
+			queue.add( testExample3 );
+
+			expect( queue.fireLineWith(testTarget) ).to.be.false;
+			expect( queue.fireLineWith(testTarget, 1) ).to.be.false;
+
+			queue.remove( 1 );
+			expect( queue.fireLineWith(testTarget) ).to.be.true;
+		});
+
+		it('handlerQueue fireReduceWith', (done)=>{
+			let queue = new util.HandlerQueue()
+				, testExample1 = function(a=0){
+					return this.a + a + 1;
+				}
+				, testExample2 = function(a=0){
+					return this.a + a + 2;
+				}
+				, testExample3 = function(a=0){
+					return this.a + a + 3;
+				}
+				, testTarget = {
+					a: 3
+				}
+				;
+
+			queue.add( testExample1 );
+			queue.add( testExample2 );
+			queue.add( testExample3 );
+
+			expect( queue.fireReduceWith(testTarget) ).to.be.an('promise');
+			queue.fireReduceWith(testTarget).then((rs)=>{
+				expect( rs ).to.be.equal( 15 );
+				done();
+			});
+		});
+		it('handlerQueue fireReduceWith 2', (done)=>{
+			let queue = new util.HandlerQueue()
+				, testExample1 = function(a=0){
+					return this.a + a + 1;
+				}
+				, testExample2 = function(a=0){
+					return this.a + a + 2;
+				}
+				, testExample3 = function(a=0){
+					return this.a + a + 3;
+				}
+				, testTarget = {
+					a: 3
+				}
+				;
+
+			queue.add( testExample1 );
+			queue.add( testExample2 );
+			queue.add( testExample3 );
+
+			queue.fireReduceWith(testTarget, 5).then((rs)=>{
+				expect( rs ).to.be.equal( 20 );
+				done();
+			});
+		});
+		it('handlerQueue fireReduceWith 3', (done)=>{
+			let queue = new util.HandlerQueue()
+				, testExample1 = function(a=0){
+					return this.a + a + 1;
+				}
+				, testExample2 = function(a=0){
+					return this.a + a + 2;
+				}
+				, testExample3 = function(a=0){
+					return this.a + a + 3;
+				}
+				, testTarget = {
+					a: 3
+				}
+				;
+
+			queue.add( testExample1 );
+			queue.add( testExample2 );
+			queue.add( testExample3 );
+
+			queue.remove( 1 );
+			queue.fireReduceWith(testTarget).then((rs)=>{
+				expect( rs ).to.be.equal( 10 );
+				done();
+			});
 		});
 	});
 });
