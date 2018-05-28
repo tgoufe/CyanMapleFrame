@@ -10,7 +10,6 @@
 // 	]
 // 	;
 
-import CONFIG       from '../config.js';
 import {listener}   from '../listener.js';
 
 const INDEX = ['source'
@@ -40,10 +39,25 @@ class Url{
 	 * @param   {string}    [url]
 	 * */
 	constructor(url){
-		let a = document.createElement('a', CONFIG.ceKey)
+		let a
 			;
 
-		a.href = url || location.href;
+		if( 'URL' in self ){
+			a = new URL( url || location.href );
+		}
+		else if( 'webkitURL' in self ){
+			a = new webkitURL( url || location.href );
+		}
+		else{
+			if( 'document' in self ){
+				a = document.createElement('a');
+
+				a.href = url || location.href;
+			}
+			else{
+				throw new Error('当前环境不支持该功能');
+			}
+		}
 
 		this.source     = a.href;
 		this.protocol   = a.protocol.replace(':', '');
