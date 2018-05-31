@@ -34,13 +34,16 @@ cookie.set('memberId', 1, '30d');   // 将 memberId 放入 cookie 中，过期�
 class CookieModel extends Model{
 	/**
 	 * @constructor
+	 * @desc    当浏览器支持 cookie 时，在构建时会将 document.cookie 进行解析，将全部值都存入内存中
 	 * */
 	constructor(){
 		super();
 
 		if( navigator.cookieEnabled ){
 			this._enabled = true;
-			this._store = Promise.resolve( true );
+			this._store = Promise.resolve().then(()=>{
+				return this.refresh();
+			});
 		}
 		else{
 			this._enabled = false;
@@ -131,25 +134,12 @@ class CookieModel extends Model{
 	 * @return      {Object|string}
 	 * */
 	_getCookie(topic){
-		let cookies = document.cookie
+		let cookies = (document.cookie || '').split('; ')
 			, i = 0, l
 			, value = ''
 			, t
 			;
 
-		if( cookies ){
-			cookies = cookies.split('; ');
-		}
-		else{
-			cookies = [];
-		}
-
-		/**
-		 * todo 调整机制
-		 *
-		 * 现在每次取值，都会将 cookie 进行一次解析
-		 * 期望改为只解析一次
-		 * */
 		for(l = cookies.length; i < l; i++ ){
 			t = cookies[i].split('=');
 
@@ -351,6 +341,33 @@ class CookieModel extends Model{
 	 * */
 	getCookieLength(){
 		return this._enabled ? document.cookie.length : 0;
+	}
+
+	/**
+	 * @summary 刷新当前 cookie 数据
+	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
+	 * @desc    从 document.cookie 读取 cookie，重新设置数据
+	 * */
+	refresh(){
+		return this.clearData().then(()=>{
+			return Promise.all( (document.cookie || '').split('; ').map((cookie)=>{
+				let value
+					;
+
+				cookie = cookie.split('=');
+
+				value = decodeURIComponent(cookie[1]);
+
+				try{
+					value = JSON.parse( value );
+				}
+				catch(e){}
+
+				return super.setData(decodeURIComponent(cookie[0]), value);
+			}) );
+		}).then(()=>{
+			return true;
+		});
 	}
 
 	/**
