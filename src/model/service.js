@@ -328,6 +328,16 @@ class ServiceModel extends Model{
 
 		return this;
 	}
+
+	/**
+	 * @summary     从期望的 model 对象获取数据，当获取失败时再发送请求
+	 * @param       {Model} model
+	 * 
+	 * @todo        是否需要
+	 * */
+	syncFrom(model){
+
+	}
 }
 
 /**
