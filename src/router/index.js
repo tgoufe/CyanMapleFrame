@@ -56,6 +56,7 @@ class Router{
 		}];
 
 		this._listener = listener(this, 'routerChange');
+		this._listener.on();
 
 		if( this.config.mode === 'history' ){
 			url.popState.add((e)=>{

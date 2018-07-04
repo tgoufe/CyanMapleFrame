@@ -43,10 +43,10 @@ class Url{
 			;
 
 		if( 'URL' in self ){
-			a = new URL( url || location.href );
+			a = new URL(url || location.href, location.origin);
 		}
 		else if( 'webkitURL' in self ){
-			a = new webkitURL( url || location.href );
+			a = new webkitURL(url || location.href, location.origin);
 		}
 		else{
 			if( 'document' in self ){
