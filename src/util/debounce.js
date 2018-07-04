@@ -19,9 +19,8 @@ let debounce = function(func, wait, cancelCB, maxWait){
 	let timeout = null
 		, maxWaitTimeout = null
 		, maxWaitOpts = null
-		, result = function(){
+		, result = function(...argv){
 			let that = this || null
-				, argv = [].slice.call( arguments )
 				;
 
 			if( timeout ){

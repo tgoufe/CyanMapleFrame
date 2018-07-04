@@ -20,9 +20,8 @@ let throttle = function(func, wait, cancelCB, leading){
 	let timeout = null
 		, lastTrigger = false
 		, lastTriggerOpts = null
-		, result = function(){
+		, result = function(...argv){
 			let that = this || null
-				, argv = [].slice.call( arguments )
 				;
 
 			if( !timeout ){
@@ -33,7 +32,7 @@ let throttle = function(func, wait, cancelCB, leading){
 					timeout = null;
 
 					if( lastTrigger ){  // 在间隔时间中调用了该事件，执行最后一次
-						result.call(lastTriggerOpts.that, lastTriggerOpts.argv);
+						result.apply(lastTriggerOpts.that, lastTriggerOpts.argv);
 
 						lastTrigger = false;
 	                    lastTriggerOpts = null;
@@ -85,7 +84,7 @@ let throttle = function(func, wait, cancelCB, leading){
 		lastTrigger = false;
 		lastTriggerOpts = null;
 
-		result.call(context, argv);
+		result.apply(context, argv);
 	};
 
 	return result;

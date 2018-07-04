@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @file    陀螺仪事件
+ * @file    visibilitychange 事件
  * */
 
 import {listener}   from '../listener.js';
@@ -10,9 +10,7 @@ import {listener}   from '../listener.js';
  * @memberOf    maple.view
  * @type        {Listener}
  * */
-let devicemotion = listener('devicemotion', {
-		useDebounce: true
-	})
+let visibilitychange = listener('visibilitychange')
 	;
 
-export default devicemotion;
+export default visibilitychange;

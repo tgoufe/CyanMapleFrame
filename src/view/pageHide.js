@@ -1,12 +1,16 @@
 'use strict';
 
+/**
+ * @file    全局事件 pagehide
+ * */
+
 import {listener}   from '../listener.js';
 
 /**
  * @memberOf    maple.view
  * @type        {Listener}
  * */
-let beforeunload = listener('before')
+let pagehide = listener('pagehide')
 	;
 
-export default beforeunload;
+export default pagehide;

@@ -24,7 +24,6 @@ const LISTENER_CONFIG = {
  * @class
  * @classdesc   全局事件监听抽象类
  * @desc        默认使用捕获方式
- * @todo        调整，兼容 addEventListener 的参数结构？
  * */
 class Listener{
 	/**
@@ -98,6 +97,11 @@ class Listener{
 	 * @return  {Listener}          返回 this，可以使用链式操作
 	 * */
 	add(callback){
+
+		if( !this._isListening ){
+			this.on();
+		}
+
 		if( !this._eventQueue.has(callback) ){
 			this._eventQueue.add( callback );
 		}
@@ -161,15 +165,14 @@ class Listener{
 	}
 	/**
 	 * @summary 立即执行
-	 * @param   {...*}
+	 * @param   {...*}  argv
 	 * */
-	trigger(){
+	trigger(...argv){
 		let context = this._config.target
 			, event = {
 				type: this._config.type
 				, target: this._config.target
 			}
-			, argv = [].slice.call(arguments)
 			;
 
 		argv.unshift( event );
@@ -226,9 +229,10 @@ let listener = (target, type, callback={}, options={})=>{
 
 	ls = new Listener( opts );
 
-	ls.on();
-
 	if( callback ){
+
+		// 在有 callback 才开始监听
+		ls.on();
 		ls.add( callback );
 	}
 
