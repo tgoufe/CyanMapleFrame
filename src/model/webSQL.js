@@ -126,7 +126,7 @@ class WebSQLModel extends Model{
 	 * @summary 查询
 	 * @private
 	 * @param   {string}    topic
-	 * @return  {Promise<String, ErrorEvent>}    返回一个 Promise 对象，在 resolve 时传回查询出来的数组
+	 * @return  {Promise<string, ErrorEvent>}    返回一个 Promise 对象，在 resolve 时传回查询出来的数组
 	 * */
 	_select(topic){
 		return this._store.then((db)=>{
