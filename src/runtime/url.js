@@ -141,11 +141,7 @@ class Url{
 	 * @return      {string}
 	 * */
 	pack(){
-		return this.protocol +'://'+
-			this.host +
-			this.path +
-			this.query +
-			(this.hash ? '#'+ this.hash : '');
+		return `${this.protocol}://${this.host}${this.path}${this.query}` + (this.hash ? `#${this.hash}` : '');
 	}
 	/**
 	 * @summary     替换当前的 params

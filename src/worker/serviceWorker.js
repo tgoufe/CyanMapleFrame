@@ -78,12 +78,6 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 
 				return all;
 			}, []) );
-
-			return Promise.all( keyList.filter((key)=>{
-				return cacheNames.indexOf(key) === -1;
-			}).map((key)=>{
-				return preCache.cacheDelete( key );
-			}) );
 		}).then(()=>{
 			/**
 			 * self.clients.claim 设置本身为 active 的 Service Worker

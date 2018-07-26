@@ -17,7 +17,7 @@ const EVENT_SOURCE_MODEL_CONFIG = {
  * @classdesc   对 EventSource 接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 eventSource，别名 ess，将可以使用工厂方法生成
  *              非实时，默认 3 秒延迟
  *              SSE 只支持服务器到客户端单向的事件推送
- *              使用 SSE 时，服务器需要要对 sse 的路径设置为 Cache-Control: no-transform，不使用 Gzip 压缩等
+ *              使用 SSE 时，服务器需要要对 SSE 的路径设置为 Cache-Control: no-transform，不使用 Gzip 压缩等
  * @extends     Model
  * */
 class EventSourceModel extends Model{

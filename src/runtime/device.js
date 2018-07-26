@@ -122,9 +122,6 @@ device.webView = (iphone || ipad || ipod) && ua.match(/.*AppleWebKit(?!.*Safari)
 // 		$metaViewport.attr('content').indexOf('minimal-ui') >= 0;
 // }
 
-// Pixel Ratio
-device.pixelRatio = window.devicePixelRatio || 1;
-
 // 微信，坑..
 device.wechat = device.weixin = /MicroMessenger/i.test( ua );
 
@@ -142,6 +139,9 @@ device.alipay = ua.indexOf("AlipayClient") > 0;
  * */
 export default device;
 
+
+// Pixel Ratio
+device.pixelRatio = window.devicePixelRatio || 1;
 
 // todo 更换位置，期望与 document 解耦
 // Check for status bar and fullscreen app mode

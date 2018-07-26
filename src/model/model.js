@@ -172,6 +172,12 @@ class Model{
 
 		return model;
 	}
+	/**
+	 * todo
+	 * */
+	// static [Symbol.hasInstance](instance){
+	//
+	// }
 
 	// ---------- 静态属性 ----------
 	/**
@@ -300,7 +306,7 @@ class Model{
 	//  * @param       {*}     result
 	//  * */
 	// /**
-	//  * @typedef     {Promise.<Object,Error>}    ModelPromise
+	//  * @typedef     {Promise<Object,Error>} ModelPromise
 	//  * @property    {Object}
 	//  * @property    {Object}
 	//  * @throws      {Error}
@@ -428,7 +434,7 @@ class Model{
 				result = Promise.resolve( this._value[topic] );
 			}
 			else{
-				result = Promise.reject( null );    // todo 调用 setData ?
+				result = Promise.reject( null );
 			}
 		}
 		
@@ -581,10 +587,35 @@ class Model{
 	}
 	/**
 	 * @summary toJSON 方法
-	 * @desc    JSON.stringify 序列号 Model 及子类的实例对象时调用
+	 * @desc    JSON.stringify 序列化 Model 及子类的实例对象时调用
 	 * */
 	toJSON(){
 		return this._value;
+	}
+	/**
+	 * @summary 实现迭代器接口
+	 * @return  {Array}
+	 * @desc    适用于 for-of
+	 * */
+	[Symbol.iterator](){
+		return this._value[Symbol.iterator]();
+	}
+	/**
+	 * @summary 实现异步迭代器接口
+	 * @return
+	 * @desc    适用于 for-await-of
+	 * */
+	[Symbol.asyncIterator](){
+		return this._value[Symbol.asyncIterator]();
+	}
+
+	// ---------- 公有属性 ----------
+	/**
+	 * @summary 实现 toStringTag 接口
+	 * @desc    在 Object.prototype.toString.call( new Model() ); 时将返回 [object Model]
+	 * */
+	get [Symbol.toStringTag](){
+		return 'Model';
 	}
 }
 

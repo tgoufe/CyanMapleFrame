@@ -105,7 +105,7 @@ function registerServiceWorker(options={}, welcome=''){
 						resolve( navigator.serviceWorker.controller );
 					}
 					else{
-						reject();
+						reject( new Error('Service Worker 注册失败') );
 					}
 					// resolve( registerServiceWorker._CACHE[config.file] );
 				});

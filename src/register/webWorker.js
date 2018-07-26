@@ -7,7 +7,7 @@ import merge from '../util/merge.js';
  * @function    registerWebWorker
  * @param   {Object}    [options={}]
  * @param   {string}    options.file
- * @return  {Promise}   返回一个 Promise 对象，在 resolve 时传入生成的 Web Worker 实例
+ * @return  {Promise<Worker, Error>}    返回一个 Promise 对象，在 resolve 时传入生成的 Web Worker 实例
  * */
 function registerWebWorker(options={}){
 	let config = merge(options, registerWebWorker._CONFIG)
