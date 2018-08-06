@@ -95,7 +95,7 @@ function registerServiceWorker(options={}, welcome=''){
 						return subscription;
 					}).then(({endpoint})=>{
 						// 将 endpoint 订阅信息发送到服务器端保存
-					});
+					}, ()=>{});
 
 					/**
 					 * 当 Service Worker 未注册成功时

@@ -20,19 +20,15 @@ const IMAGE_EXT = [
 /**
  * @summary     执行 Service Worker 监听事件
  * @function
- * @param       {string[]}      [cacheUrls=[]]
- * @param       {string}        [preCacheName='precache']
- * @param       {string}        [runtimeCacheName='runtime']
- * @param       {Object}        [errorHandler=[]]
- * @param       {string|Array}  [errorHandler[].ext]
- * @param       {Function}      [errorHandler[].handler]
+ * @param       {string}                [cacheName='cacheStorage']
+ * @param       {Request[]|string[]}    [cacheUrls=[]]
+ * @param       {Object}                [errorHandler=[]]
+ * @param       {string|Array}          [errorHandler[].ext]
+ * @param       {Function}              [errorHandler[].handler]
  * */
-function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheName='runtime', errorHandler=[]){
-	const preCache = new CacheStorageModel({
-			cacheName: preCacheName
-		})
-		, runtimeCache = new CacheStorageModel({
-			cacheName: runtimeCacheName
+function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[]){
+	const cacheStorage = new CacheStorageModel({
+			cacheName
 		})
 		;
 
@@ -44,17 +40,32 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 	self.addEventListener('install', (event)=>{
 		console.log('Service Worker 安装完成，install event', event);
 
-		// 预加载
-		event.waitUntil( preCache.addAll( cacheUrls ).then(()=>{
-			console.log('已预缓存', cacheUrls);
+		let preCache = new Promise((resolve, reject)=>{
+				if( Array.isArray(cacheUrls) && cacheUrls.length ){
+					resolve( cacheUrls );
+				}
+				else{
+					reject();
+				}
+			})
+			;
 
+		event.waitUntil( preCache.then((cacheUrls)=>{   // 预加载
+			console.log('预加载', cacheUrls);
+
+			return cacheStorage.addAll( cacheUrls );
+		}, ()=>{
+			console.log('没有预加载文件');
+		}).then(()=>{
 			/**
 			 * self.skipWaiting 跳过等待激活新的 Service Worker
 			 * 让 Service Worker 进入 activate 状态
 			 * */
 			return self.skipWaiting();
-		}, (e)=>{
-			// 安装失败  todo 发送记录
+		}).catch((e)=>{
+			// 安装失败
+			// todo 发送记录
+
 			console.log( e );
 		}) );
 	});
@@ -67,13 +78,15 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 
 		// 更新，将不是正在使用的缓存删除
 		event.waitUntil( Promise.all([
-			preCache.keys()
-			, [preCacheName, runtimeCacheName]
-		]).then(([keyList, cacheNames])=>{
+			cacheStorage.keys()
+			, cacheName
+		]).then(([keyList, cacheName])=>{
 
 			return Promise.all( keyList.reduce((all, key)=>{
-				if( cacheNames.indexOf(key) === -1 ){
-					all.push( preCache.cacheDelete(key) );
+				
+				// 更新，将不是正在使用的缓存删除
+				if( cacheName !== key ){
+					all.push( cacheStorage.cacheDelete(key) );
 				}
 
 				return all;
@@ -113,7 +126,7 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 		}
 
 		// 克隆该请求，Request 对象是 stream 类型的，只能读取一次
-		event.respondWith( runtimeCache.getData( request.clone() ).then((response)=>{
+		event.respondWith( cacheStorage.getData( request.clone() ).then((response)=>{
 			let result
 				;
 
@@ -221,7 +234,7 @@ function serviceWorkerRun(cacheUrls=[], preCacheName='precache', runtimeCacheNam
 				}
 
 				if( isCache ){
-					runtimeCache.setData(request, response.clone()).then(()=>{
+					cacheStorage.setData(request, response.clone()).then(()=>{
 						console.log('已缓存 '+ request.url);
 					});
 				}
