@@ -14,9 +14,6 @@ let vm = new Vue({
 				url: './router.html'
 				, title: 'router 功能测试'
 			}, {
-				url: './routerPage.html'
-				, title: 'router + vue 测试'
-			}, {
 				url: './listener.html'
 				, title: 'listener 事件监听器功能测试'
 			}, {

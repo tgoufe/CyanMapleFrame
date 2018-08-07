@@ -76,16 +76,6 @@ module.exports = {
 			, inject: 'body'
 		})
 		, new HtmlWebpackPlugin({
-			filename: 'routerPage.html'
-			, template: path.resolve(__dirname, 'demo/src/tpl/routerPage.html')
-			, minify: {    //压缩HTML文件
-				removeComments: true        //移除HTML中的注释
-				, collapseWhitespace: true  //删除空白符与换行符
-			}
-			, chunks: ['base', 'routerPage']
-			, inject: 'body'
-		})
-		, new HtmlWebpackPlugin({
 			filename: 'error.html'
 			, template: path.resolve(__dirname, 'demo/src/tpl/error.html')
 			, minify: {    //压缩HTML文件
@@ -117,7 +107,6 @@ module.exports = {
 	//页面入口文件配置
 	, entry: {
 		base: ['maple']
-		, 'vue-plugin/router': [path.resolve(__dirname, 'src/vue-plugin/router.js')]
 
 		, index: [path.resolve(__dirname, 'demo/src/javascript/index.js')]
 
@@ -126,7 +115,6 @@ module.exports = {
 		, listener: [path.resolve(__dirname, 'demo/src/javascript/listener.js')]
 		, model:    [path.resolve(__dirname, 'demo/src/javascript/model.js')]
 		, router:   [path.resolve(__dirname, 'demo/src/javascript/router.js')]
-		, routerPage:   [path.resolve(__dirname, 'demo/src/javascript/routerPage.js')]
 		, error:    [path.resolve(__dirname, 'demo/src/javascript/error.js')]
 		, eventSource:    [path.resolve(__dirname, 'demo/src/javascript/eventSource.js')]
 		, socket:    [path.resolve(__dirname, 'demo/src/javascript/socket.js')]
