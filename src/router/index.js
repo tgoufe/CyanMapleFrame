@@ -24,7 +24,7 @@ const CONFIG = {
  * @summary     路由信息
  * @typedef     {Object}        RouteConfig
  * @property    {string|RegExp} path
- * @property    {RouterEvent}   callback
+ * @property    {RouterEvent}   [callback]
  // * @property    {Array}         [route.children]    // todo 子路由功能
  * */
 
@@ -235,7 +235,7 @@ class Router{
 	 *          解析出来的路由参数将以组合到传入 RouterEvent 函数的参数 params 中
 	 *          若存在同名属性则覆盖
 	 * */
-	register(route, callback){
+	register(route, callback=(()=>{})){
 		let paramNames = []
 			, pattern = null
 			, path = ''
@@ -253,7 +253,7 @@ class Router{
 		// 处理 path
 		if( typeof route === 'object' && !(route instanceof RegExp) ){
 			path = route.path;
-			callback = route.callback;
+			callback = route.callback || (()=>{});
 		}
 		else{
 			path = route;
@@ -304,10 +304,12 @@ class Router{
 	}
 	/**
 	 * @summary 判断已注册的路由中是否有匹配该路径
-	 * @param   {string}    path
+	 * @param   {string|Url}    path
 	 * @return  {boolean}
 	 * */
 	has(path){
+		path = url.parseUrl( path );
+		
 		return this.routers.some((route)=>{
 			return route.pattern.test( path );
 		});
