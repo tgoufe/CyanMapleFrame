@@ -308,7 +308,7 @@ class Router{
 	 * @return  {boolean}
 	 * */
 	has(path){
-		path = url.parseUrl( path );
+		path = url.parseUrl( path ).path;
 		
 		return this.routers.some((route)=>{
 			return route.pattern.test( path );
