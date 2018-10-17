@@ -82,7 +82,7 @@ class Router{
 		}
 		else if( this.config.mode === 'hash' ){
 			url.hashChange.add((e)=>{
-				let newUrl = e.newUrl
+				let newUrl = e.newURL
 					, tempUrl = url.parseUrl( newUrl )
 					, newHash = tempUrl.hash
 					;
@@ -184,7 +184,10 @@ class Router{
 
 		url.pushHistory( targetUrl.pack() );
 
-		this._historyList.push( targetUrl.pack() );
+		this._historyList.push({
+			url: targetUrl.pack()
+			, time: Date.now()
+		});
 
 		this._trigger();
 	}
@@ -193,8 +196,6 @@ class Router{
 	 * @param   {Url}   targetUrl
 	 * */
 	_goHash(targetUrl){
-		this._historyList.push( url.source +'#'+ targetUrl.path + targetUrl.query );
-
 		url.setHash( targetUrl.path + targetUrl.query );
 	}
 
@@ -335,7 +336,7 @@ class Router{
 			else if( this.config.mode === 'hash' ){ // hash 模式
 				// hash 模式下并不直接调用 _get 方法来执行路径跳转
 				// 使用 url.setHash 设置 hash 来触发 hashChange 事件来调用 _get 方法
-				// 因为 修改 hash 与 pushState 方法不同，pushState 方法不会触发 popState 事件
+				// 因为修改 hash 与 pushState 方法不同，pushState 方法不会触发 popState 事件
 				// 但 hash 的修改都会触发 hashChange 事件
 				this._goHash( targetUrl );
 			}

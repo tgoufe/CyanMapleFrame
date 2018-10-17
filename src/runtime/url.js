@@ -426,8 +426,8 @@ url.hashChange = listener('hashchange', (e, newUrl)=>{
 	let temp
 		;
 
-	if( e.newUrl ){
-		temp = url.parseUrl( e.newUrl );
+	if( e.newURL ){
+		temp = url.parseUrl( e.newURL );
 	}
 	else if( newUrl ){
 		temp = url.parseUrl( newUrl );
