@@ -165,7 +165,7 @@ class Router{
 
 				try{
 					// 执行路由回调
-					route.callback( temp );
+					route.callback && route.callback( temp );
 				}
 				catch(e){
 					console.log(path, '路由执行错误', e);
