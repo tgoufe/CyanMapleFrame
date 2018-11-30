@@ -18,13 +18,16 @@ const CONFIG = {
  * @summary     路由回调函数
  * @callback    RouterEvent
  * @param       {Object}    params
+ * @return      {boolean|Promise|*} 返回 false 或 Promise.reject() 会中断后续的执行
  * */
 
 /**
  * @summary     路由信息
  * @typedef     {Object}        RouteConfig
  * @property    {string|RegExp} path
+ * @property    {RouterEvent}   [before]
  * @property    {RouterEvent}   [callback]
+ * @property    {RouterEvent}   [after]
  // * @property    {Array}         [route.children]    // todo 子路由功能
  * */
 
@@ -65,14 +68,14 @@ class Router{
 
 				if( this.has(tempUrl.path) ){
 
-					this._historyList.push({
-						url: tempUrl.source
-						, time: Date.now()
+					this._get( tempUrl ).then(()=>{
+						this._historyList.push({
+							url: tempUrl.source
+							, time: Date.now()
+						});
+					}).then(()=>{
+						this._trigger();
 					});
-
-					this._get( tempUrl );
-
-					this._trigger();
 				}
 				else{
 					console.log('router 中不存在', location.href, e);
@@ -91,14 +94,14 @@ class Router{
 
 				if( this.has( tempUrl.path ) ){
 
-					this._historyList.push({
-						url: newUrl
-						, time: Date.now()
+					this._get( tempUrl ).then(()=>{
+						this._historyList.push({
+							url: newUrl
+							, time: Date.now()
+						});
+					}).then(()=>{
+						this._trigger();
 					});
-
-					this._get( tempUrl );
-
-					this._trigger();
 				}
 				else{
 					console.log('router 中不存在', location.href, e);
@@ -137,42 +140,88 @@ class Router{
 		this._listener.trigger(from, to);
 	}
 	/**
+	 * @summary 找到 path 对应 route 在 this.routers 中的位置
+	 * @param   {string}    path
+	 * @return  {number}    若不存在返回 -1
+	 * */
+	_getRouteIndex(path){
+		return this.routers.findIndex((route)=>{
+			return route.pattern.test( path );
+		});
+	}
+	/**
 	 * @summary 跳转到路径
 	 * @private
 	 * @param   {Url}       targetUrl
-	 * @return  {boolean}   是否有匹配的路由执行成功
+	 * @return  {Promise}
 	 * */
 	_get(targetUrl){
 		let path = targetUrl.path
 			, params = targetUrl.params
+			, index = this._getRouteIndex( path )
+			, router
+			, result
+			, execute
+			, temp
 			;
 
-		return this.routers.some((route)=>{
-			let result = route.pattern.exec( path )
-				, temp
-				;
+		if( index !== -1 ){
+			router = this.routers[index];
+			result = router.pattern.exec( path )
+		}
+		else{
+			execute = Promise.reject('router 中不存在');
+		}
 
-			if( result ){    // 存在匹配 path
+		if( result ){    // 存在匹配 path
+			// 解析 url 中的参数
+			temp = result.slice(1).reduce((all, d, i)=>{
+				all[router.paramNames[i]] = d;
 
-				// 解析 url 中的参数
-				temp = result.slice(1).reduce((all, d, i)=>{
-					all[route.paramNames[i]] = d;
+				return all;
+			}, {});
 
-					return all;
-				}, {});
+			temp = merge(temp, params);
 
-				temp = merge(temp, params);
-
-				try{
-					// 执行路由回调
-					route.callback && route.callback( temp );
+			execute = Promise.resolve().then(()=>{
+				if( router.before ){
+					return router.before(temp);
 				}
-				catch(e){
-					console.log(path, '路由执行错误', e);
+			}).then((beforeRS)=>{
+				if( beforeRS === false ){
+					return Promise.reject('路由执行被阻止, before 返回 false');
 				}
+
+				if( router.callback ){
+					return router.callback( temp );
+				}
+			}).then((callbackRS)=>{
+				if( callbackRS === false ){
+					return Promise.reject('路由执行被阻止, callback 返回 false');
+				}
+
+				if( router.after ){
+					return router.after( temp );
+				}
+			}).then((afterRS)=>{
+				if( afterRS === false ){
+					return Promise.reject('路由执行被阻止, after 返回 false');
+				}
+			});
+		}
+		else{
+			execute = Promise.reject('路由路径不匹配');
+		}
+
+		return execute.catch((e)=>{
+			if( e instanceof  Error){
+				console.log(path, '路由执行错误', e);
+			}
+			else{
+				console.log(path, e);
 			}
 
-			return !!result;
+			return Promise.reject();
 		});
 	}
 	/**
@@ -180,16 +229,16 @@ class Router{
 	 * @param   {Url}   targetUrl
 	 * */
 	_goHistory(targetUrl){
-		this._get( targetUrl );
+		this._get( targetUrl ).then(()=>{
+			url.pushHistory( targetUrl.pack() );
 
-		url.pushHistory( targetUrl.pack() );
-
-		this._historyList.push({
-			url: targetUrl.pack()
-			, time: Date.now()
+			this._historyList.push({
+				url: targetUrl.pack()
+				, time: Date.now()
+			});
+		}).then(()=>{
+			this._trigger();
 		});
-
-		this._trigger();
 	}
 	/**
 	 * @summary hash 模式下的 go 接口的逻辑调用
@@ -294,12 +343,12 @@ class Router{
 			});
 		}
 
-		// todo 子路由
-		if( typeof route === 'object' && ('children' in route) ){
-			// this.children = new Router({
-			// 	routers: router.children
-			// });
-		}
+		// todo 子路由 是否需要？
+		// if( typeof route === 'object' && ('children' in route) ){
+		// 	// this.children = new Router({
+		// 	// 	routers: router.children
+		// 	// });
+		// }
 
 		return this;
 	}
@@ -310,10 +359,8 @@ class Router{
 	 * */
 	has(path){
 		path = url.parseUrl( path ).path;
-		
-		return this.routers.some((route)=>{
-			return route.pattern.test( path );
-		});
+
+		return this._getRouteIndex( path ) !== -1;
 	}
 	/**
 	 * @summary 页面前进到目标 path
