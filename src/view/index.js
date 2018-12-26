@@ -5,10 +5,10 @@
  * */
 
 import url          from '../runtime/url.js';
-import {listener, Listener} from '../listener.js';
+import {listener}   from '../listener.js';
 
 import resize       from './resize.js';
-import scroll       from './scroll.js';
+import scroll, {ScrollObserver} from './scroll.js';
 
 import devicemotion from './deviceMotion.js';
 
@@ -20,10 +20,12 @@ import visibilitychange from './visibilityChange.js';
 import message      from './message.js';
 
 /**
- * 统计将用的的事件
+ * 统计将用到的事件
  * */
 import beforeunload from './beforeUnload.js';
 import unload       from './unload.js';
+
+import postMessage  from './postMessage.js';
 
 let needRefreshOn = false
 
@@ -38,8 +40,8 @@ let needRefreshOn = false
 			return ;
 		}
 
-		pageShow.add(()=>{
-			pageHide.add(()=>{
+		pageshow.add(()=>{
+			pagehide.add(()=>{
 				url.reload();
 			});
 		});
@@ -67,20 +69,6 @@ let needRefreshOn = false
 		}
 
 		return rs;
-	}
-
-	/**
-	 * @summary     向其它窗口 或 Web Worker 发送消息
-	 * @function
-	 * @memberOf    maple.view
-	 * @param       {Window|Worker|Object}  targetWindow
-	 * @param       {*}                     message
-	 * @param       {string}                [targetOrigin='*']  * 表示无限制，也可以是一个 url
-	 * @param       {*}                     [transfer]
-	 * @desc        MessageHandler 为 iOS 下原生与 JS 交互的接口
-	 * */
-	, postMessage = (targetWindow, message, targetOrigin='*', transfer)=>{
-		targetWindow.postMessage(message, targetOrigin, transfer);
 	}
 
 	/**
@@ -143,6 +131,8 @@ let view = {
 		, trigger
 		, eventList
 		, ...eventList
+
+		, ScrollObserver
 
 		, needRefresh
 

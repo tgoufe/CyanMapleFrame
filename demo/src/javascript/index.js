@@ -31,6 +31,9 @@ let vm = new Vue({
 			}, {
 				url: './socket.html'
 				, title: 'socket 功能测试'
+			}, {
+				url: './intersectionObserver.html'
+				, title: 'intersectionObserver 功能测试'
 			}]
 		}
 	})

@@ -103,6 +103,16 @@ module.exports = {
 			, chunks: ['base', 'socket']
 			, inject: 'body'
 		})
+		, new HtmlWebpackPlugin({
+			filename: 'intersectionObserver.html'
+			, template: path.resolve(__dirname, 'demo/src/tpl/intersectionObserver.html')
+			, minify: {    //压缩HTML文件
+				removeComments: true        //移除HTML中的注释
+				, collapseWhitespace: true  //删除空白符与换行符
+			}
+			, chunks: ['base', 'intersectionObserver']
+			, inject: 'body'
+		})
 	]
 	//页面入口文件配置
 	, entry: {
@@ -118,6 +128,7 @@ module.exports = {
 		, error:    [path.resolve(__dirname, 'demo/src/javascript/error.js')]
 		, eventSource:    [path.resolve(__dirname, 'demo/src/javascript/eventSource.js')]
 		, socket:    [path.resolve(__dirname, 'demo/src/javascript/socket.js')]
+		, intersectionObserver: [path.resolve(__dirname, 'demo/src/javascript/intersectionObserver.js')]
 	}
 	//入口文件输出配置
 	, output: {

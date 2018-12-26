@@ -8,14 +8,77 @@
 import {listener}   from '../listener.js';
 
 /**
+ * @class
+ * @classdesc   基于 IntersectionObserver 封装
+ * */
+class ScrollObserver {
+	/**
+	 * @constructor
+	 * @param   {Object}    [options={}]
+	 * @param   {Element}   [options.root]
+	 * @param   {string}    [options.rootMargin]    计算交叉值时添加至根的边界盒中的一组偏移量，语法和 CSS 中的 margin 属性等同，默认值为 '0px 0px 0px 0px'
+	 * @param   {number}    [options.threshold]     监听目标与边界盒交叉区域的比例值，从 0.0 到 1.0 之间的数组
+	 * */
+	constructor(options={}){
+		this._listener = listener('intersection');
+		this._observer = new IntersectionObserver((entries)=>{
+			entries.forEach((entry)=>{
+				this._listener.trigger(entry);
+			});
+		}, options);
+	}
+
+	/**
+	 * @summary     监听回调函数
+	 * @callback    IntersectionCallback
+	 * @param       {Object}                    event
+	 * @param       {IntersectionObserverEntry} entry
+	 * */
+
+	/**
+	 * @summary 监听一个目标元素
+	 * @param   {Element|NodeList|HTMLCollection}   target
+	 * @param   {Function}                          handler
+	 * */
+	observe(target, handler){
+		if( target instanceof Element ){
+			this._observer.observe( target );
+		}
+		else if( target instanceof NodeList || target instanceof HTMLCollection ){
+			Array.from( target ).forEach((element)=>{
+				this._observer.observe( element );
+			});
+		}
+		else{
+			console.log('监听目标非 Element、NodeList、HTMLCollection 类型对象，无法监听');
+			return;
+		}
+
+		this._listener.add( handler );
+	}
+	/**
+	 * @summary 停止监听目标元素
+	 * @param   {Element}   target
+	 * */
+	unobserve(target){
+		this._observer.unobserve( target );
+	}
+	/**
+	 * @summary 停止监听工作
+	 * */
+	disconnect(){
+		this._observer.disconnect();
+	}
+}
+
+/**
  * @memberOf    maple.view
  * @type        {Listener}
  * */
 let scroll = listener('scroll', {
 		useDebounce: true
 	})
-	;
-let scrollTarget
+	, scrollTarget
 	, body = document.body
 	, doc = document.documentElement
 	, tempTop = body.scrollTop
@@ -172,4 +235,15 @@ scroll.scrollBar = function(offset, value){
 	}
 };
 
-export default scroll
+scroll.observer = new ScrollObserver();
+
+scroll.resetObserver = function(options={}){
+	scroll.observer.disconnect();
+	scroll.observer = new ScrollObserver( options );
+};
+
+export default scroll;
+
+export {
+	ScrollObserver
+};

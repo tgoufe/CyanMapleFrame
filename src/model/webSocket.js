@@ -239,7 +239,7 @@ class WebSocketModel extends Model{
 	 * */
 	reset(){
 		console.log('重置当前 Web Socket 连接');
-		this.close().then(()=>{
+		return this.close().then(()=>{
 			this._conn = this._createConn();
 
 			return true;
