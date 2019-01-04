@@ -90,6 +90,7 @@ class ServiceModel extends Model{
 	// ---------- 私有方法 ----------
 	/**
 	 * @summary 对 setData 和 getData 的 options 添加默认参数
+	 * @private
 	 * @param   {Object}    options setData 和 getData 的 options 参数
 	 * @return  {Object}
 	 * */
@@ -138,21 +139,54 @@ class ServiceModel extends Model{
 			return this.interceptor.res.fireReduce( result );
 		});
 	}
+	/**
+	 * @summary 发送请求，在发送请求之前执行请求拦截器，在请求返回后执行响应拦截器
+	 * @private
+	 * @param   {string}    topic
+	 * @param   {Object}    options
+	 * @return  {Promise}
+	 * */
+	_send(topic, options){
+		// 执行请求拦截器
+		return this._reqInterceptor(topic, options).then(({topic, options})=>{
+			// 发送请求，向服务器发送数据
+			console.log('发送 '+ options.method +' 请求', topic);
+
+			return request(topic, options);
+		}).then((result)=>{
+
+			// 执行响应拦截器
+			return this._resInterceptor( result );
+		}).then((result)=>{
+			if( 'res' in result ){
+				return result.res;
+			}
+			else if( 'error' in result ){
+				return Promise.reject( result.error );
+			}
+			else{
+				return Promise.reject( new Error('未知错误') );
+			}
+		});
+	}
 
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary     设置数据，默认视为发送 POST 请求到服务器，不会将返回结果保存到本地缓存
 	 * @override
-	 * @param       {string|Object} topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
-	 * @param       {string}        topic.url
-	 * @param       {Object}        [options={}]
-	 * @param       {Object}        [options.data]
-	 * @param       {string}        [options.method]
+	 * @param       {string|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
+	 * @param       {string}            topic.url
+	 * @param       {Object|boolean}    [options={}]
+	 * @param       {Object}            [options.data]
+	 * @param       {string}            [options.method]
+	 * @param       {boolean}           [isCache=false]
 	 * @return      {Promise}
 	 * */
-	setData(topic, options={}){
-		let result
-			;
+	setData(topic, options={}, isCache=false){
+		if( typeof options === 'boolean' ){
+			isCache = options;
+			options = {};
+		}
 
 		if( typeof topic === 'object' ){
 			options = topic;
@@ -168,40 +202,30 @@ class ServiceModel extends Model{
 		if( topic ){
 			
 			// 执行请求拦截器
-			result = this._reqInterceptor(topic, options).then(({topic, options})=>{
+			return this._send(topic, options).then((data)=>{
+				if( isCache && this._syncTo ){
+					return this._syncTo.setData(topic, data).then(()=>{
+						return data;
+					}, (e)=>{
+						console.log( e );
 
-				// 发送请求，向服务器发送数据
-				console.log('发送 post 请求', topic);
-
-				return request(topic, options);
-			}).then((result)=>{
-
-				// 执行响应拦截器
-				return this._resInterceptor( result );
-			}).then((result)=>{
-				if( 'res' in result ){
-					return result.res;
-				}
-				else if( 'error' in result ){
-					return Promise.reject( result.error );
+						return data;
+					});
 				}
 				else{
-					console.log('未知错误', result.topic);
-
-					return Promise.reject( new Error('未知错误') );
+					return data;
 				}
 			});
 		}
 		else{   // topic 无值不做任何处理
-			result = Promise.reject( new Error('缺少 topic 参数') );
+			return Promise.reject( new Error('缺少 topic 参数') );
 		}
-
-		return result;
 	}
 	/**
 	 * @summary     获取数据，默认视为发送 GET 请求到服务器，可以将返回结果保存到本地缓存
 	 * @override
 	 * @param       {string|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
+	 * @param       {string}            topic.url
 	 * @param       {Object|boolean}    [options={}]        对象类型为 ajax 参数，boolean 类型时将其赋值给 isCache，自身设置为 {}
 	 * @param       {Object}            [options.data]
 	 * @param       {string}            [options.method]
@@ -223,54 +247,28 @@ class ServiceModel extends Model{
 			topic = options.url;
 		}
 
+		topic = this._config.baseUrl + topic;
+
+		options = this._setOpts( options );
+
+		options.method = options.method || 'GET';
+
 		if( topic ){
 			// 判断是否设置了本地缓存以及是否从本地缓存中读取数据
 			if( isCache && this._syncTo ){
-				// todo 解决多个本地缓存优先级的问题
 				result = this._syncTo.getData( topic );
 			}
 			else{
 				result = Promise.reject('没有同步缓存');
-
-				topic = this._config.baseUrl + topic;
-
-				options = this._setOpts( options );
-
-				options.method = options.method || 'GET';
 			}
 
 			// 当从本地缓存时未找到期望的数据会 reject，或者不从缓存中获取数据时也会 reject
 			result = result.catch(()=>{
 
 				// 执行请求拦截器
-				return this._reqInterceptor(topic, options).then(()=>{
-
-					// 发送请求，从服务器获取数据
-					console.log('发送 get 请求', topic);
-
-					return request(topic, options);
-				}).then((result)=>{
-
-					// 执行响应拦截器
-					return this._resInterceptor( result );
-				}).then((result)=>{
-					if( 'res' in result ){
-						return result.res;
-					}
-					else if( 'error' in result ){
-						return Promise.reject( result.error );
-					}
-					else{
-
-						return Promise.reject( new Error('未知错误') );
-					}
-
-				}).then((data)=>{   // 将数据同步
-					let result
-						;
-
+				return this._send(topic, options).then((data)=>{   // 将数据同步
 					if( isCache && this._syncTo ){  // 如果有设置缓存，则将请求返回的数据存入本地缓存
-						result = this._syncTo.setData(topic, data).then(()=>{
+						return this._syncTo.setData(topic, data).then(()=>{
 							return data;
 						}, (e)=>{
 							console.log( e );
@@ -279,10 +277,8 @@ class ServiceModel extends Model{
 						});
 					}
 					else{
-						result = data;
+						return data;
 					}
-
-					return result;
 				});
 			});
 		}
@@ -295,14 +291,51 @@ class ServiceModel extends Model{
 	/**
 	 * @summary     删除数据
 	 * @override
-	 * @param       {string|Object} topic
-	 * @param       {Object}        [options]
+	 * @param       {string|Object}     topic
+	 * @param       {string}            topic.url
+	 * @param       {Object|boolean}    [options={}]
+	 * @param       {Object}            [options.data]
+	 * @param       {string}            [options.method]
+	 * @param       {boolean}           [isCache=false]
 	 * @return      {Promise<boolean>}  返回 resolve(true)
 	 * @todo        可以考虑支持 RESTful API，发送 delete 类型的请求
 	 * */
-	removeData(topic, options){
+	removeData(topic, options={}, isCache=false){
+		if( typeof options === 'boolean' ){
+			isCache = options;
+			options = {};
+		}
 
-		return Promise.resolve( true );
+		if( typeof topic === 'object' ){
+			options = topic;
+			topic = options.url;
+		}
+
+		topic = this._config.baseUrl + topic;
+
+		options = this._setOpts( options );
+
+		options.method = options.method || 'DELETE';
+
+		if( topic ){
+			return this._send(topic, options).then((data)=>{
+				if( isCache && this._syncTo ){
+					return this._syncTo.removeData( topic ).then(()=>{
+						return data;
+					}, (e)=>{
+						console.log( e );
+
+						return data;
+					});
+				}
+				else{
+					return data
+				}
+			});
+		}
+		else{ // topic 无值不做任何处理
+			return Promise.reject( new Error('缺少 topic 参数') );
+		}
 	}
 	/**
 	 * @summary 清空数据，实际不做任何处理

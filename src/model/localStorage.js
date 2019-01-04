@@ -49,7 +49,6 @@ class LocalStorageModel extends Model{
 			if( this._config.listen ){
 				LocalStorageModel.listenOn();
 
-				// todo 保留事件
 				LocalStorageModel._GLOBAL_LISTENER.add((e)=>{
 					let topic = e.key
 						, newVal = e.newValue

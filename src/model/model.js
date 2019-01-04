@@ -380,16 +380,8 @@ class Model{
 				this._value[topic] = value;
 			}
 			else{
-				// todo 判断 value 是 object 类型的进行深度 defineProperty
-
-				// if( typeof value === 'object' ){
-				// 	Object.keys( value ).forEach((d)=>{
-				// 		this._setObserver(value[d], d, topic);
-				// 	});
-				// }
-
 				/**
-				 * 不能同时设置访问器 (get 和 set) 和 writable 或 value，否则会报错误
+				 * 不能同时设置访问器（get 和 set）和 writable 或 value，否则会报错误
 				 * configurable 设为 true 才可以使用 delete
 				 * */
 				Object.defineProperty(this._value, topic, {
@@ -414,7 +406,7 @@ class Model{
 	}
 	/**
 	 * @summary 获取数据
-	 * @param   {string|string[]|...string} topic
+	 * @param   {...string|string[]} topic
 	 * @return  {Promise<*, null>}          返回一个 Promise 对象，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
 	 * @desc    当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值，当传入多个参数时视为传入数组的操作
 	 * */
@@ -551,7 +543,7 @@ class Model{
 		model.forEach((d)=>{
 			if( typeof d === 'object' &&
 				d instanceof Model &&
-				d.constructor !== this.constructor &&
+				d !== this &&
 				this._syncList.indexOf( d ) === -1 ){
 
 				this._syncList.push( d );

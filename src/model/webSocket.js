@@ -83,11 +83,20 @@ class WebSocketModel extends Model{
 							;
 
 						if( data instanceof ArrayBuffer ){ // 二进制数据流
-							// todo 处理数据流
-							console.log(data)
+							// 处理数据流，不能直接操作，而是要通过类型数组对象或 DataView 对象来操作
+							console.log('ArrayBuffer', data);
+							data = {
+								topic: 'ArrayBuffer'
+								, data
+							};
 						}
 						else if( data instanceof Blob ){
-							//
+							// 处理二进制数据，可用于文件传输
+							console.log('Blob', data);
+							data = {
+								topic: 'Blob'
+								, data
+							}
 						}
 						else{
 							if( typeof data === 'string' ){
@@ -104,10 +113,13 @@ class WebSocketModel extends Model{
 							else if( typeof data !== 'object' ){
 								data = {};
 							}
+							else{
 
-							if( data.topic && data.data ){
-								super.setData(data.topic, data.data);
 							}
+						}
+
+						if( data.topic && data.data ){
+							super.setData(data.topic, data.data);
 						}
 					};
 					conn.onerror = (e)=>{
