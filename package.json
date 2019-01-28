@@ -60,10 +60,9 @@
     "vue-html-loader": "~1.2.4",
     "vue-loader": "~13.7.2",
     "vue-style-loader": "~3.1.2",
-    "vue-template-compiler": "~2.5.16",
     "vueify": "~9.4.1",
     "webpack": "~3.11.0",
-    "webpack-dev-server": "~3.1.10",
+    "webpack-dev-server": "~3.1.14",
     "ws": "~4.1.0"
   },
   "dependencies": {

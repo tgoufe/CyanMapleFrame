@@ -1,7 +1,5 @@
 let webpack = require('webpack')
 	, path = require('path')
-	, HtmlWebpackPlugin = require('html-webpack-plugin')
-	, compiler = require('vue-template-compiler')
 	;
 
 module.exports = {

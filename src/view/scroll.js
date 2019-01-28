@@ -21,11 +21,19 @@ class ScrollObserver {
 	 * */
 	constructor(options={}){
 		this._listener = listener('intersection');
-		this._observer = new IntersectionObserver((entries)=>{
-			entries.forEach((entry)=>{
-				this._listener.trigger(entry);
-			});
-		}, options);
+
+		this._observer = new Promise((resolve, reject)=>{
+			if( 'IntersectionObserver' in self ){
+				resolve( new IntersectionObserver((entries)=>{
+					entries.forEach((entry)=>{
+						this._listener.trigger(entry);
+					});
+				}, options) );
+			}
+			else{
+				reject( new Error('当前浏览器不支持 IntersectionObserver') );
+			}
+		});
 	}
 
 	/**
@@ -42,11 +50,15 @@ class ScrollObserver {
 	 * */
 	observe(target, handler){
 		if( target instanceof Element ){
-			this._observer.observe( target );
+			this._observer.then((observer)=>{
+				observer.observe( target );
+			});
 		}
 		else if( target instanceof NodeList || target instanceof HTMLCollection ){
-			Array.from( target ).forEach((element)=>{
-				this._observer.observe( element );
+			this._observer.then((observer)=>{
+				Array.from( target ).forEach((element)=>{
+					observer.observe( element );
+				});
 			});
 		}
 		else{
@@ -61,13 +73,19 @@ class ScrollObserver {
 	 * @param   {Element}   target
 	 * */
 	unobserve(target){
-		this._observer.unobserve( target );
+		this._observer.then((observer)=>{
+			observer.unobserve( target );
+		});
 	}
 	/**
 	 * @summary 停止监听工作
 	 * */
 	disconnect(){
-		this._observer.disconnect();
+		this._observer.then((observer)=>{
+			observer.disconnect();
+
+			this._observer = Promise.reject( new Error('监听已停止') );
+		});
 	}
 }
 
