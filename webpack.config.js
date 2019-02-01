@@ -1,25 +1,19 @@
-let webpack = require('webpack')
-	, path = require('path')
+let path = require('path')
 	;
 
 module.exports = {
-	devtool: 'cheap-module-source-map'
-	//插件项
-	, plugins: [
-		// new webpack.optimize.CommonsChunkPlugin({name:'base'}),//提取公共文件
-		new webpack.optimize.UglifyJsPlugin({
-			compress: {
-				warnings: false
-			}
-			, sourceMap: true
-		})
-		, new webpack.optimize.CommonsChunkPlugin({
+	mode: 'production'
+	, devtool: 'cheap-module-source-map'
+	// webpack 4.0 插件项被 optimization 替代
+	, optimization: {
+		minimize: true
+		, splitChunks: {
 			name: 'index'
-		})
-	]
+		}
+	}
 	//页面入口文件配置
 	, entry: {
-		index: [path.resolve(__dirname, 'src/index.js')]
+		index: ['@babel/polyfill', path.resolve(__dirname, 'src/index.js')]
 		, 'worker/serviceWork': [path.resolve(__dirname, 'src/worker/serviceWorker.js')]
 		, 'worker/webWork': [path.resolve(__dirname, 'src/worker/webWorker.js')]
 	}

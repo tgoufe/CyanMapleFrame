@@ -589,16 +589,32 @@ class Model{
 	 * @return  {Array}
 	 * @desc    适用于 for-of
 	 * */
-	[Symbol.iterator](){
-		return this._value[Symbol.iterator]();
+	*[Symbol.iterator](){
+		let keys = Object.keys( this._value )
+			;
+
+		for(let i = 0, l = keys.length; i < l; i++){
+			yield {
+				topic: keys[i]
+				, value: this._value[keys[i]]
+			};
+		}
 	}
 	/**
 	 * @summary 实现异步迭代器接口
 	 * @return
 	 * @desc    适用于 for-await-of
 	 * */
-	[Symbol.asyncIterator](){
-		return this._value[Symbol.asyncIterator]();
+	*[Symbol.asyncIterator](){
+		let keys = Object.keys( this._value )
+			;
+
+		for(let i = 0, l = keys.length; i < l; i++){
+			yield Promise.resolve({
+				topic: keys[i]
+				, value: this._value[keys[i]]
+			});
+		}
 	}
 
 	// ---------- 公有属性 ----------
