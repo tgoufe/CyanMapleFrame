@@ -37,7 +37,6 @@
     "sinon": "~4.5.0",
     "sinon-chai": "~3.0.0",
     "style-loader": "~0.19.1",
-    "stylus": "^0.54.5",
     "stylus-loader": "~3.0.2",
     "vue-hot-reload-api": "~2.3.0",
     "vue-html-loader": "~1.2.4",
