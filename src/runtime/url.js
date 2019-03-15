@@ -284,6 +284,29 @@ url.back = ()=>{
 
 	return this;
 };
+/**
+ * @summary     页面前进
+ * @method
+ * @memberOf    url
+ * @return      {Url}   this
+ * */
+url.forward = ()=>{
+	history.forward();
+
+	return this;
+};
+/**
+ * @summary     调整到某一位置页面
+ * @method
+ * @memberOf    url
+ * @param       {number}    index
+ * @return      {Url}       this
+ * */
+url.go = (index)=>{
+	history.go( index );
+
+	return this;
+};
 
 /**
  * @summary     设置页面 hash
@@ -304,9 +327,9 @@ url.setHash = function(hash){
  * @summary     调整参数并指向调整后的路径，当前 url 添加到历史记录
  * @method
  * @memberOf    url
- * @param       {Object|string[]|...string} params
- * @param       {*|Object}                  [pushState]
- * @return      {Url}                       this
+ * @param       {string[]|Object}   params
+ * @param       {*|Object}          [pushState]
+ * @return      {Url}               this
  * @desc        只有两种情况下 pushState 才有效：
  *              1.当 params 是 Object 类型时
  *              2.当不满足 1 条件时，参数中的最后一个为 Object 类型时，视为 pushState
@@ -338,9 +361,9 @@ url.pushParams = function(params, pushState){
  * @summary     替换当前 url 上的参数
  * @method
  * @memberOf    url
- * @param       {Object|string[]|...string} params
- * @param       {*|Object}                  [replaceState]
- * @return      {Url}                       this
+ * @param       {Object|string[]}   params
+ * @param       {*|Object}          [replaceState]
+ * @return      {Url}               this
  * @desc        执行效果
  * */
 url.replaceParams = function(params, replaceState){

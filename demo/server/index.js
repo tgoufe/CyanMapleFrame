@@ -14,6 +14,9 @@ let express = require('express')
 	, webSocketServer
 	;
 
+const PORT = 9003
+	;
+
 web.use( bodyParser.json() );
 web.use( bodyParser.urlencoded({extended: true}) );
 web.use( cookieParser() );
@@ -56,8 +59,8 @@ web.get('/test/sse', function(req, res){
 	});
 });
 
-webServer = web.listen(9003, ()=>{
-	console.log('服务器运行中');
+webServer = web.listen(PORT, ()=>{
+	console.log(`服务器运行中，端口号 ${PORT}`);
 });
 
 /**

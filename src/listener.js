@@ -15,7 +15,7 @@ const LISTENER_CONFIG = {
 		type: ''
 		, target: self || null
 		, capture: true
-		, passsive: false
+		, passive: false
 		, once: false
 	}
 	;

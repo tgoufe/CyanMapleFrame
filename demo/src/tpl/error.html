@@ -10,6 +10,17 @@
 <div id="app">
 	<img :src="imgUrl" data-error-src="default"/>
 </div>
+<div>
+	<img src="a.jpg" onerror="errorHandler(this, event)" alt="">
+	<img src="a.jpg" onerror="errorHandler(this, event)" alt="">
+	<img src="a.jpg" onerror="errorHandler(this, event)" alt="">
+</div>
+<script>
+	window.errorHandler = function(target, event){
+		console.log(target, event);
 
+		target.src = '//image1.51tiangou.com/tgou2/img2/dum/dum_dog.png';
+	}
+</script>
 </body>
 </html>

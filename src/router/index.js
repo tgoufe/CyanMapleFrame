@@ -248,7 +248,6 @@ class Router{
 		url.setHash( targetUrl.path + targetUrl.query );
 	}
 
-
 	// ---------- 公有属性 ----------
 	get currentPath(){
 		let l = this._historyList.length
@@ -314,16 +313,6 @@ class Router{
 			pattern = path;
 		}
 		else if( typeof path === 'string' ){
-
-			if( !/^\//.test(path) ){    // 当前目录下
-				if( this.config.baseUrl ){
-					path = this.config.baseUrl + path;  // 基于 baseUrl
-				}
-				else{
-					path = url.dir + path;  // 添加根目录
-				}
-			}
-
 			// 替换动态路由参数
 			pattern = path.replace(/:([^\/]*)/g, (str, paramName)=>{
 				paramNames.push( paramName );
@@ -331,6 +320,17 @@ class Router{
 				return '([^\\\/]+)';
 			});
 
+			if( !/^\//.test(path) ){    // 非根目录，当前目录下
+				if( this.config.baseUrl ){
+					pattern = this.config.baseUrl + pattern;  // 基于 baseUrl
+				}
+				else{
+					pattern = url.dir + pattern;  // 添加根目录
+				}
+			}
+
+			// // 过滤掉路径中的非法字符
+			// pattern = new RegExp('^'+ pattern.replace(/([\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:])/g, "\\$1") +'$');
 			pattern = new RegExp('^'+ pattern +'$');
 		}
 
@@ -364,12 +364,19 @@ class Router{
 	}
 	/**
 	 * @summary 页面前进到目标 path
-	 * @param   {string|Url}    path
-	 * @param   {Object}        [params={}]
-	 * @return  {boolean}       是否存在对应 path
+	 * @param   {string|Url|number} path
+	 * @param   {Object}            [params={}]
+	 * @return  {boolean}           是否存在对应 path
 	 * @desc    当为 hash 模式时，该方法实际并未直接执行 router 的 callback，仅仅调用 url.setHash 方法，来触发 hashChange 事件进而执行 router 的 callback，所以将会是异步
+	 *          当 path 为数字类型的时候，实际为调用 url.go 方法，该封装主要为了统一调用对象
 	 * */
 	go(path, params={}){
+		if( typeof path === 'number' ){
+			url.go( path );
+
+			return true;
+		}
+
 		let targetUrl = url.parseUrl( path )
 			, rs = this.has( targetUrl.path )
 			;
@@ -397,6 +404,13 @@ class Router{
 	 * */
 	back(){
 		url.back();
+	}
+	/**
+	 * @summary 前进
+	 * @desc    实际为调用 url.forward 方法，该封装主要为了统一调用对象
+	 * */
+	forward(){
+		url.forward();
 	}
 
 	/**
