@@ -10,7 +10,7 @@
  * @memberOf    maple.util
  * @param       {Object}    target
  * @param       {Object}    defaults
- * @return      {object}
+ * @return      {Object}
  * */
 let merge = function(target, defaults){
 	return {

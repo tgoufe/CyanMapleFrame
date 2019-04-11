@@ -28,6 +28,8 @@ import HandlerQueue from './handlerQueue.js';
 // 工具函数
 import tools        from './tools.js';
 
+import thread       from './thread.js';
+
 export default {
 	debounce
 	, throttle
@@ -42,4 +44,6 @@ export default {
 
 	// , validate
 	, tools
+
+	, thread
 };
