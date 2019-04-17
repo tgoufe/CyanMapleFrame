@@ -14,14 +14,13 @@
  * */
 let thread = function(executor=()=>{}, once=true){
 	let code = `
-var executor = ${executor.toString()}
-	;
-self.onmessage = function(e){
+var executor = ${executor.toString()};
+onmessage = function(e){
 	try{
-		self.postMessage( executor(e.data) );
+		postMessage( executor(e.data) );
 	}
-	catch(e){
-		self.postMessage( e );
+	catch(error){
+		postMessage( error );
 	}			
 }
 `
@@ -33,6 +32,15 @@ self.onmessage = function(e){
 
 	return function(data){
 		return new Promise(function(resolve, reject){
+			let result = Object.defineProperty({}, 'data', {
+					set(v){
+						this._value = Promise.resolve( v );
+
+						resolve( v );
+					}
+				})
+				;
+
 			if( !worker ){
 				reject( new Error('worker 已终止') );
 			}
@@ -53,7 +61,7 @@ self.onmessage = function(e){
 					reject( e.data );
 				}
 				else{
-					resolve( e.data );
+					result.data = e.data
 				}
 			};
 			worker.onerror = reject;
