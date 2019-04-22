@@ -11,6 +11,11 @@ const MODEL_CONFIG = {
 		eventType: 'modelChange'
 	}
 	/**
+	 * 子类
+	 * @const
+	 * */
+	, MODEL = {}
+	/**
 	 * 子类对象缓存
 	 * @const
 	 * */
@@ -66,7 +71,7 @@ class Model{
 	constructor(config={}){
 		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 方法
 		this._history = Object.create( null );  // 历史记录
-		this._syncList = [];
+		this._syncToList = [];
 
 		this.config = merge(config, Model._CONFIG);
 
@@ -85,11 +90,11 @@ class Model{
 	 * */
 	static register(type, model){
 
-		if( type in Model && type in Model._MODEL_CACHE ){
+		if( type in Model._MODEL && type in Model._MODEL_CACHE ){
 			console.log('type', ' 重复注册，并已生成实例，不能覆盖');
 		}
 		else{
-			Model[type] = model;
+			Model._MODEL[type] = model;
 		}
 	}
 	/**
@@ -133,16 +138,16 @@ class Model{
 			}
 
 			// 判断 type 是否为别名
-			if( !(type in Model) && (type in Model._MODEL_ALIAS) ){
+			if( !(type in Model._MODEL) && (type in Model._MODEL_ALIAS) ){
 				type = Model._MODEL_ALIAS[type];
 			}
 
 			// 判断是否存在该子类
-			if( type in Model ){
+			if( type in Model._MODEL ){
 
 				if( notCache || !(type in Model._MODEL_CACHE) ){    // 不使用缓存或没有该子类实例
 
-					model = new Model[type]( options );
+					model = new Model._MODEL[type]( options );
 
 					if( !notCache ){
 
@@ -173,6 +178,14 @@ class Model{
 		return model;
 	}
 	/**
+	 * @summary 判断某一对象是否为 Model 类型
+	 * @param   {*}         target
+	 * @return  {boolean}   返回结果
+	 * */
+	static is(target){
+		return target[Symbol.toStringTag] === 'Model';
+	}
+	/**
 	 * todo
 	 * */
 	// static [Symbol.hasInstance](instance){
@@ -187,6 +200,14 @@ class Model{
 	 * */
 	static get _CONFIG(){
 		return MODEL_CONFIG;
+	}
+	/**
+	 * @summary 子类
+	 * @static
+	 * @const
+	 * */
+	static get _MODEL(){
+		return MODEL;
 	}
 	/**
 	 * @summary 子类对象缓存
@@ -272,20 +293,20 @@ class Model{
 	 * @param       {*}         value
 	 * */
 	_sync(topic, value){
-		if( this._syncList.length ){
-			Promise.all( this._syncList.map((d)=>{
+		if( this._syncToList.length ){
+			Promise.all( this._syncToList.map((m)=>{
 				let result
-				;
+					;
 
 				if( value !== null ){
-					result = d.setData(topic, value);
+					result = m.setData(topic, value);
 				}
 				else{
-					result = d.removeData( topic );
+					result = m.removeData( topic );
 				}
 
 				result.catch(function(e){
-					console.log(e, d.constructor.name, '同步失败');
+					console.log(e, m.constructor.name, topic, value, '同步失败');
 				});
 
 				return result;
@@ -434,7 +455,8 @@ class Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {string|string[]|...string} topic
+	 * @param   {string|string[]}           topic
+	 * @param   {...string}
 	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    目前子类的实现中都调用了 super.removeData，若其它子类的实现中并没有调用，但需对数据监控，应在适当的时候调用 _trigger 方法
 	 * */
@@ -540,13 +562,12 @@ class Model{
 			model = [model];
 		}
 
-		model.forEach((d)=>{
-			if( typeof d === 'object' &&
-				d instanceof Model &&
-				d !== this &&
-				this._syncList.indexOf( d ) === -1 ){
-
-				this._syncList.push( d );
+		model.forEach((m)=>{
+			if( Model.is( m )
+				&& m !== this
+				&& this._syncToList.indexOf( m ) === -1 ){
+				
+				this._syncToList.push( m );
 			}
 			else{   // 该实例类型已经存在
 				console.log('该实例类型已经存在');
@@ -561,11 +582,11 @@ class Model{
 	 * @return  {Model} 返回 this
 	 * */
 	cleanSync(model){
-		let i = this._syncList.indexOf( model )
+		let i = this._syncToList.indexOf( model )
 			;
 
 		if( i !== -1 ){
-			this._syncList.splice(i, 1);
+			this._syncToList.splice(i, 1);
 		}
 
 		return this;

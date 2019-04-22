@@ -139,6 +139,22 @@ class EventSourceModel extends Model{
 	clearData(){
 		return Promise.reject( false );
 	}
+	/**
+	 * @summary     将数据同步到本地存储，一次只能设置一个本地缓存
+	 * @override
+	 * @param       {Model}     model
+	 * @return      {Model}     返回 this
+	 * @todo        目前只能将数据同步到一个本地缓存中，是否考虑可以同步到多个本地缓存，亦或由本地缓存之间设置同步
+	 * */
+	syncTo(model){
+
+		// 判断 model 是继承自 Model 的类，且 Symbol.toStringTag 设置为 Model
+		if( Model.is( model ) ){
+			this._syncTo = model;
+		}
+
+		return this;
+	}
 
 	/**
 	 * @summary 关闭服务器端事件推送
@@ -178,6 +194,15 @@ class EventSourceModel extends Model{
 
 			return true;
 		});
+	}
+
+	// ---------- 公有属性 ----------
+	/**
+	 * @summary 实现 toStringTag 接口
+	 * @desc    在 Object.prototype.toString.call( new EventSourceModel() ); 时将返回 [object ServiceModel]
+	 * */
+	get [Symbol.toStringTag](){
+		return 'EventSourceModel';
 	}
 }
 

@@ -353,13 +353,21 @@ class ServiceModel extends Model{
 	 * */
 	syncTo(model){
 
-		// 判断 model 是继承自 Model 的类但并不继承自 ServiceModel
-		// todo 新加了子类 WebSocketMode 和 EventSourceModel 子类，是否需要判断
-		if( (model instanceof Model) && !(model instanceof ServiceModel) ){
+		// 判断 model 是继承自 Model 的类，且 Symbol.toStringTag 设置为 Model
+		if( Model.is( model ) ){
 			this._syncTo = model;
 		}
 
 		return this;
+	}
+
+	// ---------- 公有属性 ----------
+	/**
+	 * @summary 实现 toStringTag 接口
+	 * @desc    在 Object.prototype.toString.call( new ServiceModel() ); 时将返回 [object ServiceModel]
+	 * */
+	get [Symbol.toStringTag](){
+		return 'ServiceModel';
 	}
 }
 

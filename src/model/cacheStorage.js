@@ -115,7 +115,7 @@ class CacheStorageModel extends Model{
 	 * @summary 将缓存删除
 	 * @param   {string|Request}    topic
 	 * @param   {Object}            [options={}]    cache.delete 的可选参数
-	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回结果
+	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	removeData(topic, options={}){
 		topic = this._tranToRequest( topic );
@@ -188,6 +188,15 @@ class CacheStorageModel extends Model{
 		if( typeof callback === 'function' ){
 			this._store.catch( callback );
 		}
+	}
+
+	// ---------- 公有属性 ----------
+	/**
+	 * @summary 实现 toStringTag 接口
+	 * @desc    在 Object.prototype.toString.call( new Model() ); 时将返回 [object CacheStorageModel]
+	 * */
+	get [Symbol.toStringTag](){
+		return 'CacheStorageModel';
 	}
 }
 

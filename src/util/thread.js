@@ -32,14 +32,14 @@ onmessage = function(e){
 
 	return function(data){
 		return new Promise(function(resolve, reject){
-			let result = Object.defineProperty({}, 'data', {
-					set(v){
-						this._value = Promise.resolve( v );
-
-						resolve( v );
-					}
-				})
+			let result = {}
 				;
+			
+			Object.defineProperty(result, 'data', {
+				set(v){
+					resolve( v );
+				}
+			});
 
 			if( !worker ){
 				reject( new Error('worker 已终止') );

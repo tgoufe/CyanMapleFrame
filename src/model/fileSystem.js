@@ -250,8 +250,9 @@ class FileSystemModel extends Model{
 	}
 	/**
 	 * @summary 获取数据
-	 * @param   {string|string[]|...string} topic
-	 * @return  {Promise<*, null>}          返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
+	 * @param   {string|string[]}   topic
+	 * @param   {...string}
+	 * @return  {Promise<*, null>}  返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
 	 * @desc    获取数据时会优先从内存中取值，若没有则从 file system 中取值并将其存入内存中，当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
 	 * */
 	getData(topic){
@@ -303,8 +304,9 @@ class FileSystemModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
-	 * @param   {string|string[]|...string} topic
-	 * @return  {Promise<boolean>}          返回一个 Promise 对象，在 resolve 时传回 true
+	 * @param   {string|string[]}   topic
+	 * @param   {...string}
+	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	removeData(topic){
 		let argc = arguments.length
