@@ -93,9 +93,7 @@ class ScrollObserver {
  * @memberOf    maple.view
  * @type        {Listener}
  * */
-let scroll = listener('scroll', {
-		useDebounce: true
-	})
+let scroll = listener('scroll')
 	, scrollTarget
 	, body = document.body
 	, doc = document.documentElement

@@ -49,8 +49,6 @@ class Listener{
 
 		this._listener = null;      // 执行函数
 
-		// this._eventQueue = [];      // 事件对列
-
 		this._eventQueue = new HandlerQueue();
 	}
 
@@ -113,16 +111,16 @@ class Listener{
 	}
 	/**
 	 * @summary 开始监听事件
-	 * @return  {Listener}  返回 this，可以使用链式操作
-	 * @desc    当传入 wait 参数时根据生成 Listener 对象实例时的 useDebounce 或 useThrottle 参数来判断使用哪种方式，若都设置则 debounce 优先
+	 * @param   {ListenerCallback}  [callback]  若传入函数也可以绑定事件回调
+	 * @return  {Listener}          返回 this，可以使用链式操作
 	 * */
-	on(){
+	on(callback){
 
-		if( this._isListening ){
-			return this;
+		if( callback ){
+			this._eventQueue.add( callback );
 		}
 
-		if( !this._config.target ){
+		if( this._isListening || !this._config.target ){
 			return this;
 		}
 

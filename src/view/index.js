@@ -7,25 +7,11 @@
 import url          from '../runtime/url.js';
 import {listener}   from '../listener.js';
 
-import resize       from './resize.js';
 import scroll, {ScrollObserver} from './scroll.js';
 
-import devicemotion from './deviceMotion.js';
-
-import pageshow     from './pageShow.js';
-import pagehide     from './pageHide.js';
-
-import visibilitychange from './visibilityChange.js';
-
-import message      from './message.js';
-
-/**
- * 统计将用到的事件
- * */
-import beforeunload from './beforeUnload.js';
-import unload       from './unload.js';
-
 import postMessage  from './postMessage.js';
+
+import vibrate, {clearVibrate}  from './vibrate.js';
 
 let needRefreshOn = false
 
@@ -73,21 +59,31 @@ let needRefreshOn = false
 
 	/**
 	 * @namespace   maple.view.eventList
+	 * @summary     预定义事件
 	 * */
 	, eventList = {
-		resize
-		, scroll
-		, devicemotion
+		scroll
+		, resize:           listener('resize')
+		, devicemotion:     listener('devicemotion')
 
-		, pageshow
-		, pagehide
+		, pageshow:         listener('pageshow')
+		, pagehide:         listener('pagehide')
 
-		, visibilitychange
+		/**
+		 * focus 和 blur 事件应该注意防止捕获冒泡的方式触发
+		 * */
+		, focus:            listener('focus')
+		, blur:             listener('blur')
 
-		, message
+		, visibilitychange: listener('visibilitychange')
 
-		, beforeunload
-		, unload
+		, online:           listener('online')
+		, offline:          listener('offline')
+
+		, message:          listener('message')
+
+		, beforeunload:     listener('beforeUnload')
+		, unload:           listener('unload')
 	}
 
 	/**
@@ -137,6 +133,9 @@ let view = {
 		, needRefresh
 
 		, postMessage
+
+		, vibrate
+		, clearVibrate
 
 		, offset
 	}
