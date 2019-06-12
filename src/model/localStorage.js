@@ -1,8 +1,8 @@
 'use strict';
 
-import Model        from './model.js';
-import merge        from '../util/merge.js';
-import {listener}   from '../listener.js';
+import Model    from './model.js';
+import merge    from '../util/merge.js';
+import listener from '../listener.js';
 
 /**
  * 默认参数

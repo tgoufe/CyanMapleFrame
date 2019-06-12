@@ -1,7 +1,7 @@
 'use strict';
 
-import {listener}   from '../listener.js';
-import merge        from '../util/merge.js';
+import listener from '../listener.js';
+import merge    from '../util/merge.js';
 
 /**
  * 默认配置

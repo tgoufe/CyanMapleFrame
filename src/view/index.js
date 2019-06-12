@@ -4,8 +4,8 @@
  * @file    view    视图功能聚合
  * */
 
-import url          from '../runtime/url.js';
-import {listener}   from '../listener.js';
+import url      from '../runtime/url.js';
+import listener from '../listener.js';
 
 import scroll, {ScrollObserver} from './scroll.js';
 

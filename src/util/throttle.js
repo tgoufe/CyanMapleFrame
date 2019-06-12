@@ -32,7 +32,7 @@ let throttle = function(func, wait, cancelCB, leading){
 					timeout = null;
 
 					if( lastTrigger ){  // 在间隔时间中调用了该事件，执行最后一次
-						result.apply(lastTriggerOpts.that, lastTriggerOpts.argv);
+						result.apply(lastTriggerOpts.context, lastTriggerOpts.argv);
 
 						lastTrigger = false;
 	                    lastTriggerOpts = null;
@@ -44,7 +44,7 @@ let throttle = function(func, wait, cancelCB, leading){
 					lastTrigger = true;
 
 					lastTriggerOpts = {
-						that
+						context: that
 						, argv
 					}
 				}

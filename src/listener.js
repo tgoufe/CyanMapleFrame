@@ -237,7 +237,7 @@ let listener = (target, type, callback={}, options={})=>{
 	return ls;
 };
 
+export default listener;
 export {
 	Listener
-	, listener
 };

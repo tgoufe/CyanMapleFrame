@@ -41,7 +41,7 @@
 /**
  * ---------- 事件队列监听 ----------
  * */
-import {Listener, listener} from './listener.js';
+import listener, {Listener} from './listener.js';
 
 /**
  * ---------- 通用工具 ----------
@@ -131,3 +131,13 @@ let maple = {
 window.maple = maple;
 
 export default maple;
+
+export {
+	Listener
+	, Model
+	, Router
+	, view as View
+	, device as Device
+	, util as Util
+	, url as Url
+};

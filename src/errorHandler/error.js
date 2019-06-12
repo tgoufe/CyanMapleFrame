@@ -1,6 +1,6 @@
 'use strict';
 
-import {listener} from "../listener";
+import listener from "../listener";
 
 /**
  * @memberOf    maple

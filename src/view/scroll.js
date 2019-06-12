@@ -5,7 +5,7 @@
  *          使用捕捉方式
  * */
 
-import {listener}   from '../listener.js';
+import listener from '../listener.js';
 
 /**
  * @class
