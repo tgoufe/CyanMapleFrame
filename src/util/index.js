@@ -13,6 +13,7 @@ import debounce     from './debounce.js';
 import throttle     from './throttle.js';
 import lockup       from './lockup.js';
 import aspect, {Aspect} from './aspect.js';
+import timeout      from './timeout.js';
 
 // 数据处理类
 import merge        from './merge.js';
@@ -35,6 +36,7 @@ export default {
 	debounce
 	, throttle
 	, lockup
+	, timeout
 
 	// AOP
 	, aspect

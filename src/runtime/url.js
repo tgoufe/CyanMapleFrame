@@ -10,7 +10,7 @@
 // 	]
 // 	;
 
-import {listener}   from '../listener.js';
+import listener from '../listener.js';
 
 const INDEX = ['source'
 		, 'protocol'
@@ -31,7 +31,7 @@ const INDEX = ['source'
 
 /**
  * @class
- * @classdesc   url 解析
+ * @desc    url 解析
  * */
 class Url{
 	/**
@@ -39,8 +39,56 @@ class Url{
 	 * @param   {string}    [url]
 	 * */
 	constructor(url){
-		let a
+		let target = Url.createParseTarget( url )
+			, temp
 			;
+
+		// 处理非标准协议头，在 PC 的 Chrome 上，对非标准协议头处理，无法解析出 host 等参数
+		if( ['http:', 'https:'].indexOf(target.protocol) === -1 ){
+			temp = target.protocol;
+
+			target = Url.createParseTarget( target.href.replace(temp, 'http:') );
+		}
+
+		this.protocol   = (temp || target.protocol).replace(':', '');
+
+		this.source     = target.href;
+		this.origin     = target.origin;
+		this.port       = target.port || '80';
+		this.host       = target.hostname + (this.port !== '80' ? ':'+ this.port : '');
+		this.path       = target.pathname.replace(/^([^\/])/, '$1');
+		// 相对路径
+		this.relative   = (target.href.match(/tps?:\/\/[^\/]+(.*)/) || ['', ''])[1];
+		// 当前页面文件名
+		this.file       = (target.pathname.match(/\/([^\/?#]+)$/i) || ['', ''])[1];
+		// 当前页面目录
+		this.dir        = this.path.replace(this.file, '');
+		// todo ?
+		this.segments   = target.pathname.replace(/^\//, '').split('/');
+		// 参数对象
+		this.params     = this.parseSearch( target.search );
+		// hash
+		this.hash       = target.hash.slice(1);
+		// 页面来源
+		this.from       = document.referrer;
+
+		target = null;   // 释放内存
+	}
+
+	// ---------- 静态属性 ----------
+	static get _INDEX(){
+		return INDEX;
+	}
+
+	// ---------- 静态方法 ----------
+	/**
+	 * @summary 创建解析 url 的对象
+	 * @param   {string}    url
+	 * @return  {Object}
+	 * */
+	static createParseTarget(url){
+		let a
+		;
 
 		if( 'URL' in self ){
 			a = new URL(url || location.href, location.origin);
@@ -59,33 +107,7 @@ class Url{
 			}
 		}
 
-		this.source     = a.href;
-		this.protocol   = a.protocol.replace(':', '');
-		this.origin     = a.origin;
-		this.port       = a.port || '80';
-		this.host       = a.hostname + (this.port !== '80' ? ':'+ this.port : '');
-		this.path       = a.pathname.replace(/^([^\/])/, '$1');
-		// 相对路径
-		this.relative   = (a.href.match(/tps?:\/\/[^\/]+(.*)/) || ['', ''])[1];
-		// 当前页面文件名
-		this.file       = (a.pathname.match(/\/([^\/?#]+)$/i) || ['', ''])[1];
-		// 当前页面目录
-		this.dir        = this.path.replace(this.file, '');
-		// todo ?
-		this.segments   = a.pathname.replace(/^\//, '').split('/');
-		// 参数对象
-		this.params     = this.parseSearch( a.search );
-		// hash
-		this.hash       = a.hash.slice(1);
-		// 页面来源
-		this.from       = document.referrer;
-
-		a = null;   // 释放内存
-	}
-
-	// ---------- 静态属性 ----------
-	static get _INDEX(){
-		return INDEX;
+		return a;
 	}
 
 	// ---------- 公有属性 ----------
@@ -145,7 +167,8 @@ class Url{
 	}
 	/**
 	 * @summary     替换当前的 params
-	 * @param       {Object|string[]|...string} params
+	 * @param       {string|string[]|Object}    params
+	 * @param       {...string}
 	 * @return      {Url}                       this
 	 * @desc        当为多个 string 时，为删除当前 url 上参数，当为 object 时为设置当前 url 上参数
 	 * */
@@ -496,3 +519,6 @@ url.popState = listener('popstate', (e, newUrl)=>{
  * @memberOf    maple
  * */
 export default url;
+export {
+	Url
+};

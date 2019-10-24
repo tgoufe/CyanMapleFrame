@@ -9,7 +9,7 @@ import listener from '../listener.js';
 
 /**
  * @class
- * @classdesc   基于 IntersectionObserver 封装
+ * @desc    基于 IntersectionObserver 封装
  * */
 class ScrollObserver {
 	/**

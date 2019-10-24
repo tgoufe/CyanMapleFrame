@@ -17,8 +17,8 @@ const COOKIE_DEFAULT = {
 
 /**
  * @class
- * @classdesc   对 cookie 的使用进行封装，统一调用接口，在 Model.factory 工厂方法注册为 cookie，别名 c，将可以使用工厂方法生成
- * @extends     Model
+ * @desc    对 cookie 的使用进行封装，统一调用接口，在 Model.factory 工厂方法注册为 cookie，别名 c，将可以使用工厂方法生成
+ * @extends Model
  * @example
 </pre>
 let cookieModel = new CookieModel()
@@ -113,7 +113,7 @@ class CookieModel extends Model{
 		}
 
 		document.cookie = encodeURIComponent( topic ) +'='+
-			encodeURIComponent( this._stringify(value) ) +
+			encodeURIComponent( CookieModel.stringify(value) ) +
 			Object.keys( CookieModel._DEFAULT ).reduce((a, d)=>{    // 整理配置
 				let t = options[d] || CookieModel._DEFAULT[d]
 					;
@@ -216,6 +216,7 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 获取数据
+	 * @override
 	 * @param   {string|string[]}   topic
 	 * @param   {...string}
 	 * @return  {Promise<*, null>}  返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
@@ -308,6 +309,7 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
+	 * @override
 	 * @param   {string|string[]}   topic
 	 * @param   {...string}
 	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
@@ -332,6 +334,7 @@ class CookieModel extends Model{
 	}
 	/**
 	 * @summary 清空数据
+	 * @override
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    只调用了父类的 clearData 方法，清楚了内存中的数据，对 cookie 实际没做任何处理
 	 * */

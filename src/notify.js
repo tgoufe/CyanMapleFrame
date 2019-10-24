@@ -8,11 +8,12 @@
  * @param       {string}        content.body
  * @param       {string}        [content.icon]
  * @param       {string}        [content.tag]
- * @param       {Array}         [content.actions]
- * @param       {string}        content.actions[].action
- * @param       {string}        content.actions[].title
- * @param       {string}        content.actions[].icon
- * @param       {string}        [icon]
+ * @param       {number|number[]}   [content.vibrate]
+ * @param       {Array}             [content.actions]
+ * @param       {string}            content.actions[].action
+ * @param       {string}            content.actions[].title
+ * @param       {string}            content.actions[].icon
+ * @param       {string}            [icon]
  * @return      {Promise}
  * */
 let notify

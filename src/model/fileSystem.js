@@ -16,8 +16,8 @@ const FILE_SYSTEM_CONFIG = {
 
 /**
  * @class
- * @classdesc   对 File System 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 file，别名 fs，将可以使用工厂方法生成。默认使用文件名为 storage.txt，2MB 空间
- * @extends     Model
+ * @desc    对 File System 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 file，别名 fs，将可以使用工厂方法生成。默认使用文件名为 storage.txt，2MB 空间
+ * @extends Model
  * */
 class FileSystemModel extends Model{
 	/**
@@ -211,6 +211,7 @@ class FileSystemModel extends Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 设置数据
+	 * @override
 	 * @param   {string|Object} topic
 	 * @param   {*}             value
 	 * @return  {Promise<boolean>}       返回一个 Promise 对象，在 resolve 时传回 true
@@ -250,6 +251,7 @@ class FileSystemModel extends Model{
 	}
 	/**
 	 * @summary 获取数据
+	 * @override
 	 * @param   {string|string[]}   topic
 	 * @param   {...string}
 	 * @return  {Promise<*, null>}  返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
@@ -304,6 +306,7 @@ class FileSystemModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
+	 * @override
 	 * @param   {string|string[]}   topic
 	 * @param   {...string}
 	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
@@ -339,6 +342,7 @@ class FileSystemModel extends Model{
 	}
 	/**
 	 * @summary 清空数据
+	 * @override
 	 * @return  {Promise}   返回一个 Promise 对象
 	 * @desc    删除文件
 	 * */
@@ -391,3 +395,5 @@ Model.register('file', FileSystemModel);
  * 注册别名
  * */
 Model.registerAlias('file', ['fs']);
+
+export default FileSystemModel;

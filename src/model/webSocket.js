@@ -15,8 +15,8 @@ const WEB_SOCKET_CONFIG = {
 
 /**
  * @class
- * @classdesc   WebSocket 接口，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 webSocket，别名 socket，将可以使用工厂方法生成
- * @extends     Model
+ * @desc    WebSocket 接口，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 webSocket，别名 socket，将可以使用工厂方法生成
+ * @extends Model
  * */
 class WebSocketModel extends Model{
 	/**
@@ -167,6 +167,7 @@ class WebSocketModel extends Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 获取数据
+	 * @override
 	 * @param   {string}    topic
 	 * @param   {*}         data
 	 * @return  {Promise}   数据发送是否成功
@@ -193,6 +194,7 @@ class WebSocketModel extends Model{
 	}
 	/**
 	 * @summary 重写覆盖父类 getData 方法
+	 * @override
 	 * @return  {Promise}   返回 reject(null)
 	 * @desc    web socket 为单向，所以 getData 方法没有意义
 	 * */
@@ -201,6 +203,7 @@ class WebSocketModel extends Model{
 	}
 	/**
 	 * @summary 重写覆盖父类 removeData 方法
+	 * @override
 	 * @return  {Promise}   返回 reject(false)
 	 * @desc    removeData 方法没有意义
 	 * */
@@ -209,6 +212,7 @@ class WebSocketModel extends Model{
 	}
 	/**
 	 * @summary 重写覆盖父类 clearData 方法
+	 * @override
 	 * @return  {Promise}   返回 reject(false);
 	 * @desc    clearData 方法没有意义
 	 * */

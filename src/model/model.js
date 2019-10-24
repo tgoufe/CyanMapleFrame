@@ -29,7 +29,7 @@ const MODEL_CONFIG = {
 
 /**
  * @class
- * @classdesc   数据层基类，将数据保存在内存中
+ * @desc    数据层基类，将数据保存在内存中
  * @example
 let model = new Model();
 
@@ -186,6 +186,20 @@ class Model{
 		return target[Symbol.toStringTag] === 'Model';
 	}
 	/**
+	 * @summary     转为字符串，会将 null,undefined 转为空字符串
+	 * @protected
+	 * @param       {*}     value
+	 * @return      {string}
+	 * */
+	static stringify(value){
+
+		if( value === null || value === undefined ){
+			value = '';
+		}
+
+		return typeof value === 'object' ? JSON.stringify( value ) : value.toString();
+	}
+	/**
 	 * todo
 	 * */
 	// static [Symbol.hasInstance](instance){
@@ -227,20 +241,6 @@ class Model{
 	}
 
 	// ---------- 私有方法 ----------
-	/**
-	 * @summary     转为字符串，会将 null,undefined 转为空字符串
-	 * @protected
-	 * @param       {*}     value
-	 * @return      {string}
-	 * */
-	_stringify(value){
-
-		if( value === null || value === undefined ){
-			value = '';
-		}
-
-		return typeof value === 'object' ? JSON.stringify( value ) : value.toString();
-	}
 	/**
 	 * @summary     获取上一次该 topic 最后记录
 	 * @protected
@@ -337,7 +337,7 @@ class Model{
 	 * @summary     当 setData 传入一个 json 时内部调用函数
 	 * @protected
 	 * @param       {Object}    topic
-	 * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传回 true
+	 * @return      {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	_setByObject(topic){
 		return Promise.all( Object.keys(topic).map((d)=>{
@@ -427,7 +427,8 @@ class Model{
 	}
 	/**
 	 * @summary 获取数据
-	 * @param   {...string|string[]} topic
+	 * @param   {string|string[]} topic
+	 * @param   {...string}
 	 * @return  {Promise<*, null>}          返回一个 Promise 对象，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
 	 * @desc    当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值，当传入多个参数时视为传入数组的操作
 	 * */

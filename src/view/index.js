@@ -26,8 +26,8 @@ let needRefreshOn = false
 			return ;
 		}
 
-		pageshow.add(()=>{
-			pagehide.add(()=>{
+		eventList.pageshow.add(()=>{
+			eventList.pagehide.add(()=>{
 				url.reload();
 			});
 		});

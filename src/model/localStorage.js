@@ -15,8 +15,8 @@ const LOCAL_STORAGE_MODEL_CONFIG = {
 
 /**
  * @class
- * @classdesc   对 localStorage 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 localStorage，别名 ls，将可以使用工厂方法生成
- * @extends     Model
+ * @desc    对 localStorage 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 localStorage，别名 ls，将可以使用工厂方法生成
+ * @extends Model
  * @example
  *
 <pre>
@@ -113,6 +113,7 @@ class LocalStorageModel extends Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 设置数据
+	 * @override
 	 * @param   {string|Object} topic
 	 * @param   {*}             value   当 topic 为 object 类型时被忽略
 	 * @return  {Promise<boolean>}      返回一个 Promise 对象，在 resolve 时传回 true
@@ -128,7 +129,7 @@ class LocalStorageModel extends Model{
 		else{
 			result = super.setData(topic, value).then(()=>{
 				return this._store.then((store)=>{
-					store.setItem(topic, this._stringify(value));
+					store.setItem(topic, LocalStorageModel.stringify(value));
 
 					return true;
 				});
@@ -139,6 +140,7 @@ class LocalStorageModel extends Model{
 	}
 	/**
 	 * @summary 获取数据
+	 * @override
 	 * @param   {string|string[]}   topic
 	 * @param   {...string}
 	 * @return  {Promise<*, null>}  返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
@@ -234,6 +236,7 @@ class LocalStorageModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
+	 * @override
 	 * @param   {string|string[]}   topic
 	 * @param   {...string}
 	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回 true
@@ -263,6 +266,7 @@ class LocalStorageModel extends Model{
 	}
 	/**
 	 * @summary 清空数据
+	 * @override
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	clearData(){

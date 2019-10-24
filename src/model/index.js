@@ -37,18 +37,34 @@
 import Model from './model.js';
 
 // 缓存
-import './cookie.js';
-import './localStorage.js';
-import './sessionStorage.js';
-import './indexedDB.js';
-import './webSQL.js';
-import './fileSystem.js';
+import CookieModel         from './cookie.js';
+import LocalStorageModel   from './localStorage.js';
+import SessionStorageModel from './sessionStorage.js';
+import IndexedDBModel      from './indexedDB.js';
+import WebSQLModel         from './webSQL.js';
+import FileSystemModel     from './fileSystem.js';
 
-import './cacheStorage.js';
+import CacheStorageModel from './cacheStorage.js';
 
 // 网络请求
-import './service.js';
-import './webSocket.js';
-import './eventSource.js';
+import ServiceModel     from './service.js';
+import WebSocketModel   from './webSocket.js';
+import EventSourceModel from './eventSource.js';
 
 export default Model;
+
+export {
+	Model
+	, CookieModel
+	, LocalStorageModel
+	, SessionStorageModel
+	, IndexedDBModel
+	, WebSQLModel
+	, FileSystemModel
+
+	, CacheStorageModel
+
+	, ServiceModel
+	, WebSocketModel
+	, EventSourceModel
+}

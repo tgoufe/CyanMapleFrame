@@ -33,7 +33,7 @@ const CONFIG = {
 
 /**
  * @class
- * @classdesc   路由配置类
+ * @desc    路由配置类
  * */
 class Router{
 	/**
@@ -434,3 +434,7 @@ class Router{
 }
 
 export default Router;
+
+export {
+	Router
+};

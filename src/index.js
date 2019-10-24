@@ -60,7 +60,8 @@ import device   from './runtime/device.js';
 /**
  * ---------- 数据层 ----------
  * */
-import Model    from './model/index.js';
+import model, * as Model    from './model/index.js';
+export * from './model/index.js';
 
 /**
  * ---------- View 监控对象 ----------
@@ -70,7 +71,8 @@ import view     from './view/index.js';
 /**
  * ---------- Router 路由控制 ----------
  * */
-import Router   from './router/index.js';
+import router, * as Router  from './router/index.js';
+export * from './router/index.js';
 
 /**
  * ---------- 错误处理 ----------
@@ -109,13 +111,13 @@ let maple = {
 	, url
 	, device
 
-	, Model
-	, model: Model
+	, ...Model
+	, model
 
 	, view
 
-	, Router
-	, router: Router
+	, ...Router
+	, router
 
 	, error
 	, unHandledRejection
@@ -134,8 +136,6 @@ export default maple;
 
 export {
 	Listener
-	, Model
-	, Router
 	, view as View
 	, device as Device
 	, util as Util

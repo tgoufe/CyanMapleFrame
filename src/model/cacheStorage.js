@@ -14,8 +14,8 @@ const CACHE_STORAGE_MODEL_CONFIG = {
 
 /**
  * @class
+ * @desc    对浏览器源生 CacheStorage 接口进行封装，统一调用接口，主要提供给 Service Worker 调用，普通页面使用场景有限，在 Model.factory 工厂方法注册为 cacheStorage，别名 cs，将可以使用工厂方法生成
  * @extends Model
- * @classdesc   对浏览器源生 CacheStorage 接口进行封装，统一调用接口，主要提供给 Service Worker 调用，普通页面使用场景有限，在 Model.factory 工厂方法注册为 cacheStorage，别名 cs，将可以使用工厂方法生成
  * @example
 let cacheStorageModel = new CacheStorageModel()
 	, storage = Model.factory('cacheStorage')
@@ -52,14 +52,14 @@ class CacheStorageModel extends Model{
 		return CACHE_STORAGE_MODEL_CONFIG;
 	}
 
-	// ---------- 私有方法 ----------
+	// ---------- 静态方法 ----------
 	/**
 	 * @summary 将 url 字符串转换为 Request 对象
 	 * @private
 	 * @param   {string|Request}    url
 	 * @return  {Request}
 	 * */
-	_tranToRequest(url){
+	static tranToRequest(url){
 		
 		if( typeof url === 'object' && url instanceof Request ){}
 		else{
@@ -72,6 +72,7 @@ class CacheStorageModel extends Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 设置缓存
+	 * @override
 	 * @param   {string|Request}    topic
 	 * @param   {Response}          response
 	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回结果
@@ -82,18 +83,19 @@ class CacheStorageModel extends Model{
 		}).then((cache)=>{
 			console.log('缓存 '+ (typeof topic === 'string' ? topic : topic.url));
 
-			return cache.put(this._tranToRequest(topic), response);
+			return cache.put(CacheStorageModel.tranToRequest(topic), response);
 		});
 	}
 	/**
 	 * @summary 获取缓存
+	 * @override
 	 * @param   {string|Request}    topic
 	 * @param   {Object}            [options={}]
 	 * @param   {boolean}           [options.ignoreVary]    请求的 url 和 header 都一致才是相同的资源
 	 * @return  {Promise<Response, Error>}  返回一个 Promise 对象，在 resolve 时传回查询到的缓存，reject 时传回 Error
 	 * */
 	getData(topic, options={}){
-		topic = this._tranToRequest( topic );
+		topic = CacheStorageModel.tranToRequest( topic );
 
 		return this._store.then((caches)=>{
 			return caches.match(topic, options);
@@ -113,12 +115,13 @@ class CacheStorageModel extends Model{
 	}
 	/**
 	 * @summary 将缓存删除
+	 * @override
 	 * @param   {string|Request}    topic
 	 * @param   {Object}            [options={}]    cache.delete 的可选参数
 	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	removeData(topic, options={}){
-		topic = this._tranToRequest( topic );
+		topic = CacheStorageModel.tranToRequest( topic );
 
 		return this._store.then((caches)=>{
 			return caches.open( this._config.cacheName );
@@ -128,6 +131,7 @@ class CacheStorageModel extends Model{
 	}
 	/**
 	 * @summary 清空缓存
+	 * @override
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回结果
 	 * */
 	clearData(){

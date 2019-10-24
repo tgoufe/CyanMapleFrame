@@ -13,21 +13,21 @@ return rs;
 
 		this.original = original;
 	}
-	before(...args){
-		this.beforeQueue.push.apply(this.beforeQueue, args);
+	before(...argv){
+		this.beforeQueue.push.apply(this.beforeQueue, argv);
 
 		return this;
 	}
-	beforeRun(that, args){
-		this.beforeQueue.forEach( executor=>executor.apply(that, args) );
+	beforeRun(that, argv){
+		this.beforeQueue.forEach( executor=>executor.apply(that, argv) );
 	}
-	after(...args){
-		this.afterQueue.push.apply(this.afterQueue, args);
+	after(...argv){
+		this.afterQueue.push.apply(this.afterQueue, argv);
 
 		return this;
 	}
-	afterRun(that, args){
-		this.afterQueue.forEach( executor=>executor.apply(that, args) );
+	afterRun(that, argv){
+		this.afterQueue.forEach( executor=>executor.apply(that, argv) );
 	}
 	around(before, after){
 		this.beforeQueue.push( before );
@@ -75,7 +75,6 @@ let aspect = function(original){
 // 	;
 
 export default aspect;
-
 export {
 	Aspect
 };

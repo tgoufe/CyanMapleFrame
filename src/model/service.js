@@ -34,8 +34,8 @@ const SERVICE_MODEL_CONFIG = {
 
 /**
  * @class
- * @classdesc   对服务器接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 service，别名 s，将可以使用工厂方法生成
- * @extends     Model
+ * @desc    对服务器接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 service，别名 s，将可以使用工厂方法生成
+ * @extends Model
  *
  * @todo 支持 RESTful API
  * @todo 通道功能，一个 topic 一次只能发送一条，其余保存在队列中，等待当前发送的返回，再发送下一条
@@ -339,6 +339,7 @@ class ServiceModel extends Model{
 	}
 	/**
 	 * @summary 清空数据，实际不做任何处理
+	 * @override
 	 * @return  {Promise<boolean>}  返回 resolve(true)
 	 * */
 	clearData(){

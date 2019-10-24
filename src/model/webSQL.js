@@ -27,8 +27,8 @@ const WEB_SQL_MODEL_CONFIG = {
 
 /**
  * @class
- * @classdesc   对 WebSQL Database 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 webSQL，别名 ws,sql，将可以使用工厂方法生成。默认使用表名为 storage，有 id,topic,value 3 个列的表，在生成对象时传入 options 可覆盖默认 SQL 语句
- * @extends     Model
+ * @desc    对 WebSQL Database 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 webSQL，别名 ws,sql，将可以使用工厂方法生成。默认使用表名为 storage，有 id,topic,value 3 个列的表，在生成对象时传入 options 可覆盖默认 SQL 语句
+ * @extends Model
  * @example
 <pre>
 let webSQLModel = new WebSQLModel()
@@ -227,6 +227,7 @@ class WebSQLModel extends Model{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 设置数据
+	 * @override
 	 * @param   {string|Object} topic
 	 * @param   {*}             value
 	 * @return  {Promise<boolean>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
@@ -242,7 +243,7 @@ class WebSQLModel extends Model{
 		else{
 			result = super.setData(topic, value).then(()=>{
 
-				value = this._stringify( value );
+				value = WebSQLModel.stringify( value );
 
 				return this._select( topic );
 			}).then((rs)=>{
@@ -264,6 +265,7 @@ class WebSQLModel extends Model{
 	}
 	/**
 	 * @summary 获取数据
+	 * @override
 	 * @param   {string|string[]}   topic
 	 * @param   {...string}
 	 * @return  {Promise<*, null>}  返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
@@ -311,6 +313,7 @@ class WebSQLModel extends Model{
 	}
 	/**
 	 * @summary 将数据从缓存中删除
+	 * @override
 	 * @param   {string|string[]}   topic
 	 * @param   {...string}
 	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
@@ -336,6 +339,7 @@ class WebSQLModel extends Model{
 	}
 	/**
 	 * @summary 清空数据
+	 * @override
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * */
 	clearData(){

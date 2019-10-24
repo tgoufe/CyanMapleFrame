@@ -99,27 +99,15 @@ class HandlerQueue{
 	}
 	/**
 	 * @summary 执行队列中的一个 handler，内部指针将指向下一个 handler
-	 * @param   {...*}
+	 * @param   {Object}    [context=null]
+	 * @param   {...*}      [args]
 	 * @return  {*}
 	 * @desc    当传入参数时，参数被视为传入 handler 的参数
 	 * */
-	fire(){
-		return this.next()( ...arguments );
-	}
-	/**
-	 * @summary 以指定上下文来执行队列中的一个 handler，内部指针将指向下一个 handler
-	 * @param   {Element|Window|Object} context=null
-	 * @param   {Array|*}               [args=[]]
-	 * @return  {*}
-	 * */
-	fireWith(context=null, args=[]){
-
-		if( !Array.isArray(args) ){
-			args = [args];
-		}
-
+	fire(context=null, ...args){
 		return this.next().apply(context, args);
 	}
+
 	/**
 	 * @summary 执行队列中的全部 handler，将返回一个结果数组
 	 * @param   {...*}
@@ -244,6 +232,32 @@ class HandlerQueue{
 			return promise;
 		}, Promise.resolve(init));
 	}
+
+	map(){
+		return
+	}
+
+	compose(){
+		return {
+			fire: (context, ...args)=>{
+
+			}
+		}
+	}
+
+	pipe(){
+
+	}
+
+	context(context, argv){
+		// fire
+	}
+
+	all(){}
+
+	line(){}
+
+	reduce(){}
 }
 
 export default HandlerQueue;

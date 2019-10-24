@@ -22,8 +22,7 @@ const LISTENER_CONFIG = {
 
 /**
  * @class
- * @classdesc   全局事件监听抽象类
- * @desc        默认使用捕获方式
+ * @desc        全局事件监听抽象类，默认使用捕获方式
  * */
 class Listener{
 	/**
@@ -163,7 +162,7 @@ class Listener{
 	}
 	/**
 	 * @summary 立即执行
-	 * @param   {...*}  argv
+	 * @param   {...*}  [argv]
 	 * */
 	trigger(...argv){
 		let context = this._config.target
