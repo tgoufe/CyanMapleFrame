@@ -34,10 +34,12 @@ cookie.set('memberId', 1, '30d');   // 将 memberId 放入 cookie 中，过期�
 class CookieModel extends Model{
 	/**
 	 * @constructor
+	 * @param   {Object}    [config={}]
+	 * @param   {string}    [config.eventType]
 	 * @desc    当浏览器支持 cookie 时，在构建时会将 document.cookie 进行解析，将全部值都存入内存中
 	 * */
-	constructor(){
-		super();
+	constructor(config={}){
+		super( config );
 
 		if( navigator.cookieEnabled ){
 			this._enabled = true;
@@ -244,70 +246,6 @@ class CookieModel extends Model{
 		return result
 	}
 	/**
-	 * @summary 以同步的方式获取 cookie 中的数据
-	 * @param   {string|string[]}   topic
-	 * @param   {...string}
-	 * @return  {Object|string}     若存在 topic 的值，返回查询出来的 value，否则返回 null
-	 * @desc    获取数据时会优先从内存中取值，若没有则从 cookie 中取值并将其存入内存中，当 topic 的类型为数组的时候，返回结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
-	 * */
-	getDataSync(topic){
-		let argc = arguments.length
-			, keyList
-			, result
-			;
-
-		// 判断当前环境是否支持 cookie
-		if( this._enabled ){
-
-			if( !Array.isArray(topic) ){
-				keyList = [topic];
-			}
-			else if( argc > 1 ){
-				keyList = [].slice.call( arguments );
-			}
-			else{
-				keyList = topic;
-			}
-
-			result = keyList.reduce((all, d)=>{
-
-				if( d in this._value ){
-					all[d] = this._value[d];
-				}
-				else{
-					let temp = this._getCookie( d )
-						;
-
-					if( temp instanceof Promise ){  // 不存在该 topic 的值
-						all[d] = null;
-					}
-					else{
-						all[d] = temp;
-
-						// 尝试解析
-						try{
-							all[d] = JSON.parse( all[d] );
-						}
-						catch(e){}
-					}
-
-					super.setData(d, all[d]);
-				}
-
-				return all;
-			}, {});
-
-			if( !Array.isArray(topic) ){
-				result = result[topic];
-			}
-		}
-		else{
-			result = null;
-		}
-
-		return result;
-	}
-	/**
 	 * @summary 将数据从缓存中删除
 	 * @override
 	 * @param   {string|string[]}   topic
@@ -342,13 +280,113 @@ class CookieModel extends Model{
 		return super.clearData();
 	}
 	/**
+	 * @summary 以同步的方式向 cookie 中写入数据
+	 * @param   {string|Object}             topic
+	 * @param   {*}                         value               当 topic 为 object 类型时，被视为 options
+	 * @param   {Object|number|string}      [options]           相关配置
+	 * @param   {string}                    [options.path]
+	 * @param   {string}                    [options.domain]
+	 * @param   {Date|number|string}        [options.expires]
+	 * @param   {string}                    [options.secure]
+	 * @return  {boolean}
+	 * @desc    保存值得时候，同时会保存在内存中
+	 * */
+	setDataSync(topic, value, options){
+		let result = !!this._enabled
+			;
+
+		if( this._enabled ){
+			try{
+				if( typeof topic === 'object' ){
+					options = value;
+
+					Object.keys( topic ).forEach((k)=>{
+						this._setCookie(k, topic[k], options);
+
+						super.setData(k, topic[k]);
+					});
+				}
+				else{
+					this._setCookie(topic, value, options);
+				}
+
+				result = true;
+			}
+			catch(e){
+				result = false;
+			}
+		}
+
+		return result;
+	}
+	/**
+	 * @summary 以同步的方式获取 cookie 中的数据
+	 * @param   {string|string[]}   topic
+	 * @param   {...string}
+	 * @return  {Object|string}     若存在 topic 的值，返回查询出来的 value，否则返回 null
+	 * @desc    获取数据时会从 cookie 中取值并将其存入内存中，当 topic 的类型为数组的时候，返回结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
+	 * */
+	getDataSync(topic){
+		let argc = arguments.length
+			, keyList
+			, result = null
+			;
+
+		// 判断当前环境是否支持 cookie
+		if( this._enabled ){
+
+			if( !Array.isArray(topic) ){
+				keyList = [topic];
+			}
+			else if( argc > 1 ){
+				keyList = [].slice.call( arguments );
+			}
+			else{
+				keyList = topic;
+			}
+
+			result = keyList.reduce((all, d)=>{
+
+				if( d in this._value ){
+					all[d] = this._value[d];
+				}
+				else{
+					let temp = this._getCookie( d )
+					;
+
+					if( temp instanceof Promise ){  // 不存在该 topic 的值
+						all[d] = null;
+					}
+					else{
+						all[d] = temp;
+
+						// 尝试解析
+						try{
+							all[d] = JSON.parse( all[d] );
+						}
+						catch(e){}
+					}
+
+					super.setData(d, all[d]);
+				}
+
+				return all;
+			}, {});
+
+			if( !Array.isArray(topic) ){
+				result = result[topic];
+			}
+		}
+
+		return result;
+	}
+	/**
 	 * @summary 获取 cookie 长度
 	 * @return  {number}
 	 * */
 	getCookieLength(){
 		return this._enabled ? document.cookie.length : 0;
 	}
-
 	/**
 	 * @summary 刷新当前 cookie 数据
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
@@ -375,7 +413,6 @@ class CookieModel extends Model{
 			return true;
 		});
 	}
-
 	/**
 	 * @summary 类构造失败时的回调接口
 	 * @param   {Function}  callback
@@ -383,6 +420,34 @@ class CookieModel extends Model{
 	catch(callback){
 		if( typeof callback === 'function' ){
 			this._store.catch( callback );
+		}
+	}
+
+	// ---------- 公有属性 ----------
+	/**
+	 * @summary 提供更直观更语义化的同步数据读写接口
+	 * @desc    可以使用 c.sync.getData 和 c.sync.setData 同步的方式来读写数据
+	 * */
+	get sync(){
+		return {
+			/**
+			 * @summary 语义化的同步数据写接口
+			 * @param   {...*}  argv    参数与 setDataSync 方法相同
+			 * @return  {boolean}
+			 * @desc    内部为调用 setDataSync 方法
+			 * */
+			setData: (...argv)=>{
+				return this.setDataSync( ...argv );
+			}
+			/**
+			 * @summary 语义化的同步保存数据接口
+			 * @param   {...string}  argv    参数与 getDatasync 方法相同
+			 * @return  {*}
+			 * @desc    内部为调用 getDataSync 方法
+			 * */
+			, getData: (...argv)=>{
+				return this.getDataSync( ...argv );
+			}
 		}
 	}
 }

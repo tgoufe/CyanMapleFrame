@@ -49,6 +49,7 @@ class IndexedDBModel extends Model{
 	 * @param   {string}    config.index[].name
 	 * @param   {string}    [config.index[].keyPath]    未设置时默认使用 name
 	 * @param   {boolean}   [config.index[].unique=false]   默认值 false
+	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
 		super( config );

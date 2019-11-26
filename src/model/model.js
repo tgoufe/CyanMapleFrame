@@ -84,26 +84,26 @@ class Model{
 	/**
 	 * @summary 注册子类
 	 * @static
-	 * @param   {string}    type
+	 * @param   {string}    name
 	 * @param   {Model}     model
 	 * @desc    若该子类已经被注册，并且缓存中没有该子类的实例，则覆盖
 	 * */
-	static register(type, model){
+	static register(name, model){
 
-		if( type in Model._MODEL && type in Model._MODEL_CACHE ){
-			console.log('type', ' 重复注册，并已生成实例，不能覆盖');
+		if( name in Model._MODEL && name in Model._MODEL_CACHE ){
+			console.log(name, '重复注册，并已生成实例，不能覆盖');
 		}
 		else{
-			Model._MODEL[type] = model;
+			Model._MODEL[name] = model;
 		}
 	}
 	/**
 	 * @summary 注册子类的别名
 	 * @static
-	 * @param   {string}            type        已注册的子类名
+	 * @param   {string}            name        已注册的子类名
 	 * @param   {string|string[]}   aliasName   该子类的别名
 	 * */
-	static registerAlias(type, aliasName){
+	static registerAlias(name, aliasName){
 
 		if( !Array.isArray(aliasName) ){
 			aliasName = [aliasName];
@@ -111,7 +111,7 @@ class Model{
 
 		aliasName.forEach((d)=>{
 			if( !(d in Model._MODEL_ALIAS) ){
-				Model._MODEL_ALIAS[d] = type;
+				Model._MODEL_ALIAS[d] = name;
 			}
 			else{
 				console.log(d, ' 已经存在');

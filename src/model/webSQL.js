@@ -58,6 +58,7 @@ class WebSQLModel extends Model{
 	 * @param   {string}    [config.sql.insert] 插入时执行的 sql 语句
 	 * @param   {string}    [config.sql.delete] 删除时执行的 sql 语句
 	 * @param   {string}    [config.sql.clear]  clearData 时执行的 sql 语句
+	 * @param   {string}    [config.eventType]
 	 * @desc    传入 sql 语句时，可用 {{tableName}} 来代替表名
 	 * */
 	constructor(config={}){

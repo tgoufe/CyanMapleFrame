@@ -25,6 +25,7 @@ class WebSocketModel extends Model{
 	 * @param   {string|string[]}   config.url
 	 * @param   {string}            [config.protocol]   单个的协议名字字符串或者包含多个协议名字字符串的数组
 	 * @param   {string}            [config.binaryType] 设置收到的二进制数据类型
+	 * @param   {string}            [config.eventType]
 	 * */
 	constructor(config={}){
 		super( config );

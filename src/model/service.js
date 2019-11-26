@@ -49,6 +49,7 @@ class ServiceModel extends Model{
 	 // * @param   {boolean}   [config.isCrossDomain]
 	 // * @param   {boolean}   [config.useLock]
 	 * @param   {number}    [config.timeout]
+	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
 		super( config );

@@ -26,6 +26,7 @@ class FileSystemModel extends Model{
 	 * @param   {string}    [config.fileName]
 	 * @param   {number}    [config.fileSize]
 	 * @param   {number}    [config.fileType]   文件的保存类型，0 为临时文件，1 为持久文件，可以使用 FileSystemModel.TEMPORARY 和 FileSystemModel.PERSISTENT 来替代
+	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
 		super( config );

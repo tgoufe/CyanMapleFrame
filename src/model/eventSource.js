@@ -25,6 +25,7 @@ class EventSourceModel extends Model{
 	 * @constructor
 	 * @param   {Object}    [config={}]
 	 * @param   {boolean}   [config.withCredentials]
+	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
 		super( config );
