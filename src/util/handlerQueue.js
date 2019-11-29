@@ -1,5 +1,30 @@
 'use strict';
 
+let compose = (...fns)=>{
+		return (param)=>{
+			return fns.reduceRight((rs, fn)=>{
+				return fn( rs );
+			}, param);
+		}
+	}
+	, pipe = (...fns)=>{
+		return (param)=>{
+			return fns.reduce((rs, fn)=>{
+				return fn( rs );
+			}, param)
+		}
+	}
+	;
+
+function executor(tasks){
+	return Promise.all( tasks.slice(1).reduce((all, task)=>{
+
+		all.push( all[all.length - 1].then( task ).catch( ()=>null ) );
+
+		return all;
+	}, [tasks[0]()]) )
+}
+
 class HandlerQueue{
 	/**
 	 * @constructor
@@ -99,165 +124,202 @@ class HandlerQueue{
 	}
 	/**
 	 * @summary 执行队列中的一个 handler，内部指针将指向下一个 handler
-	 * @param   {Object}    [context=null]
+	 // * @param   {Object}    [context=null]
 	 * @param   {...*}      [args]
 	 * @return  {*}
 	 * @desc    当传入参数时，参数被视为传入 handler 的参数
 	 * */
-	fire(context=null, ...args){
-		return this.next().apply(context, args);
+	fire(...args){
+		return this.next()( ...args );
 	}
 
-	/**
-	 * @summary 执行队列中的全部 handler，将返回一个结果数组
-	 * @param   {...*}
-	 * @return  {Array} 数组中将不包括已失效
-	 * @desc    当传入参数时，参数被视为传入 handler 的参数（所有 handler 都会传入相同的参数），全部执行后会重置
-	 * */
-	fireAll(){
-		let args = arguments
-			;
-
-		this.reset();
-
-		return this._queue.reduce((all, h)=>{
-			if( h !== null ){
-				all.push( h(...args) );
+	all(...args){
+		return this._queue.reduce((rs, handler)=>{
+			if( handler !== null ){
+				rs.push( handler(...args) );
 			}
 
-			return all;
+			return rs;
 		}, []);
 	}
-	/**
-	 * @summary 以指定上下文的方式执行队列中的全部 handler，将返回一个结果数组
-	 * @param   {Element|Window|Object} context=null
-	 * @param   {Array|*}               [args=[]]
-	 * @return  {*}
-	 * */
-	fireAllWith(context=null, args=[]){
-		this.reset();
-
-		if( !Array.isArray(args) ){
-			args = [args];
-		}
-
-		return this._queue.reduce((all, h)=>{
-			if( h !== null ){
-				all.push( h.apply(context, args) );
+	compose(...args){
+		return this._queue.reduceRight((params, handler)=>{
+			if( handler === null ){
+				return params;
 			}
 
-			return all;
-		}, []);
+			return [handler( ...params )];
+		}, args);
 	}
-	/**
-	 * @summary 顺序执行队列中的全部 handler，前一个 handler 的返回结果觉得下一个 handler 是否执行
-	 * @param   {...*}
-	 * @return  {boolean|undefined}
-	 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
-	 * */
-	fireLine(){
-		let args = arguments
-			;
-
-		this.reset();
-
-		return !this._queue.some((h)=>{
-			if( h !== null ){
-				return h( ...args ) === false;
+	pipe(...args){
+		return this._queue.reduce((params, handler)=>{
+			if( handler === null ){
+				return params;
 			}
 
-			return false;
+			return [handler( ...params )];
+		}, args);
+	}
+	line(...args){
+		return !this._queue.some((handler)=>{
+			if( handler === null ){
+				return false;
+			}
+
+			return handler( ...args ) === false;
 		});
 	}
-	/**
-	 * @summary 以指定上下文的方式顺序执行队列中的全部 handler，前一个 handler 的返回结果觉得下一个 handler 是否执行
-	 * @param   {Element|Window|Object} context=null
-	 * @param   {Array|*}               [args=[]]
-	 * @return  {*}
-	 * */
-	fireLineWith(context=null, args=[]){
-		this.reset();
 
-		if( !Array.isArray(args) ){
-			args = [args];
-		}
-
-		return !this._queue.some((h)=>{
-			if( h !== null ){
-				return h.apply(context, args) === false;
-			}
-
-			return false;
-		});
-	}
-	/**
-	 * @summary 用 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
-	 * @param   {*}         [init]
-	 * @return  {Promise}
-	 * @desc    当传入参数时，参数被视为传入第一个 handler 的参数，全部执行后会重置
-	 *          由于为 reduce 方式调用，将只允许传入一个初始参数，并且原则上所有 handler 都应只有一个参数
-	 *          由于为 reduce 方式调用，将返回 Promise 类型的结果
-	 * */
-	fireReduce(init){
-		
-		this.reset();
-
-		return this._queue.reduce((promise, h)=>{
-			if( h !== null ){
-				return promise.then( rs=>h( rs ) );
-			}
-
-			return promise;
-		}, Promise.resolve(init));
-	}
-	/**
-	 * @summary 以指定上下文的方式用 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
-	 * @param   {Element|Window|Object} context=null
-	 * @param   {*}                     [init]
-	 * @return  {Promise}
-	 * @desc    当传入 init 参数时，参数被视为传入第一个 handler 的参数，全部执行后会重置
-	 *          由于为 reduce 方式调用，将只允许传入一个初始参数，并且原则上所有 handler 都应只有一个参数
-	 *          由于为 reduce 方式调用，将返回 Promise 类型的结果
-	 * */
-	fireReduceWith(context=null, init){
-
-		this.reset();
-
-
-		return this._queue.reduce((promise, h)=>{
-			if( h !== null ){
-				return promise.then( rs=>h.call(context, rs) );
-			}
-			
-			return promise;
-		}, Promise.resolve(init));
-	}
-
-	map(){
-		return
-	}
-
-	compose(){
+	with(context){
 		return {
-			fire: (context, ...args)=>{
-
+			fire: (...args)=>{
+				return this.next().apply(context, args);
 			}
-		}
+			, all: (...args)=>{
+				return this._queue.reduce((rs, handler)=>{
+					if( handler !== null ){
+						rs.push( handler.apply(context, args) );
+					}
+
+					return rs;
+				}, []);
+			}
+			, compose: (...args)=>{
+				return this._queue.reduceRight((params, handler)=>{
+					if( handler === null ){
+						return params;
+					}
+
+					return [handler.apply(context, params)];
+				}, args);
+			}
+			, pipe: (...args)=>{
+				return this._queue.reduce((params, handler)=>{
+					if( handler === null ){
+						return params;
+					}
+
+					return [handler.apply(context, params)];
+				}, args);
+			}
+			, line: (...args)=>{
+				return !this._queue.some((handler)=>{
+					if( handler === null ){
+						return false;
+					}
+
+					return handler.apply(context, args) === false;
+				});
+			}
+			, promise: {
+				all: (...args)=>{
+					return Promise.all( this._queue.reduce((rs, handler)=>{
+						if( handler !== null ){
+							rs.push( handler.apply(context, args) );
+						}
+
+						return rs;
+					}, []) );
+				}
+				, compose: (...args)=>{
+					return this._queue.reduceRight((promise, handler)=>{
+						if( handler === null ){
+							return promise;
+						}
+
+						return promise.then((params)=>{
+							return handler.apply(context, params);
+						}).then((rs)=>{
+							return [rs];
+						});
+					}, Promise.resolve(args));
+				}
+				, pipe: (...args)=>{
+					return this._queue.reduce((promise, handler)=>{
+						if( handler === null ){
+							return promise;
+						}
+
+						return promise.then((args)=>{
+							return handler.apply(context, args);
+						}).then((rs)=>{
+							return [rs];
+						});
+					}, Promise.resolve(args));
+				}
+				, line: (...args)=>{
+					return !this._queue.reduce((promise, handler)=>{
+						if( handler === null ){
+							return promise;
+						}
+
+						return promise.then((rs)=>{
+							if( rs === false ){
+								return Promise.reject();
+							}
+
+							return handler( ...args );
+						});
+					}, Promise.resolve());
+				}
+			}
+		};
 	}
 
-	pipe(){
+	get promise(){
+		return {
+			all: (...args)=>{
+				return Promise.all( this._queue.reduce((rs, handler)=>{
+					if( handler !== null ){
+						rs.push( handler(...args) );
+					}
 
+					return rs;
+				}, []) );
+			}
+			, compose: (...args)=>{
+				return this._queue.reduceRight((promise, handler)=>{
+					if( handler === null ){
+						return promise;
+					}
+
+					return promise.then((params)=>{
+						return handler( ...params );
+					}).then((rs)=>{
+						return [rs];
+					});
+				}, Promise.resolve(args));
+			}
+			, pipe: (...args)=>{
+				return this._queue.reduce((promise, handler)=>{
+					if( handler === null ){
+						return promise;
+					}
+
+					return promise.then((params)=>{
+						return handler( ...params );
+					}).then((rs)=>{
+						return [rs];
+					});
+				}, Promise.resolve(args));
+			}
+			, line: (...args)=>{
+				return !this._queue.reduce((promise, handler)=>{
+					if( handler === null ){
+						return promise;
+					}
+
+					return promise.then((rs)=>{
+						if( rs === false ){
+							return Promise.reject();
+						}
+
+						return handler( ...args );
+					});
+				}, Promise.resolve());
+			}
+		};
 	}
-
-	context(context, argv){
-		// fire
-	}
-
-	all(){}
-
-	line(){}
-
-	reduce(){}
 }
 
 export default HandlerQueue;
