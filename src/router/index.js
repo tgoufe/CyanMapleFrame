@@ -78,7 +78,7 @@ class Router{
 					});
 				}
 				else{
-					console.log('router 中不存在', location.href, e);
+					console.log(`router 中不存在 ${location.href}`, e);
 					this.config.fallback && this.config.fallback( location.href );
 				}
 			});
@@ -104,7 +104,7 @@ class Router{
 					});
 				}
 				else{
-					console.log('router 中不存在', location.href, e);
+					console.log(`router 中不存在 ${location.href}`, e);
 					this.config.fallback && this.config.fallback( location.href );
 				}
 			});
@@ -215,7 +215,7 @@ class Router{
 
 		return execute.catch((e)=>{
 			if( e instanceof  Error){
-				console.log(path, '路由执行错误', e);
+				console.log(`${path} 路由执行错误`, e);
 			}
 			else{
 				console.log(path, e);
@@ -394,6 +394,9 @@ class Router{
 				// 但 hash 的修改都会触发 hashChange 事件
 				this._goHash( targetUrl );
 			}
+		}
+		else{
+			this._trigger();
 		}
 
 		return rs;

@@ -88,16 +88,9 @@ class Listener{
 			let context = this || null
 				;
 
-			return eventQueue.with( context ).line( Array.from(arguments) );
-			// return eventQueue.fireLineWith(context, Array.from(arguments));
+			return eventQueue.with( context ).line( ...arguments );
 		};
 	}
-	// _executor(){
-	// 	let context = this || null
-	// 		;
-	//
-	// 	return this._eventQueue.fireLineWith(context, Array.from(arguments));
-	// }
 
 	/**
 	 * @summary     监听事件回调
@@ -110,7 +103,7 @@ class Listener{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 添加执行函数
-	 * @param   {ListenerCallback}  callback
+	 * @param   {ListenerCallback|HandlerQueue}  callback
 	 * @return  {Listener}          返回 this，可以使用链式操作
 	 * */
 	add(callback){
@@ -198,7 +191,6 @@ class Listener{
 			this._isListening = false;
 		}
 		else if( typeof isAll === 'function' ){
-
 			this._eventQueue.remove( isAll );
 		}
 
@@ -223,6 +215,15 @@ class Listener{
 		if( this._config.once ){    // 事件只执行一次，接触事件绑定
 			this.off();
 		}
+	}
+
+	// ---------- 公有属性 ----------
+	/**
+	 * @summary 实现 toStringTag 接口
+	 * @desc    在 Object.prototype.toString.call( new Listener() ); 时将返回 [object Listener]
+	 * */
+	get [Symbol.toStringTag](){
+		return 'Listener';
 	}
 }
 

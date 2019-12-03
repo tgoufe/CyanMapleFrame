@@ -113,7 +113,7 @@ let needRefreshOn = false
 			return eventList[eventType].trigger(...argv);
 		}
 		else{
-			console.log('不存在', eventType, '类型的事件');
+			console.log(`不存在 ${eventType} 类型的事件`);
 		}
 	}
 	;

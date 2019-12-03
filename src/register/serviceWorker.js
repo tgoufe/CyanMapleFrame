@@ -39,7 +39,7 @@ function registerServiceWorker(options={}, welcome=''){
 					if( serviceWorker ){
 						// 监听 Service Worker 状态变化
 						serviceWorker.addEventListener('statechange', (e)=>{
-							console.log('state chagne:', e.target.state);
+							console.log(`state change: ${e.target.state}`);
 						});
 					}
 
@@ -78,7 +78,7 @@ function registerServiceWorker(options={}, welcome=''){
 							subscription = regist.pushManager.subscribe({
 								userVisibleOnly: true
 							}).then((sub)=>{
-								console.log('订阅成功', sub.endpoint);
+								console.log(`订阅成功 ${sub.endpoint}`);
 
 								return subscription;
 							}).catch((e)=>{
@@ -89,7 +89,7 @@ function registerServiceWorker(options={}, welcome=''){
 							});
 						}
 						else{
-							console.log('已经订阅', subscription.endpoint);
+							console.log(`已经订阅 ${subscription.endpoint}`);
 						}
 
 						return subscription;

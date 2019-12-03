@@ -81,7 +81,7 @@ class CacheStorageModel extends Model{
 		return this._store.then((caches)=>{
 			return caches.open( this._config.cacheName );
 		}).then((cache)=>{
-			console.log('缓存 '+ (typeof topic === 'string' ? topic : topic.url));
+			console.log(`缓存 ${typeof topic === 'string' ? topic : topic.url}`);
 
 			return cache.put(CacheStorageModel.tranToRequest(topic), response);
 		});

@@ -84,14 +84,14 @@ class Model{
 	/**
 	 * @summary 注册子类
 	 * @static
-	 * @param   {string}    name
-	 * @param   {Model}     model
+	 * @param   {string}            name
+	 * @param   {Model}    model
 	 * @desc    若该子类已经被注册，并且缓存中没有该子类的实例，则覆盖
 	 * */
 	static register(name, model){
 
 		if( name in Model._MODEL && name in Model._MODEL_CACHE ){
-			console.log(name, '重复注册，并已生成实例，不能覆盖');
+			console.log(`${name} 重复注册，并已生成实例，不能覆盖`);
 		}
 		else{
 			Model._MODEL[name] = model;
@@ -114,7 +114,7 @@ class Model{
 				Model._MODEL_ALIAS[d] = name;
 			}
 			else{
-				console.log(d, ' 已经存在');
+				console.log(`${d} 已经存在`);
 			}
 		});
 	}
@@ -154,19 +154,19 @@ class Model{
 						// 使用缓存，将该子类实例缓存
 						Model._MODEL_CACHE[type] = model;
 
-						console.log('通过工厂方法生成', type, '类型的对象', '将', type, '类型的对象缓存');
+						console.log(`通过工厂方法生成 ${type} 类型的对象, 将 ${type} 类型的对象缓存`);
 					}
 				}
 				else{   // 使用缓存并存在该子类实例
 					model = Model._MODEL_CACHE[type];
 
-					console.log('从缓存中取到', type, '类型的对象');
+					console.log(`从缓存中取到 ${type} 类型的对象`);
 				}
 			}
 			else{
 				model = new Model();
 
-				console.log('不存在注册为 ', type, ' 的子类');
+				console.log(`不存在注册为 ${type} 的子类`);
 			}
 		}
 		else{
@@ -183,7 +183,7 @@ class Model{
 	 * @return  {boolean}   返回结果
 	 * */
 	static is(target){
-		return target[Symbol.toStringTag] === 'Model';
+		return target && target[Symbol.toStringTag] === 'Model';
 	}
 	/**
 	 * @summary     转为字符串，会将 null,undefined 转为空字符串
@@ -271,7 +271,7 @@ class Model{
 		if( newVal !== oldVal ){
 			this._history[topic].push( newVal );
 			
-			console.log('设置', topic, '的值为', newVal);
+			console.log(`设置 ${topic} 的值为 ${newVal}`);
 
 			this._trigger(topic, newVal, oldVal);
 		}
@@ -306,7 +306,7 @@ class Model{
 				}
 
 				result.catch(function(e){
-					console.log(e, m.constructor.name, topic, value, '同步失败');
+					console.log(`${m.constructor.name} ${topic} ${value} 同步失败`, e);
 				});
 
 				return result;
@@ -620,6 +620,22 @@ class Model{
 				topic: keys[i]
 				, value: this._value[keys[i]]
 			};
+		}
+
+		let a = {
+			a: 1
+				, b: 2
+				, c: 3
+
+			, *[Symbol.iterator](){
+				let keys = Object.keys( this );
+				for(let i = 0, l = keys.length; i < l; i++){
+					yield {
+						topic: keys[i]
+						, value: this[keys[i]]
+					};
+				}
+			}
 		}
 	}
 	/**

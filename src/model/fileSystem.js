@@ -136,7 +136,7 @@ class FileSystemModel extends Model{
 	 * */
 	_write(content){
 		return this._getFileEntry().then((fileEntry)=>{
-			console.log('写入文件 ',  fileEntry.toURL());
+			console.log(`写入文件 ${fileEntry.toURL()}`);
 			return this._getFileWriter( fileEntry );
 		}).then((fileWriter)=>{
 			return this._writeFile(fileWriter, content);
@@ -186,7 +186,7 @@ class FileSystemModel extends Model{
 		return this._getFileEntry({
 			create: true
 		}).then((fileEntry)=>{
-			console.log('读取文件 ', fileEntry.toURL());
+			console.log(`读取文件 ${fileEntry.toURL()}`);
 			return this._getFile( fileEntry );
 		}).then((file)=>{
 			return this._readFile( file );
@@ -354,7 +354,7 @@ class FileSystemModel extends Model{
 			});
 		}).then((fileEntry)=>{
 			return new Promise((resolve, reject)=>{
-				console.log(fileEntry.toURL(), ' 文件被删除');
+				console.log(`${fileEntry.toURL()} 文件被删除`);
 
 				fileEntry.remove(resolve, reject);
 			});

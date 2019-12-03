@@ -62,6 +62,20 @@ class ServiceModel extends Model{
 			req: new HandlerQueue()
 			, res: new HandlerQueue()
 		};
+
+		this._execReqInterceptor = new HandlerQueue();
+		this._execReqInterceptor.add( ServiceModel.interceptor.req );
+		this._execReqInterceptor.add(({topic})=>{
+			console.log(`执行局部请求拦截器 ${topic}`);
+		});
+		this._execReqInterceptor.add( this.interceptor.req );
+
+		this._execResInterceptor = new HandlerQueue();
+		this._execResInterceptor.add( ServiceModel.interceptor.res );
+		this._execResInterceptor.add(({topic})=>{
+			console.log(`执行局部响应拦截器 ${topic}`);
+		});
+		this._execResInterceptor.add( this.interceptor.res );
 	}
 
 	// ---------- 静态属性 ----------
@@ -113,13 +127,15 @@ class ServiceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	_reqInterceptor(topic, options){
-		console.log('执行全局请求拦截器', topic);
+		console.log(`执行全局请求拦截器 ${topic}`);
 
-		return ServiceModel.interceptor.req.fireReduce({topic, options}).then(({topic, options})=>{
-			console.log('执行局部请求拦截器', topic);
+		return this._execReqInterceptor.promise.line({topic, options});
 
-			return this.interceptor.req.fireReduce({topic, options});
-		});
+		// return ServiceModel.interceptor.req.fireReduce({topic, options}).then(({topic, options})=>{
+		// 	console.log(`执行局部请求拦截器 ${topic}`);
+		//
+		// 	return this.interceptor.req.fireReduce({topic, options});
+		// });
 	}
 	/**
 	 * @summary 执行响应拦截器进行验证
@@ -132,13 +148,15 @@ class ServiceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	_resInterceptor(result){
-		console.log('执行全局响应拦截器', result.topic);
+		console.log(`执行全局响应拦截器 ${result.topic}`);
 
-		return ServiceModel.interceptor.res.fireReduce( result ).then((result)=>{
-			console.log('执行局部响应拦截器', result.topic);
+		return this._execResInterceptor.promise.line( result );
 
-			return this.interceptor.res.fireReduce( result );
-		});
+		// return ServiceModel.interceptor.res.fireReduce( result ).then((result)=>{
+		// 	console.log(`执行局部响应拦截器 ${result.topic}`);
+		//
+		// 	return this.interceptor.res.fireReduce( result );
+		// });
 	}
 	/**
 	 * @summary 发送请求，在发送请求之前执行请求拦截器，在请求返回后执行响应拦截器
@@ -151,7 +169,7 @@ class ServiceModel extends Model{
 		// 执行请求拦截器
 		return this._reqInterceptor(topic, options).then(({topic, options})=>{
 			// 发送请求，向服务器发送数据
-			console.log('发送 '+ options.method +' 请求', topic);
+			console.log(`发送 ${options.method} 请求 ${topic}`);
 
 			return request(topic, options);
 		}).then((result)=>{

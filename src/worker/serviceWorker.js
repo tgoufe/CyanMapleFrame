@@ -165,7 +165,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 
 					}
 
-					console.log('不缓存', request.url, 'status: ', response.status, 'type: ', response.type);
+					console.log(`不缓存 ${request.url} status: ${response.status} type: ${response.type}`);
 					// 异常响应，跨域资源，不缓存直接返回
 					// 跨域资源 response.status 会返回 0
 					// response.type:
@@ -235,7 +235,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 
 				if( isCache ){
 					cacheStorage.setData(request, response.clone()).then(()=>{
-						console.log('已缓存 '+ request.url);
+						console.log(`已缓存 ${request.url}`);
 					});
 				}
 
