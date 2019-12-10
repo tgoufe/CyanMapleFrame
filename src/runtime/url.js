@@ -112,8 +112,8 @@ class Url{
 
 	// ---------- 公有属性 ----------
 	get query(){    // 当前页面参数拼接字符串
-		let query = Object.keys( this.params ).reduce((all, d)=>{
-				all.push( encodeURIComponent(d) +'='+ encodeURIComponent(this.params[d]) );
+		let query = Object.entries( this.params ).reduce((all, [k, v])=>{
+				all.push( encodeURIComponent(k) +'='+ encodeURIComponent(v) );
 
 				return all;
 			}, [])
@@ -191,8 +191,8 @@ class Url{
 			});
 		}
 		else if( typeof argv === 'object' ){
-			Object.keys( argv ).forEach((d)=>{
-				this.params[d] = params[d];
+			Object.entries( argv ).forEach(([k, v])=>{
+				this.params[k] = v;
 			});
 		}
 

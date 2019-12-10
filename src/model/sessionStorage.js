@@ -167,10 +167,10 @@ class SessionStorageModel extends Model{
 		if( this._enabled ){
 			try{
 				if( typeof topic === 'object' ){
-					Object.keys( topic ).forEach((k)=>{
-						this._storeSync.setItem(k, SessionStorageModel.stringify(topic[k]));
+					Object.entries( topic ).forEach(([k, v])=>{
+						this._storeSync.setItem(k, SessionStorageModel.stringify(v));
 
-						super.setData(k, topic[k]);
+						super.setData(k, v);
 					});
 				}
 				else{

@@ -116,12 +116,12 @@ class CookieModel extends Model{
 
 		document.cookie = encodeURIComponent( topic ) +'='+
 			encodeURIComponent( CookieModel.stringify(value) ) +
-			Object.keys( CookieModel._DEFAULT ).reduce((a, d)=>{    // 整理配置
-				let t = options[d] || CookieModel._DEFAULT[d]
+			Object.entries( CookieModel._DEFAULT ).reduce((a, [k, v])=>{    // 整理配置
+				let t = options[k] || v
 					;
 
 				if( t ){
-					a += '; '+ d +'='+ t;
+					a += '; '+ k +'='+ t;
 				}
 
 				return a;
@@ -176,8 +176,8 @@ class CookieModel extends Model{
 	 * @desc        因为设置 cookie 时有相关配置，故重写覆盖父类的 _setByObject 方法
 	 * */
 	_setByObject(topic, options){
-		return Promise.all( Object.keys(topic).map((d)=>{
-			return this.setData(d, topic[d], options);
+		return Promise.all( Object.entries(topic).map(([k, v])=>{
+			return this.setData(k, v, options);
 		}) ).then((resultList)=>{
 			return resultList.every( rs=>rs );
 		});
@@ -300,10 +300,10 @@ class CookieModel extends Model{
 				if( typeof topic === 'object' ){
 					options = value;
 
-					Object.keys( topic ).forEach((k)=>{
-						this._setCookie(k, topic[k], options);
+					Object.entries( topic ).forEach(([k, v])=>{
+						this._setCookie(k, v, options);
 
-						super.setData(k, topic[k]);
+						super.setData(k, v);
 					});
 				}
 				else{

@@ -234,8 +234,8 @@ class FileSystemModel extends Model{
 
 		if( writeTarget ){
 
-			Object.keys( writeTarget ).forEach((t)=>{
-				return super.setData(t, writeTarget[t]);
+			Object.entries( writeTarget ).forEach(([k, v])=>{
+				return super.setData(k, v);
 			});
 
 			result = this._read().then((content)=>{

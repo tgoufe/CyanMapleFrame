@@ -340,8 +340,8 @@ class Model{
 	 * @return      {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	_setByObject(topic){
-		return Promise.all( Object.keys(topic).map((d)=>{
-			return this.setData(d, topic[d]);
+		return Promise.all( Object.entries(topic).map(([k, v])=>{
+			return this.setData(k, v);
 		}) ).then((data)=>{
 			return !!data;
 		});
@@ -612,31 +612,31 @@ class Model{
 	 * @desc    适用于 for-of
 	 * */
 	*[Symbol.iterator](){
-		let keys = Object.keys( this._value )
+		let entries = Object.entries( this._value )
 			;
 
-		for(let i = 0, l = keys.length; i < l; i++){
+		for(let i = 0, l = entries.length; i < l; i++){
 			yield {
-				topic: keys[i]
-				, value: this._value[keys[i]]
+				topic: entries[i][0]
+				, value: entries[i][1]
 			};
 		}
 
-		let a = {
-			a: 1
-				, b: 2
-				, c: 3
-
-			, *[Symbol.iterator](){
-				let keys = Object.keys( this );
-				for(let i = 0, l = keys.length; i < l; i++){
-					yield {
-						topic: keys[i]
-						, value: this[keys[i]]
-					};
-				}
-			}
-		}
+		// let a = {
+		// 	a: 1
+		// 		, b: 2
+		// 		, c: 3
+		//
+		// 	, *[Symbol.iterator](){
+		// 		let keys = Object.keys( this );
+		// 		for(let i = 0, l = keys.length; i < l; i++){
+		// 			yield {
+		// 				topic: keys[i]
+		// 				, value: this[keys[i]]
+		// 			};
+		// 		}
+		// 	}
+		// }
 	}
 	/**
 	 * @summary 实现异步迭代器接口
@@ -644,13 +644,13 @@ class Model{
 	 * @desc    适用于 for-await-of
 	 * */
 	*[Symbol.asyncIterator](){
-		let keys = Object.keys( this._value )
+		let entries = Object.entries( this._value )
 			;
 
-		for(let i = 0, l = keys.length; i < l; i++){
+		for(let i = 0, l = entries.length; i < l; i++){
 			yield Promise.resolve({
-				topic: keys[i]
-				, value: this._value[keys[i]]
+				topic: entries[i][0]
+				, value: entries[i][1]
 			});
 		}
 	}

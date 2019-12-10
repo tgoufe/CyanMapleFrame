@@ -74,8 +74,8 @@ class WebSQLModel extends Model{
 			this._config.sql = merge(sql, WebSQLModel._CONFIG.sql);
 		}
 
-		Object.keys( this._config.sql ).forEach((d)=>{
-			this._config.sql[d] = this._replaceTableName( this._config.sql[d] );
+		Object.entries( this._config.sql ).forEach(([k, v])=>{
+			this._config.sql[k] = this._replaceTableName( v );
 		});
 
 		// this._store 为 Promise 类型，会在 resolve 中传入 db 实例，因为要保证数据表存在才可以操作
