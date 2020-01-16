@@ -1,8 +1,8 @@
 'use strict';
 
-import url      from '../runtime/url.js';
-import Model from './model.js';
-import merge from '../util/merge.js';
+import {Url}    from '../runtime/url.js';
+import Model    from '../model/model.js';
+import merge    from '../util/merge.js';
 
 /**
  * 默认配置
@@ -28,9 +28,11 @@ class WebSocketModel extends Model{
 	 * @param   {string}            [config.eventType]
 	 * */
 	constructor(config={}){
+		config = merge(config, WebSocketModel._CONFIG);
+
 		super( config );
 
-		this._config = merge(config, WebSocketModel._CONFIG);
+		this._config = config;
 
 		this._conn = this._createConn();
 	}
@@ -44,6 +46,16 @@ class WebSocketModel extends Model{
 	// 		return false;
 	// 	}
 	// }
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $socket，配置参数名 socket
+	 * */
+	static inject(app){
+		app.inject('$socket', new WebSocketModel( app.$options.socket ));
+	}
 
 	// ---------- 静态属性 ----------
 	/**
@@ -70,7 +82,7 @@ class WebSocketModel extends Model{
 				if( 'WebSocket' in self ){
 
 					if( !/^wss?:\/\//.test( this._config.url ) ){
-						this._config.url = (url.protocol === 'https'? 'wss' :'ws') +'://'+ this._config.url;
+						this._config.url = (this.$url.protocol === 'https'? 'wss' :'ws') +'://'+ this._config.url;
 					}
 
 					conn = new WebSocket(this._config.url, this._config.protocol);
@@ -288,6 +300,8 @@ class WebSocketModel extends Model{
 		return 'WebSocketModel';
 	}
 }
+
+WebSocketModel.use( Url );
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成

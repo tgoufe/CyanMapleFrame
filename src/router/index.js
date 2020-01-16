@@ -1,8 +1,10 @@
 'use strict';
 
-import url      from '../runtime/url.js';
+import Base     from '../base.js';
+import {Url}    from '../runtime/url.js';
 import merge    from '../util/merge.js';
-import listener from '../listener.js';
+import HandlerQueue from '../util/handlerQueue.js';
+import {Listener}   from '../util/listener.js';
 
 /**
  * 路由默认配置
@@ -11,6 +13,7 @@ import listener from '../listener.js';
 const CONFIG = {
 		mode: 'history'
 		, baseUrl: ''   // 若设置 baseUrl 应以 / 结尾
+		, eventType: 'routerChange'
 	}
 	;
 
@@ -34,36 +37,37 @@ const CONFIG = {
 /**
  * @class
  * @desc    路由配置类
+ * @extends Base
  * */
-class Router{
+class Router extends Base{
 	/**
 	 * @constructor
 	 * @param   {Object}        [config={}]
 	 * @param   {string}        [config.baseUrl]
 	 * @param   {string}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式
 	 * @param   {RouteConfig[]} [config.routers]
-	 * @param   {Function}      [config.fallback]       当路由不存在时的回调函数，传入参数当前 location.href
+	 * @param   {Function}      [config.fallback]       当路由不存在时的回调函数，传入参数当前路由的 Url 类型参数
+	 * @param   {string}        [config.eventType]
 	 * */
 	constructor(config={}){
-		// this.listener = listener(this, 'routerChange', (e, newUrl, oldUrl)=>{
-		//
-		// });
+		config = merge(config, Router._CONFIG);
+
+		super( config );
 
 		this.routers = [];
 
-		this.config = merge(config, Router._CONFIG);
+		this.config = config;
 
 		this._historyList = [{
-			url: url.source
+			url: this.$url.source
 			, time: Date.now()
 		}];
 
-		this._listener = listener(this, 'routerChange');
-		this._listener.on();
+		this._$trigger = this.$listener(this, this.config.eventType, ()=>{});
 
 		if( this.config.mode === 'history' ){
-			url.popState.add((e)=>{
-				let tempUrl = url.parseUrl( location.href )
+			this.$url.popState((e)=>{
+				let tempUrl = this.$url.parseUrl( location.href )
 					;
 
 				if( this.has(tempUrl.path) ){
@@ -79,18 +83,18 @@ class Router{
 				}
 				else{
 					console.log(`router 中不存在 ${location.href}`, e);
-					this.config.fallback && this.config.fallback( location.href );
+					this.config.fallback && this.config.fallback( tempUrl );
 				}
 			});
 		}
 		else if( this.config.mode === 'hash' ){
-			url.hashChange.add((e)=>{
+			this.$url.hashChange((e)=>{
 				let newUrl = e.newURL
-					, tempUrl = url.parseUrl( newUrl )
+					, tempUrl = this.$url.parseUrl( newUrl )
 					, newHash = tempUrl.hash
 					;
 
-				tempUrl = url.parseUrl( newHash );
+				tempUrl = this.$url.parseUrl( newHash );
 
 				if( this.has( tempUrl.path ) ){
 
@@ -104,8 +108,8 @@ class Router{
 					});
 				}
 				else{
-					console.log(`router 中不存在 ${location.href}`, e);
-					this.config.fallback && this.config.fallback( location.href );
+					console.log(`router 中不存在 ${tempUrl.path}`, e);
+					this.config.fallback && this.config.fallback( tempUrl.path );
 				}
 			});
 		}
@@ -115,6 +119,17 @@ class Router{
 				this.register( route );
 			});
 		}
+	}
+
+	// ---------- 静态方法 ----------
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @static
+	 * @param   {Object}    app
+	 * @desc    注入为 $router，配置参数名 router
+	 * */
+	static inject(app){
+		app.inject('$router', new Router( app.$options.router ));
 	}
 
 	// ---------- 静态属性 ----------
@@ -130,6 +145,7 @@ class Router{
 	// ---------- 私有方法 ----------
 	/**
 	 * @summary 触发路由改变事件
+	 * @private
 	 * */
 	_trigger(){
 		let l = this._historyList.length
@@ -137,10 +153,11 @@ class Router{
 			, to = this._historyList[l -1]
 			;
 
-		this._listener.trigger(from, to);
+		this._$trigger(from, to);
 	}
 	/**
 	 * @summary 找到 path 对应 route 在 this.routers 中的位置
+	 * @private
 	 * @param   {string}    path
 	 * @return  {number}    若不存在返回 -1
 	 * */
@@ -162,55 +179,37 @@ class Router{
 			, router
 			, result
 			, execute
-			, temp
+			, tempParams
 			;
+
+		this.$handlers.clear();
 
 		if( index !== -1 ){
 			router = this.routers[index];
-			result = router.pattern.exec( path )
+			result = router.pattern.exec( path );
+
+			if( result ){    // 存在匹配 path
+				// 解析 url 中的参数
+				tempParams = result.slice(1).reduce((all, d, i)=>{
+					all[router.paramNames[i]] = d;
+
+					return all;
+				}, {});
+
+				tempParams = merge(tempParams, params);
+
+				router.before && this.$handlers.add( router.before );
+				this.$handlers.add( router.callback );
+				router.after && this.$handlers.add( router.after );
+
+				execute = this.$handlers.promise.line( tempParams );
+			}
+			else{
+				execute = Promise.reject('路由路径不匹配');
+			}
 		}
 		else{
 			execute = Promise.reject('router 中不存在');
-		}
-
-		if( result ){    // 存在匹配 path
-			// 解析 url 中的参数
-			temp = result.slice(1).reduce((all, d, i)=>{
-				all[router.paramNames[i]] = d;
-
-				return all;
-			}, {});
-
-			temp = merge(temp, params);
-
-			execute = Promise.resolve().then(()=>{
-				if( router.before ){
-					return router.before(temp);
-				}
-			}).then((beforeRS)=>{
-				if( beforeRS === false ){
-					return Promise.reject('路由执行被阻止, before 返回 false');
-				}
-
-				if( router.callback ){
-					return router.callback( temp );
-				}
-			}).then((callbackRS)=>{
-				if( callbackRS === false ){
-					return Promise.reject('路由执行被阻止, callback 返回 false');
-				}
-
-				if( router.after ){
-					return router.after( temp );
-				}
-			}).then((afterRS)=>{
-				if( afterRS === false ){
-					return Promise.reject('路由执行被阻止, after 返回 false');
-				}
-			});
-		}
-		else{
-			execute = Promise.reject('路由路径不匹配');
 		}
 
 		return execute.catch((e)=>{
@@ -226,11 +225,12 @@ class Router{
 	}
 	/**
 	 * @summary history 模式下的 go 接口的逻辑调用
+	 * @private
 	 * @param   {Url}   targetUrl
 	 * */
 	_goHistory(targetUrl){
 		this._get( targetUrl ).then(()=>{
-			url.pushHistory( targetUrl.pack() );
+			this.$url.pushHistory( targetUrl.pack() );
 
 			this._historyList.push({
 				url: targetUrl.pack()
@@ -242,17 +242,11 @@ class Router{
 	}
 	/**
 	 * @summary hash 模式下的 go 接口的逻辑调用
+	 * @private
 	 * @param   {Url}   targetUrl
 	 * */
 	_goHash(targetUrl){
-		url.setHash( targetUrl.path + targetUrl.query );
-	}
-
-	// ---------- 公有属性 ----------
-	get currentPath(){
-		let l = this._historyList.length
-			;
-		return url.parseUrl( this._historyList[l -1] ).path;
+		this.$url.setHash( targetUrl.path + targetUrl.query );
 	}
 
 	// ---------- 公有方法 ----------
@@ -264,10 +258,10 @@ class Router{
 			;
 
 		if( this.config.mode === 'history' ){
-			tempUrl = url;
+			tempUrl = this.$url;
 		}
 		else if( this.config.mode === 'hash' ){
-			tempUrl = url.parseUrl( url.hash || '/' );
+			tempUrl = this.$url.parseUrl( this.$url.hash || '/' );
 		}
 
 		if( this.has(tempUrl.path) ){
@@ -288,6 +282,8 @@ class Router{
 		let paramNames = []
 			, pattern = null
 			, path = ''
+			, before
+			, after
 			;
 
 		// route 是数组类型
@@ -303,6 +299,8 @@ class Router{
 		if( typeof route === 'object' && !(route instanceof RegExp) ){
 			path = route.path;
 			callback = route.callback || (()=>{});
+			before = router.before;
+			after = router.after;
 		}
 		else{
 			path = route;
@@ -325,7 +323,7 @@ class Router{
 					pattern = this.config.baseUrl + pattern;  // 基于 baseUrl
 				}
 				else{
-					pattern = url.dir + pattern;  // 添加根目录
+					pattern = this.$url.dir + pattern;  // 添加根目录
 				}
 			}
 
@@ -339,7 +337,9 @@ class Router{
 			this.routers.push({
 				pattern
 				, paramNames
+				, before
 				, callback
+				, after
 			});
 		}
 
@@ -358,7 +358,7 @@ class Router{
 	 * @return  {boolean}
 	 * */
 	has(path){
-		path = url.parseUrl( path ).path;
+		path = this.$url.parseUrl( path ).path;
 
 		return this._getRouteIndex( path ) !== -1;
 	}
@@ -372,12 +372,12 @@ class Router{
 	 * */
 	go(path, params={}){
 		if( typeof path === 'number' ){
-			url.go( path );
+			this.$url.go( path );
 
 			return true;
 		}
 
-		let targetUrl = url.parseUrl( path )
+		let targetUrl = this.$url.parseUrl( path )
 			, rs = this.has( targetUrl.path )
 			;
 
@@ -395,9 +395,6 @@ class Router{
 				this._goHash( targetUrl );
 			}
 		}
-		else{
-			this._trigger();
-		}
 
 		return rs;
 	}
@@ -406,14 +403,14 @@ class Router{
 	 * @desc    实际为调用 url.back 方法，该封装主要为了统一调用对象
 	 * */
 	back(){
-		url.back();
+		this.$url.back();
 	}
 	/**
 	 * @summary 前进
 	 * @desc    实际为调用 url.forward 方法，该封装主要为了统一调用对象
 	 * */
 	forward(){
-		url.forward();
+		this.$url.forward();
 	}
 
 	/**
@@ -432,9 +429,19 @@ class Router{
 	 * @param   {RouterChangeEvent} callback
 	 * */
 	on(callback){
-		this._listener.add( callback );
+		this.$listener.on(this.config.eventType, callback);
+	}
+
+	// ---------- 公有属性 ----------
+	/**
+	 * @summary 获取当前路径
+	 * */
+	get currentPath(){
+		return this.$url.parseUrl( this._historyList[this._historyList.length -1] ).path;
 	}
 }
+
+Router.use(Url, Listener, HandlerQueue);
 
 export default Router;
 

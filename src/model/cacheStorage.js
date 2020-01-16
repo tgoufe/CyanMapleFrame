@@ -30,9 +30,11 @@ class CacheStorageModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
+		config = merge(config, CacheStorageModel._CONFIG);
+
 		super( config );
 
-		this._config = merge(config, CacheStorageModel._CONFIG);
+		this._config = config;
 
 		if( 'caches' in self ){ // 判断
 			this._store = Promise.resolve( self.caches );

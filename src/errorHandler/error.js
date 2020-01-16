@@ -1,12 +1,18 @@
 'use strict';
 
-import listener from "../listener";
+import listener from "../util/listener";
 
 /**
+ * @summary     添加全局异常事件监控
  * @memberOf    maple
- * @type        {Listener}
+ * @param       {ListenerCallback}  callback
+ * @return      {Object}
  * */
-let error = listener('error')
+let error = (callback)=>{
+		return listener.on('error', callback, {
+			capture: true
+		});
+	}
 	;
 
 export default error;

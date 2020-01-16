@@ -52,9 +52,11 @@ class IndexedDBModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
+		config = merge(config, IndexedDBModel._CONFIG);
+
 		super( config );
 
-		this._config = merge(config, IndexedDBModel._CONFIG);
+		this._config = config;
 
 		// this._store 为 Promise 类型，会在 resolve 中传入 db 实例，因为要保证数据库打开成功才可以操作
 		this._store = new Promise((resolve, reject)=>{
@@ -105,6 +107,16 @@ class IndexedDBModel extends Model{
 		});
 	}
 
+	// ---------- 静态方法 ----------
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $idb，配置参数名 idb
+	 * */
+	static inject(app){
+		app.inject('$idb', new IndexedDBModel( app.$options.idb ));
+	}
+
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置
@@ -121,6 +133,7 @@ class IndexedDBModel extends Model{
 	 * @private
 	 * @param   {string}    topic
 	 * @return  {Promise<*, ErrorEvent>} 返回一个 Promise 对象，在 resolve 时传回查询出来的 value
+	 * @desc    获取数据时会将其存入内存中
 	 * */
 	_select(topic){
 		return this._store.then((db)=>{
@@ -130,7 +143,12 @@ class IndexedDBModel extends Model{
 					;
 
 				objectStoreRequest.onsuccess = function(e){
-					resolve( e.target.result );
+					let value = e.target.result
+						;
+
+					super.setData(topic, value);
+
+					resolve( value );
 				};
 				objectStoreRequest.onerror = function(e){
 					console.log( e );
@@ -146,6 +164,7 @@ class IndexedDBModel extends Model{
 	 * @param   {string}    value
 	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    add 接口要求数据库中不能已经有相同键的对象存在，因此统一使用 put 接口
+	 *          保持值得时候，同时会保持在内存中
 	 * */
 	_put(topic, value){
 		return this._store.then((db)=>{
@@ -158,6 +177,8 @@ class IndexedDBModel extends Model{
 					;
 
 				objectStoreRequest.onsuccess = function(e){
+					super.setData(topic, value);
+
 					resolve( !!e.target.result );
 				};
 				objectStoreRequest.onerror = function(e){
@@ -181,6 +202,8 @@ class IndexedDBModel extends Model{
 					;
 
 				objectStoreRequest.onsuccess = function(){
+					super.removeData( topic );
+
 					resolve( true );
 				};
 				objectStoreRequest.onerror = function(e){
@@ -203,6 +226,8 @@ class IndexedDBModel extends Model{
 					;
 
 				objectStoreRequest.onsuccess = function(){
+					super.clearData();
+
 					resolve( true );
 				};
 				objectStoreRequest.onerror = function(e){
@@ -230,9 +255,7 @@ class IndexedDBModel extends Model{
 			result = this._setByObject( topic );
 		}
 		else{
-			result = super.setData(topic, value).then(()=>{
-				return this._put(topic, value);
-			});
+			result = this._put(topic, value);
 		}
 
 		return result;
@@ -257,30 +280,25 @@ class IndexedDBModel extends Model{
 			result = this._getByArray( [].slice.call(arguments) );
 		}
 		else{
-			result = super.getData( topic ).catch(()=>{
-				return this._select( topic ).then((rs)=>{
-					let value
-						;
+			result = this._select( topic ).then((rs)=>{
+				let value
+					;
 
-					if( rs ){
-						value = rs.value;
+				if( rs ){
+					value = rs.value;
 
-						if( typeof value === 'string' ){ // 若为字符串类型的数据，尝试进行解析
-							try{
-								value = JSON.parse( value );
-							}
-							catch(e){}
+					if( typeof value === 'string' ){ // 若为字符串类型的数据，尝试进行解析
+						try{
+							value = JSON.parse( value );
 						}
-
-						// 在内存中保留该值
-						super.setData(topic, value);
+						catch(e){}
 					}
-					else{
-						value = Promise.reject( null );
-					}
+				}
+				else{
+					value = Promise.reject( null );
+				}
 
-					return value;
-				});
+				return value;
 			});
 		}
 
@@ -305,9 +323,7 @@ class IndexedDBModel extends Model{
 			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
-			result = super.removeData( topic ).then(()=>{
-				return this._delete( topic );
-			});
+			result = this._delete( topic );
 		}
 
 		return result;
@@ -318,9 +334,7 @@ class IndexedDBModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	clearData(){
-		return super.clearData().then(()=>{
-			return this._clear();
-		});
+		return this._clear();
 	}
 	/**
 	 * @summary 获取通过 range 获取数据

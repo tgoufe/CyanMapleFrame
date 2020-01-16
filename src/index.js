@@ -24,11 +24,11 @@
  |                                                           |
 -----------------------------------------------------------------------
  |                                                           |
- |  +------------+  +------------+  +----------+             |
- |  |            |  |            |  |          |             |
- |  |  position  |  |  register  |  |  notify  |             |  浏览器增强功能
- |  |            |  |            |  |          |             |
- |  +------------+  +------------+  +----------+             |
+ |  +-------+  +------------+  +----------+                  |
+ |  |       |  |            |  |          |                  |
+ |  |  geo  |  |  register  |  |  notify  |                  |  浏览器增强功能
+ |  |       |  |            |  |          |                  |
+ |  +-------+  +------------+  +----------+                  |
  |                                                           |
  +-----------------------------------------------------------+
 </pre>
@@ -38,15 +38,18 @@
  * @namespace   maple
  * */
 
-/**
- * ---------- 事件队列监听 ----------
- * */
-import listener, {Listener} from './listener.js';
+import Base from './base.js';
 
 /**
  * ---------- 通用工具 ----------
  * */
 import util     from './util/index.js';
+export * from './util/index.js';
+
+/**
+ * ---------- 事件队列监听 ----------
+ * */
+import listener, {Listener} from './util/listener.js';
 
 /**
  * ---------- 全局运行时检测 ----------
@@ -71,7 +74,7 @@ import view     from './view/index.js';
 /**
  * ---------- Router 路由控制 ----------
  * */
-import router, * as Router  from './router/index.js';
+import router, {Router}  from './router/index.js';
 export * from './router/index.js';
 
 /**
@@ -85,13 +88,13 @@ import unHandledRejection   from './errorHandler/unHandledRejection.js';
 /**
  * ---------- 获取地理位置 ----------
  * */
-import position from './position.js';
+import geo, {Geo} from './view/geo.js';
 
-/**
- * ---------- 动画库 ----------
- * todo 实验性功能
- * */
-import * as animate from './animate/index.js';
+// /**
+//  * ---------- 动画库 ----------
+//  * todo 实验性功能
+//  * */
+// import * as animate from './animate/index.js';
 
 /**
  * ---------- 注册后台 worker ----------
@@ -101,10 +104,50 @@ import register from './register/index.js';
 /**
  * ---------- 桌面通知 ----------
  * */
-import notify   from './notify.js';
+import notify     from './view/notify.js';
+
+// const MODULE_LIST = []
+// 	;
+//
+// class App extends Base{
+// 	constructor(options){
+// 		super( options );
+// 	}
+//
+// 	static use(module){
+// 		this.modules.push( module );
+// 	}
+// 	static get modules(){
+// 		return MODULE_LIST;
+// 	}
+//
+// 	init(){
+// 		App.modules.forEach((module)=>{
+// 			module.inject && module.inject( this );
+// 		});
+// 	}
+//
+// 	inject(key, module){
+// 		if( key in this ){
+// 			throw Error('已存在同名模块');
+// 		}
+// 		else{
+// 			this.keys.push( key );
+//
+// 			Object.defineProperty(this, key, {
+// 				get(){
+// 					return module;
+// 				}
+// 			});
+// 		}
+// 	}
+// }
+
+import useAxios from './service/useAxios.js';
 
 let maple = {
-	Listener
+	App: Base
+	, Listener
 	, listener
 	, util
 
@@ -116,28 +159,30 @@ let maple = {
 
 	, view
 
-	, ...Router
+	, Router
 	, router
 
 	, error
 	, unHandledRejection
 
-	, position
+	, geo
 
 	// 实验性功能
-	, animate
+	// , animate
 	, register
 	, notify
+	, useAxios(){
+		Model.ServiceModel.use( useAxios );
+	}
 };
-
-window.maple = maple;
 
 export default maple;
 
 export {
-	Listener
+	Base as App
 	, view as View
 	, device as Device
 	, util as Util
 	, url as Url
+	, Geo
 };

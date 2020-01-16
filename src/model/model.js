@@ -1,7 +1,8 @@
 'use strict';
 
-import listener from '../listener.js';
-import merge    from '../util/merge.js';
+import Base     from '../base.js';
+import {Listener}   from '../util/listener.js';
+import merge        from '../util/merge.js';
 
 /**
  * 默认配置
@@ -30,6 +31,7 @@ const MODEL_CONFIG = {
 /**
  * @class
  * @desc    数据层基类，将数据保存在内存中
+ * @extends Base
  * @example
 let model = new Model();
 
@@ -62,20 +64,24 @@ model.getData('isLogin', 'token', 'hybrid').then(({isLogin, token, hybrid})=>{
 	//
 })
  * */
-class Model{
+class Model extends Base{
 	/**
 	 * @constructor
 	 * @param   {Object}    [config={}]
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 方法
+		config = merge(config, Model._CONFIG);
+
+		super( config );
+		
+		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 等方法
 		this._history = Object.create( null );  // 历史记录
 		this._syncToList = [];
 
-		this.config = merge(config, Model._CONFIG);
+		this.config = config;
 
-		this._listener = listener(this, this.config.eventType, (e, topic, value)=>{
+		this._$trigger = this.$listener.on(this, this.config.eventType, (e, topic, value)=>{
 			this._sync(topic, value);
 		});
 	}
@@ -84,8 +90,8 @@ class Model{
 	/**
 	 * @summary 注册子类
 	 * @static
-	 * @param   {string}            name
-	 * @param   {Model}    model
+	 * @param   {string}    name
+	 * @param   {Model}     model
 	 * @desc    若该子类已经被注册，并且缓存中没有该子类的实例，则覆盖
 	 * */
 	static register(name, model){
@@ -200,6 +206,14 @@ class Model{
 		return typeof value === 'object' ? JSON.stringify( value ) : value.toString();
 	}
 	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $model，配置参数名 model
+	 * */
+	static inject(app){
+		app.inject('$model', new Model( app.$options.model ));
+	}
+	/**
 	 * todo
 	 * */
 	// static [Symbol.hasInstance](instance){
@@ -284,7 +298,7 @@ class Model{
 	 * @param       {*}         oldValue
 	 * */
 	_trigger(topic, newValue, oldValue){
-		this._listener.trigger(topic, newValue, oldValue);
+		this._$trigger(topic, newValue, oldValue);
 	}
 	/**
 	 * @summary     数据同步的内部实现
@@ -539,7 +553,7 @@ class Model{
 	 * @return  {Model}             返回 this
 	 * */
 	on(callback){
-		this._listener.add( callback );
+		this.$listener.on(this, this.config.eventType, callback);
 
 		return this;
 	}
@@ -548,7 +562,7 @@ class Model{
 	 * @param   {ModelChangeEvent}  callback
 	 * */
 	off(callback){
-		this._listener.off( callback );
+		this.$listener.off(this, this.config.eventType, callback);
 
 		return this;
 	}
@@ -664,5 +678,7 @@ class Model{
 		return 'Model';
 	}
 }
+
+Model.use( Listener );
 
 export default Model;

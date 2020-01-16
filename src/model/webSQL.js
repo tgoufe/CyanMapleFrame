@@ -62,17 +62,12 @@ class WebSQLModel extends Model{
 	 * @desc    传入 sql 语句时，可用 {{tableName}} 来代替表名
 	 * */
 	constructor(config={}){
+		config = merge(config, WebSQLModel._CONFIG);
+		config.sql = merge(config.sql, WebSQLModel._CONFIG.sql);
+
 		super( config );
 
-		let sql = config.sql
-			;
-
-		this._config = merge(config, WebSQLModel._CONFIG);
-
-		if( sql && typeof sql === 'object' ){
-
-			this._config.sql = merge(sql, WebSQLModel._CONFIG.sql);
-		}
+		this._config = config;
 
 		Object.entries( this._config.sql ).forEach(([k, v])=>{
 			this._config.sql[k] = this._replaceTableName( v );
@@ -242,12 +237,7 @@ class WebSQLModel extends Model{
 			result = this._setByObject( topic );
 		}
 		else{
-			result = super.setData(topic, value).then(()=>{
-
-				value = WebSQLModel.stringify( value );
-
-				return this._select( topic );
-			}).then((rs)=>{
+			result = this._select( topic ).then((rs)=>{
 				let result
 					;
 
@@ -257,6 +247,8 @@ class WebSQLModel extends Model{
 				else{
 					result = this._insert(topic, value);
 				}
+
+				super.setData(topic, value);
 
 				return result;
 			});
@@ -284,29 +276,30 @@ class WebSQLModel extends Model{
 			result = this._getByArray( [].slice.call(arguments) );
 		}
 		else{
-			result = super.getData( topic ).catch(()=>{
-				return this._select( topic ).then((rs)=>{
-					let value = ''
-						;
+			result = this._select( topic ).then((rs)=>{
+				let value = ''
+					;
 
-					if( rs && rs.length ){
-						// 只返回第一条数据
-						value = rs[0].value;
+				if( rs && rs.length ){
+					// 只返回第一条数据
+					value = rs[0].value;
 
-						try{
-							value = JSON.parse( value );
-						}
-						catch(e){}
-
-						// 在内存中保留该值
-						super.setData(topic, value);
+					try{
+						value = JSON.parse( value );
 					}
-					else{
-						value = Promise.reject( null );
-					}
+					catch(e){}
 
-					return value;
-				});
+					// 在内存中保留该值
+					super.setData(topic, value);
+				}
+				else{
+					value = Promise.reject( null );
+
+					// 在内存中保留该值
+					super.setData(topic, null);
+				}
+
+				return value;
 			});
 		}
 
@@ -331,9 +324,9 @@ class WebSQLModel extends Model{
 			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
-			result = super.removeData( topic ).then(()=>{
-				return this._delete( topic );
-			});
+			result = this._delete( topic );
+
+			super.removeData( topic );
 		}
 
 		return result;
@@ -344,9 +337,9 @@ class WebSQLModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * */
 	clearData(){
-		return this.clearData().then(()=>{
-			return this._clear();
-		});
+		this.clearData();
+
+		return this._clear();
 	}
 
 	/**

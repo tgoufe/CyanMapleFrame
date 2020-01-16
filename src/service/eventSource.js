@@ -1,7 +1,7 @@
 'use strict';
 
-import Model    from './model.js';
-import merge    from '../util/merge';
+import Model from '../model/model.js';
+import merge from '../util/merge';
 
 /**
  * 默认配置
@@ -28,9 +28,11 @@ class EventSourceModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
+		config = merge(config, EventSourceModel._CONFIG);
+		
 		super( config );
 
-		this._config = merge(config, EventSourceModel._CONFIG);
+		this._config = config;
 
 		this._conn = this._createConn();
 	}

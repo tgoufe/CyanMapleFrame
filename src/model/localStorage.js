@@ -2,7 +2,7 @@
 
 import Model    from './model.js';
 import merge    from '../util/merge.js';
-import listener from '../listener.js';
+import listener from '../util/listener.js';
 
 /**
  * 默认参数
@@ -38,9 +38,11 @@ class LocalStorageModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
+		config = merge(config, LocalStorageModel._CONFIG);
+
 		super( config );
 
-		this._config = merge(config, LocalStorageModel._CONFIG);
+		this._config = config;
 
 		if( 'localStorage' in self ){
 			this._enabled = true;
@@ -48,9 +50,7 @@ class LocalStorageModel extends Model{
 			this._store = Promise.resolve( self.localStorage );
 
 			if( this._config.listen ){
-				LocalStorageModel.listenOn();
-
-				LocalStorageModel._GLOBAL_LISTENER.add((e)=>{
+				LocalStorageModel.listenOn((e)=>{
 					let topic = e.key
 						, newVal = e.newValue
 						;
@@ -75,30 +75,29 @@ class LocalStorageModel extends Model{
 	/**
 	 * @summary 全局 storage 事件监听
 	 * @static
+	 * @param   {function}  callback
 	 * @desc    只执行一次，执行后将 LocalStorageModel._listenOn 设为 true，该监听事件只能由其他页面修改 localStorage 的数据时触发
 	 * */
-	static listenOn(){
-		
-		if( LocalStorageModel._listenOn ){
-			return;
-		}
-		
-		LocalStorageModel._GLOBAL_LISTENER = listener('storage');
-		LocalStorageModel._listenOn = true;
+	static listenOn(callback){
+		listener.on('storage', callback);
 	}
 	/**
 	 * @summary 全局 storage 事件解除监听
 	 * @static
+	 * @param   {Function}  [callback]
 	 * @desc    执行后将 LocalStorageModel._listenOn 设为 false
 	 * */
-	static listenOff(){
-		if( LocalStorageModel._listenOn && LocalStorageModel._GLOBAL_LISTENER ){
-			LocalStorageModel._GLOBAL_LISTENER.off();
-
-			LocalStorageModel._GLOBAL_LISTENER = null;
-
-			LocalStorageModel._listenOn = false;
-		}
+	static listenOff(callback){
+		listener.off('storage', callback);
+	}
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @static
+	 * @param   {Object}    app
+	 * @desc    注入为 $ls，配置参数名 ls
+	 * */
+	static inject(app){
+		app.inject('$ls', new LocalStorageModel( app.$options.ls ));
 	}
 
 	// ---------- 静态属性 ----------
@@ -128,10 +127,10 @@ class LocalStorageModel extends Model{
 			result = this._setByObject( topic );
 		}
 		else{
-			result = super.setData(topic, value).then(()=>{
-				return this._store;
-			}).then((store)=>{
+			result = this._store.then((store)=>{
 				store.setItem(topic, LocalStorageModel.stringify(value));
+
+				super.setData(topic, value);
 
 				return true;
 			});
@@ -159,26 +158,26 @@ class LocalStorageModel extends Model{
 			result = this._getByArray( [].slice.call(arguments) );
 		}
 		else{
-			result = super.getData( topic ).catch(()=>{
-				return this._store.then((store)=>{
-					let value = store.getItem( topic )
-						;
+			result = this._store.then((store)=>{
+				let value = store.getItem( topic )
+					;
 
-					if( value === null ){
-						value = Promise.reject( null );
+				if( value === null ){
+					value = Promise.reject( null );
+
+					super.setData(topic, null);
+				}
+				else{
+					try{
+						value = JSON.parse( value );
 					}
-					else{
-						try{
-							value = JSON.parse( value );
-						}
-						catch(e){}
+					catch(e){}
 
-						// 在内存中保留该值
-						super.setData(topic, value);
-					}
+					// 在内存中保留该值
+					super.setData(topic, value);
+				}
 
-					return value;
-				});
+				return value;
 			});
 		}
 		
@@ -220,12 +219,12 @@ class LocalStorageModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	clearData(){
-		return super.clearData().then(()=>{
-			return this._store.then((store)=>{
-				store.clear();
+		return this._store.then((store)=>{
+			store.clear();
 
-				return true;
-			});
+			super.clearData();
+
+			return true;
 		});
 	}
 
@@ -251,6 +250,8 @@ class LocalStorageModel extends Model{
 				}
 				else{
 					this._storeSync.setItem(topic, LocalStorageModel.stringify(value));
+
+					super.setData(topic, value);
 				}
 
 				result = true;
@@ -349,17 +350,6 @@ class LocalStorageModel extends Model{
 		}
 	}
 }
-
-/**
- * 全局 storage 监听事件是否开启
- * @static
- * */
-LocalStorageModel._listenOn = true;
-/**
- * 全局 storage 事件监听
- * @static
- * */
-LocalStorageModel._GLOBAL_LISTENER = listener('storage');
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成

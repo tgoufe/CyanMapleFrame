@@ -47,9 +47,9 @@ import FileSystemModel     from './fileSystem.js';
 import CacheStorageModel from './cacheStorage.js';
 
 // 网络请求
-import ServiceModel     from './service.js';
-import WebSocketModel   from './webSocket.js';
-import EventSourceModel from './eventSource.js';
+import ServiceModel     from '../service/service.js';
+import WebSocketModel   from '../service/webSocket.js';
+import EventSourceModel from '../service/eventSource.js';
 
 export default Model;
 

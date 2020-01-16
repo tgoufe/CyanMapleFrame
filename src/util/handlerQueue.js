@@ -1,12 +1,19 @@
 'use strict';
 
-class HandlerQueue{
+import Base from '../base.js'
+
+/**
+ * @class
+ * @desc    对函数队列统一进行操作，目前有 all、line、pipe 和 compose 四个方法
+ * @extends Base
+ * */
+class HandlerQueue extends Base{
 	/**
 	 * @constructor
 	 * */
 	constructor(){
-		this._queue = [];
-		this._currIndex = 0;
+		super();
+		this._handlers = [];
 	}
 
 	// ---------- 静态方法 ----------
@@ -17,6 +24,14 @@ class HandlerQueue{
 	 * */
 	static is(target){
 		return target && target[Symbol.toStringTag] === 'HandlerQueue';
+	}
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $handlers
+	 * */
+	static inject(app){
+		app.inject('$handlers', new HandlerQueue());
 	}
 
 	// ---------- 私有方法 ----------
@@ -36,7 +51,7 @@ class HandlerQueue{
 		return (rs, handler)=>{
 			if( handler !== null ){
 				if( HandlerQueue.is(handler) ){
-					rs.push.apply(rs, handler.with( context ).all( ...args ));
+					rs.push( ...handler.with( context ).all( ...args ) );
 				}
 				else{
 					rs.push( handler.apply(context, args) );
@@ -207,7 +222,7 @@ class HandlerQueue{
 	 * */
 	add(handler){
 		if( typeof handler === 'function' || HandlerQueue.is(handler) ){
-			return this._queue.push( handler );
+			return this._handlers.push( handler );
 		}
 		else{
 			return -1;
@@ -219,7 +234,7 @@ class HandlerQueue{
 	 * @return  {boolean}
 	 * */
 	has(handler){
-		return this._queue.indexOf( handler ) !== -1;
+		return this._handlers.indexOf( handler ) !== -1;
 	}
 	/**
 	 * @summary 从队列中移除相应的 handler
@@ -227,7 +242,7 @@ class HandlerQueue{
 	 * */
 	remove(findBy){
 		if( typeof findBy === 'function' || HandlerQueue.is(findBy) ){
-			findBy = this._queue.indexOf( findBy );
+			findBy = this._handlers.indexOf( findBy );
 		}
 		else if( typeof findBy === 'number' ){
 			findBy = parseInt( findBy );    // 去掉小数
@@ -237,15 +252,14 @@ class HandlerQueue{
 		}
 
 		if( findBy > -1 ){
-			this._queue[findBy] = null;
+			this._handlers[findBy] = null;
 		}
 	}
 	/**
 	 * @summary 清空队列
 	 * */
 	clear(){
-		this._queue = [];
-		this._currIndex = 0;
+		this._handlers = [];
 	}
 
 	/**
@@ -256,7 +270,17 @@ class HandlerQueue{
 	 *          若 handler 是 HandlerQueue 类型，将会执行其 all 方法将返回的结果评级的放入数组中
 	 * */
 	all(...args){
-		return this._queue.reduce(this._allExecutor(null, args), []);
+		return this._handlers.reduce(this._allExecutor(null, args), []);
+	}
+	/**
+	 * @summary 依次执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
+	 * @param   {...*}      [args]
+	 * @return  {boolean}
+	 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
+	 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
+	 * */
+	line(...args){
+		return !this._handlers.some( this._lineExecutor(null, args) );
 	}
 	/**
 	 * @summary 用 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
@@ -267,7 +291,7 @@ class HandlerQueue{
 	 *          若 handler 是 HandlerQueue 类型，将会执行其 pipe 方法
 	 * */
 	pipe(...args){
-		return this._queue.reduce( this._funcExecutor('pipe', null, args) );
+		return this._handlers.reduce( this._funcExecutor('pipe', null, args) );
 	}
 	/**
 	 * @summary 为 pipe 方法的逆序，用 reduceRight 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
@@ -278,17 +302,7 @@ class HandlerQueue{
 	 *          若 handler 是 HandlerQueue 类型，将会执行其 compose 方法
 	 * */
 	compose(...args){
-		return this._queue.reduceRight( this._funcExecutor('compose', null, args) );
-	}
-	/**
-	 * @summary 依次执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
-	 * @param   {...*}      [args]
-	 * @return  {boolean}
-	 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
-	 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
-	 * */
-	line(...args){
-		return !this._queue.some( this._lineExecutor(null, args) );
+		return this._handlers.reduceRight( this._funcExecutor('compose', null, args) );
 	}
 	/**
 	 * @summary 指定上下文，返回执行 handler 队列的方法集合
@@ -304,12 +318,22 @@ class HandlerQueue{
 		 *          若 handler 是 HandlerQueue 类型，将会执行其 all 方法将返回的结果评级的放入数组中
 		 * */
 		let all = (...args)=>{
-				return this._queue.reduce(this._allExecutor(context, args), []);
+				return this._handlers.reduce(this._allExecutor(context, args), []);
 			}
 			;
 
 		return {
 			all
+			/**
+			 * @summary 指定在 context 的上下文中，顺序执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
+			 * @param   {...*}      [args]
+			 * @return  {boolean}
+			 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
+			 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
+			 * */
+			, line: (...args)=>{
+				return !this._handlers.some( this._lineExecutor(context, args) );
+			}
 			/**
 			 * @summary 指定在 context 的上下文中，用 reduce 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
 			 * @param   {...*}  [args]
@@ -319,7 +343,7 @@ class HandlerQueue{
 			 *          若 handler 是 HandlerQueue 类型，将会执行其 pipe 方法
 			 * */
 			, pipe: (...args)=>{
-				return this._queue.reduce( this._funcExecutor('pipe', context, args) );
+				return this._handlers.reduce( this._funcExecutor('pipe', context, args) );
 			}
 			/**
 			 * @summary 指定在 context 的上下文中，为 pipe 方法的逆序，用 reduceRight 的形式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
@@ -330,17 +354,7 @@ class HandlerQueue{
 			 *          若 handler 是 HandlerQueue 类型，将会执行其 compose 方法
 			 * */
 			, compose: (...args)=>{
-				return this._queue.reduceRight( this._funcExecutor('compose', context, args) );
-			}
-			/**
-			 * @summary 指定在 context 的上下文中，顺序执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
-			 * @param   {...*}      [args]
-			 * @return  {boolean}
-			 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
-			 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
-			 * */
-			, line: (...args)=>{
-				return !this._queue.some( this._lineExecutor(context, args) );
+				return this._handlers.reduceRight( this._funcExecutor('compose', context, args) );
 			}
 			, promise: {
 				/**
@@ -354,6 +368,16 @@ class HandlerQueue{
 					return Promise.all( all(args) );
 				}
 				/**
+				 * @summary 指定在 context 的上下文中，以 promise 串行的方式执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
+				 * @param   {...*}      [args]
+				 * @return  {Promise<boolean>}
+				 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
+				 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
+				 * */
+				, line: (...args)=>{
+					return this._handlers.reduce(this._lineExecutorPromise(context, args), Promise.resolve());
+				}
+				/**
 				 * @summary 指定在 context 的上下文中，以 promise 串行的方式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
 				 * @param   {...*}  [args]
 				 * @return  {Promise<*>}
@@ -362,7 +386,7 @@ class HandlerQueue{
 				 *          若 handler 是 HandlerQueue 类型，将会执行其 pipe 方法
 				 * */
 				, pipe: (...args)=>{
-					return this._queue.reduce( this._funcExecutorPromise('pipe', context, args) );
+					return this._handlers.reduce( this._funcExecutorPromise('pipe', context, args) );
 				}
 				/**
 				 * @summary 指定在 context 的上下文中，为 pipe 方法的逆序，以 promise 串行的方式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
@@ -373,17 +397,7 @@ class HandlerQueue{
 				 *          若 handler 是 HandlerQueue 类型，将会执行其 compose 方法
 				 * */
 				, compose: (...args)=>{
-					return this._queue.reduceRight( this._funcExecutorPromise('compose', context, args) );
-				}
-				/**
-				 * @summary 指定在 context 的上下文中，以 promise 串行的方式执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
-				 * @param   {...*}      [args]
-				 * @return  {Promise<boolean>}
-				 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
-				 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
-				 * */
-				, line: (...args)=>{
-					return this._queue.reduce(this._lineExecutorPromise(context, args), Promise.resolve());
+					return this._handlers.reduceRight( this._funcExecutorPromise('compose', context, args) );
 				}
 			}
 		};
@@ -407,6 +421,16 @@ class HandlerQueue{
 				return Promise.all( this.all(...args) );
 			}
 			/**
+			 * @summary 以 promise 串行的方式执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
+			 * @param   {...*}      [args]
+			 * @return  {Promise<boolean>}
+			 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
+			 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
+			 * */
+			, line: (...args)=>{
+				return this._handlers.reduce(this._lineExecutorPromise(null, args), Promise.resolve());
+			}
+			/**
 			 * @summary 以 promise 串行的方式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
 			 * @param   {...*}  [args]
 			 * @return  {Promise<*>}
@@ -415,7 +439,7 @@ class HandlerQueue{
 			 *          若 handler 是 HandlerQueue 类型，将会执行其 pipe 方法
 			 * */
 			, pipe: (...args)=>{
-				return this._queue.reduce( this._funcExecutorPromise('pipe', null, args) );
+				return this._handlers.reduce( this._funcExecutorPromise('pipe', null, args) );
 			}
 			/**
 			 * @summary 为 pipe 方法的逆序，以 promise 串行的方式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
@@ -426,17 +450,7 @@ class HandlerQueue{
 			 *          若 handler 是 HandlerQueue 类型，将会执行其 compose 方法
 			 * */
 			, compose: (...args)=>{
-				return this._queue.reduceRight( this._funcExecutorPromise('compose', null, args) );
-			}
-			/**
-			 * @summary 以 promise 串行的方式执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
-			 * @param   {...*}      [args]
-			 * @return  {Promise<boolean>}
-			 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
-			 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
-			 * */
-			, line: (...args)=>{
-				return this._queue.reduce(this._lineExecutorPromise(null, args), Promise.resolve());
+				return this._handlers.reduceRight( this._funcExecutorPromise('compose', null, args) );
 			}
 		};
 	}

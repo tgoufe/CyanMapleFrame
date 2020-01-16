@@ -1,9 +1,8 @@
 'use strict';
 
-import Model        from './model.js';
+import Model        from '../model/model.js';
 import merge        from '../util/merge.js';
 import HandlerQueue from '../util/handlerQueue.js';
-import request      from '../request.js';
 
 /**
  * @file    所有 ajax 请求基类
@@ -18,7 +17,7 @@ import request      from '../request.js';
 const SERVICE_MODEL_CONFIG = {
 		baseUrl: ''
 		// , isCrossDomain: true
-		, task: false
+		// , task: false
 		// , jsonp: false
 		, timeout: 10000
 	}
@@ -52,9 +51,15 @@ class ServiceModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
+		config = merge(config, ServiceModel._CONFIG);
+
 		super( config );
 
-		this._config = merge(config, ServiceModel._CONFIG);
+		this._config = config;
+
+		if( !'$request' in this ){
+			throw new Error(`$request 未注入，无法发送请求`);
+		}
 		
 		this._syncTo = null;
 
@@ -65,17 +70,27 @@ class ServiceModel extends Model{
 
 		this._execReqInterceptor = new HandlerQueue();
 		this._execReqInterceptor.add( ServiceModel.interceptor.req );
-		this._execReqInterceptor.add(({topic})=>{
-			console.log(`执行局部请求拦截器 ${topic}`);
-		});
+		// this._execReqInterceptor.add(({topic})=>{
+		// 	console.log(`执行局部请求拦截器 ${topic}`);
+		// });
 		this._execReqInterceptor.add( this.interceptor.req );
 
 		this._execResInterceptor = new HandlerQueue();
 		this._execResInterceptor.add( ServiceModel.interceptor.res );
-		this._execResInterceptor.add(({topic})=>{
-			console.log(`执行局部响应拦截器 ${topic}`);
-		});
+		// this._execResInterceptor.add(({topic})=>{
+		// 	console.log(`执行局部响应拦截器 ${topic}`);
+		// });
 		this._execResInterceptor.add( this.interceptor.res );
+	}
+
+	// ---------- 静态方法 ----------
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $service，配置参数名 service
+	 * */
+	static inject(app){
+		app.inject('$service', new ServiceModel( app.$options.service ));
 	}
 
 	// ---------- 静态属性 ----------
@@ -94,12 +109,6 @@ class ServiceModel extends Model{
 	 * */
 	static get interceptor(){
 		return INTERCEPTOR;
-	}
-	/**
-	 * @summary 请求发送方式
-	 * */
-	static use(){
-
 	}
 
 	// ---------- 私有方法 ----------
@@ -127,7 +136,7 @@ class ServiceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	_reqInterceptor(topic, options){
-		console.log(`执行全局请求拦截器 ${topic}`);
+		// console.log(`执行全局请求拦截器 ${topic}`);
 
 		return this._execReqInterceptor.promise.line({topic, options});
 
@@ -148,7 +157,7 @@ class ServiceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	_resInterceptor(result){
-		console.log(`执行全局响应拦截器 ${result.topic}`);
+		// console.log(`执行全局响应拦截器 ${result.topic}`);
 
 		return this._execResInterceptor.promise.line( result );
 
@@ -171,7 +180,7 @@ class ServiceModel extends Model{
 			// 发送请求，向服务器发送数据
 			console.log(`发送 ${options.method} 请求 ${topic}`);
 
-			return request(topic, options);
+			return this.$request(topic, options);
 		}).then((result)=>{
 
 			// 执行响应拦截器

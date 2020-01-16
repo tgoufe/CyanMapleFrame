@@ -24,6 +24,8 @@ import dateFormat   from './dateFormat.js';
 
 import HandlerQueue from './handlerQueue.js';
 
+import listener, {Listener} from './listener.js';
+
 // 验证
 // import validate     from './validate.js';
 
@@ -53,4 +55,13 @@ export default {
 	, tools
 
 	, thread
+
+	, listener
+	, Listener
 };
+
+export {
+	Aspect
+	, HandlerQueue
+	, Listener
+}

@@ -35,6 +35,16 @@ class SessionStorageModel extends Model{
 		}
 	}
 
+	// ---------- 静态方法 ----------
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $ss
+	 * */
+	static inject(app){
+		app.inject('$ss', new SessionStorageModel( app.$options.ss ));
+	}
+
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 设置数据
@@ -52,10 +62,10 @@ class SessionStorageModel extends Model{
 			result = this._setByObject( topic );
 		}
 		else{
-			result = super.setData(topic, value).then(()=>{
-				return this._store;
-			}).then((store)=>{
+			result = this._store.then((store)=>{
 				store.setItem(topic, SessionStorageModel.stringify(value));
+
+				super.setData(topic, value);
 
 				return true;
 			});
@@ -83,26 +93,27 @@ class SessionStorageModel extends Model{
 			result = this._getByArray( [].slice.call(arguments) );
 		}
 		else{
-			result = super.getData( topic ).catch(()=>{
-				return this._store.then((store)=>{
-					let value = store.getItem( topic )
-						;
+			result = this._store.then((store)=>{
+				let value = store.getItem( topic )
+				;
 
-					if( value === null ){
-						value = Promise.reject( null );
+				if( value === null ){
+					value = Promise.reject( null );
+
+					// 在内存中保留该值
+					super.setData(topic, null);
+				}
+				else{
+					try{
+						value = JSON.parse( value );
 					}
-					else{
-						try{
-							value = JSON.parse( value );
-						}
-						catch(e){}
+					catch(e){}
 
-						// 在内存中保留该值
-						super.setData(topic, value);
-					}
+					// 在内存中保留该值
+					super.setData(topic, value);
+				}
 
-					return value;
-				});
+				return value;
 			});
 		}
 
@@ -144,12 +155,12 @@ class SessionStorageModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	clearData(){
-		return super.clearData().then(()=>{
-			return this._store.then((store)=>{
-				store.clear();
+		return this._store.then((store)=>{
+			store.clear();
 
-				return true;
-			});
+			super.clearData();
+
+			return true;
 		});
 	}
 
@@ -175,6 +186,8 @@ class SessionStorageModel extends Model{
 				}
 				else{
 					this._storeSync.setItem(topic, SessionStorageModel.stringify(value));
+
+					super.setData(topic, value);
 				}
 
 				result = true;

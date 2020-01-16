@@ -5,16 +5,19 @@
  * */
 
 import url      from '../runtime/url.js';
-import listener from '../listener.js';
+import listener from '../util/listener.js';
 
-import scroll, {ScrollObserver} from './scroll.js';
+import scroll   from './scroll.js';
 
 import postMessage  from './postMessage.js';
 
 import vibrate, {clearVibrate}  from './vibrate.js';
 
-let needRefreshOn = false
+import geo, {Geo}   from './geo.js';
 
+import notify, {Notify} from  './notify.js';
+
+let needRefreshOn = false
 	/**
 	 * @summary     设置页面回退时刷新该页面
 	 * @function
@@ -63,57 +66,51 @@ let needRefreshOn = false
 	 * */
 	, eventList = {
 		scroll
-		, resize:           listener('resize')
-		, devicemotion:     listener('devicemotion')
+		, resize(callback){
+			listener.on('resize', callback);
+		}
+		, devicemotion(callback){
+			listener.on('devicemotion', callback);
+		}
 
-		, pageshow:         listener('pageshow')
-		, pagehide:         listener('pagehide')
+		, pageshow(callback){
+			listener.on('pageshow', callback);
+		}
+		, pagehide(callback){
+			listener.on('pagehide', callback);
+		}
+
+		, message(callback){
+			listener.on('message', callback);
+		}
+
+		, visibilitychange(callback){
+			listener.on('visibilitychange', callback);
+		}
+
+		, online(callback){
+			listener.on('online', callback);
+		}
+		, offline(callback){
+			listener.on('offline', callback);
+		}
+
+
+		, beforeunload(callback){
+			listener.on('beforeUnload', callback);
+		}
+		, unload(callback){
+			listener.on('unload', callback);
+		}
 
 		/**
 		 * focus 和 blur 事件应该注意防止捕获冒泡的方式触发
 		 * */
-		, focus:            listener('focus')
-		, blur:             listener('blur')
-
-		, visibilitychange: listener('visibilitychange')
-
-		, online:           listener('online')
-		, offline:          listener('offline')
-
-		, message:          listener('message')
-
-		, beforeunload:     listener('beforeUnload')
-		, unload:           listener('unload')
-	}
-
-	/**
-	 * @summary     绑定事件
-	 * @function
-	 * @memberOf    maple.view
-	 * @param       {string}    eventType
-	 * @param       {Function}  callback
-	 * */
-	, on = (eventType, callback)=>{
-		if( !(eventType in eventList) ){
-			eventList[eventType] = listener( eventType );
+		, focus(callback){
+			listener.on('focus', callback);
 		}
-
-		eventList[eventType].add( callback );
-	}
-	/**
-	 * @summary     触发事件
-	 * @function
-	 * @memberOf    maple.view
-	 * @param       {string}    eventType
-	 * @param       {...*}      argv
-	 * @return      {*}
-	 * */
-	, trigger = (eventType, ...argv)=>{
-		if( eventType in eventList ){
-			return eventList[eventType].trigger(...argv);
-		}
-		else{
-			console.log(`不存在 ${eventType} 类型的事件`);
+		, blur(callback){
+			listener.on('blur', callback);
 		}
 	}
 	;
@@ -123,12 +120,8 @@ let needRefreshOn = false
  * @namespace   maple.view
  * */
 let view = {
-		on
-		, trigger
-		, eventList
+		eventList
 		, ...eventList
-
-		, ScrollObserver
 
 		, needRefresh
 
@@ -138,6 +131,10 @@ let view = {
 		, clearVibrate
 
 		, offset
+
+		, geo
+
+		, notify
 	}
 	;
 
@@ -145,3 +142,21 @@ let view = {
  * @exports view
  * */
 export default view;
+
+const View = {
+		/**
+		 * @summary 与 App 类约定的注入接口
+		 * @param   {Object}    app
+		 * @desc    注入为 $view
+		 * */
+		inject(app){
+			app.inject('$view', view);
+		}
+	}
+	;
+
+export {
+	View
+	, Geo
+	, Notify
+};

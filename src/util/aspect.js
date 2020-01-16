@@ -14,7 +14,7 @@ return rs;
 		this.original = original;
 	}
 	before(...argv){
-		this.beforeQueue.push.apply(this.beforeQueue, argv);
+		this.beforeQueue.push( ...argv );
 
 		return this;
 	}
@@ -22,7 +22,7 @@ return rs;
 		this.beforeQueue.forEach( executor=>executor.apply(that, argv) );
 	}
 	after(...argv){
-		this.afterQueue.push.apply(this.afterQueue, argv);
+		this.afterQueue.push( ...argv );
 
 		return this;
 	}

@@ -8,7 +8,7 @@
  *          否则使用 mouse 事件替代
  * */
 
-import listener from '../listener.js';
+import listener from '../util/listener.js';
 
 // const pointerEventType = [
 // 		'over'

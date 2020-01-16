@@ -5,95 +5,172 @@
  *          使用捕捉方式
  * */
 
-import listener from '../listener.js';
+import listener from '../util/listener.js';
 
 /**
- * @class
- * @desc    基于 IntersectionObserver 封装
+ * @summary     全局滚动事件监听
+ * @memberOf    maple.view
+ * @method
+ * @param       {Function}  callback
+ * @return      {Object}
  * */
-class ScrollObserver {
+let scroll = (callback)=>{
+		return listener.on('scroll', callback);
+	}
 	/**
-	 * @constructor
-	 * @param   {Object}    [options={}]
-	 * @param   {Element}   [options.root]
-	 * @param   {string}    [options.rootMargin]    计算交叉值时添加至根的边界盒中的一组偏移量，语法和 CSS 中的 margin 属性等同，默认值为 '0px 0px 0px 0px'
-	 * @param   {number}    [options.threshold]     监听目标与边界盒交叉区域的比例值，从 0.0 到 1.0 之间的数组
+	 * @summary     监控目标对象进出可视区
+	 * @memberOf    scroll
+	 * @method
+	 * @param       {Element}   target
+	 * @param       {Function}  callback
 	 * */
-	constructor(options={}){
-		this._listener = listener('intersection');
+	, observer = (target, callback)=>{
+		listener.on(target, 'intersectionObserver', callback);
+	}
+	/**
+	 * @summary     取消监控目标对象进程可视区
+	 * @memberOf    scroll
+	 * @method
+	 * @param       {Element}   target
+	 * @param       {Function}  [callback]
+	 * */
+	, unobserver = (target, callback)=>{
+		listener.off(target, 'intersectionObserver', callback);
+	}
+	/**
+	 * @summary     设置或读取当前页面滚动条位置
+	 * @memberOf    scroll
+	 * @method
+	 * @param       {string}        offset  获取方位基准，取值为 'top','bottom','left','right' 中一个
+	 * @param       {string|number} [value] 设置滚动条的位置
+	 * @return      {Object|null}
+	 * */
+	, scrollBar = (offset, value)=>{
+		let argc = arguments.length
+			, curr = 0
+			, total = 1
+			, view = 1
+			, regexp = /^(\d+(?:\.\d+)?)(%|view)?$/
+			, temp
+			;
 
-		this._observer = new Promise((resolve, reject)=>{
-			if( 'IntersectionObserver' in self ){
-				resolve( new IntersectionObserver((entries)=>{
-					entries.forEach((entry)=>{
-						this._listener.trigger(entry);
-					});
-				}, options) );
+		if( argc === 1 ){   // 读操作
+
+			switch( arguments[0] ){
+				case 'top':
+					total = scrollTarget.scrollHeight;
+					curr = scrollTarget.scrollTop;
+					view = doc.clientHeight;
+					break;
+				case 'bottom':
+					total = scrollTarget.scrollHeight;
+					view = doc.clientHeight;
+					curr = total - scrollTarget.scrollTop - view;
+					break;
+				case 'left':
+					total = scrollTarget.scrollWidth;
+					curr = scrollTarget.scrollLeft;
+					view = doc.clientWidth;
+					break;
+				case 'right':
+					total = scrollTarget.scrollWidth;
+					view = doc.clientWidth;
+					curr = total - scrollTarget.scrollLeft - view;
+					break;
+				default:
+					break;
+			}
+
+			return {
+				px: curr
+				, percent: Math.floor(curr / total * 100)
+				, view: parseFloat((curr / view).toFixed(1))
+			};
+		}
+		else{   // 写 操作
+			temp = regexp.exec( value );
+
+			if( temp ){
+				switch( offset ){
+					case 'top':
+						curr = parseFloat(temp[1]);
+
+						if (temp[2] === '%') {  // 百分比
+							curr = curr * scrollTarget.scrollHeight / 100;
+						}
+						else if (temp[2] === 'view') {  // 屏数
+							curr = curr * doc.clientHeight;
+						}
+
+						scrollTarget.scrollTop = curr;
+						break;
+					case 'bottom':
+						curr = parseFloat(temp[1]);
+
+						if (temp[2] === '%') {  // 百分比
+							curr = Math.max(scrollTarget.scrollHeight * (1 - curr / 100), 0);
+						}
+						else if (temp[2] === 'view') {  // 屏数
+							curr = Math.max(scrollTarget.scrollHeight - curr * doc.clientHeight, 0);
+						}
+						else{
+							curr = Math.max(scrollTarget.scrollHeight - curr, 0);
+						}
+
+						scrollTarget.scrollTop = curr;
+						break;
+					case 'left':
+						curr = parseFloat(temp[1]);
+
+						if (temp[2] === '%') {  // 百分比
+							curr = curr * scrollTarget.scrollWidth / 100;
+						}
+						else if (temp[2] === 'view') {  // 屏数
+							curr = curr * doc.clientWidth;
+						}
+
+						scrollTarget.scrollLeft = curr;
+						break;
+					case 'right':
+						curr = parseFloat(temp[1]);
+
+						if (temp[2] === '%') {  // 百分比
+							curr = Math.max(scrollTarget.scrollWidth * (1 - curr / 100), 0);
+						}
+						else if (temp[2] === 'view') {  // 屏数
+							curr = Math.max(scrollTarget.scrollWidth - curr * doc.clientWidth, 0);
+						}
+						else{
+							curr = Math.max(scrollTarget.scrollWidth - curr, 0);
+						}
+
+						scrollTarget.scrollLeft = curr;
+						break;
+					default:
+						break;
+				}
 			}
 			else{
-				reject( new Error('当前浏览器不支持 IntersectionObserver') );
+				console.log('scrollBar 参数设置错误');
 			}
-		});
-	}
-
-	/**
-	 * @summary     监听回调函数
-	 * @callback    IntersectionCallback
-	 * @param       {Object}                    event
-	 * @param       {IntersectionObserverEntry} entry
-	 * */
-
-	/**
-	 * @summary 监听一个目标元素
-	 * @param   {Element|NodeList|HTMLCollection}   target
-	 * @param   {Function}                          handler
-	 * */
-	observe(target, handler){
-		if( target instanceof Element ){
-			this._observer.then((observer)=>{
-				observer.observe( target );
-			});
 		}
-		else if( target instanceof NodeList || target instanceof HTMLCollection ){
-			this._observer.then((observer)=>{
-				Array.from( target ).forEach((element)=>{
-					observer.observe( element );
-				});
-			});
+	}
+	/**
+	 * @summary     禁止页面滚动
+	 * @memberOf    scroll
+	 * @method
+	 * @param       {boolean}   disabled
+	 * */
+	, disabled = (disabled)=>{
+		if( disabled ){
+			body.dataset.overflowState = window.getComputedStyle( body ).overflow || 'visible';
+
+			body.style.overflow = 'hidden';
 		}
 		else{
-			console.log('监听目标非 Element、NodeList、HTMLCollection 类型对象，无法监听');
-			return;
+			body.style.overflow = body.dataset.overflowState || 'visible';
 		}
-
-		this._listener.add( handler );
 	}
-	/**
-	 * @summary 停止监听目标元素
-	 * @param   {Element}   target
-	 * */
-	unobserve(target){
-		this._observer.then((observer)=>{
-			observer.unobserve( target );
-		});
-	}
-	/**
-	 * @summary 停止监听工作
-	 * */
-	disconnect(){
-		this._observer.then((observer)=>{
-			observer.disconnect();
-
-			this._observer = Promise.reject( new Error('监听已停止') );
-		});
-	}
-}
-
-/**
- * @memberOf    maple.view
- * @type        {Listener}
- * */
-let scroll = listener('scroll')
 	, scrollTarget
 	, body = document.body
 	, doc = document.documentElement
@@ -120,7 +197,6 @@ scroll.disabled = function(disabled){
 /**
  * 测试获取滚动条信息的对象为 document.body 还是 document.documentElement
  * */
-
 body.scrollTop = tempTop +1;
 
 if( body.scrollTop === tempTop +1 ){    // document.body 可用
@@ -132,134 +208,17 @@ else{
 	scrollTarget = doc;
 }
 
-/**
- * @summary     设置或读取当前页面滚动条位置
- * @method
- * @memberOf    scroll
- * @param       {string}        offset  获取方位基准，取值为 'top','bottom','left','right' 中一个
- * @param       {string|number} [value] 设置滚动条的位置
- * @return      {Object|null}
- * */
-scroll.scrollBar = function(offset, value){
-	let argc = arguments.length
-		, curr = 0
-		, total = 1
-		, view = 1
-		, regexp = /^(\d+(?:\.\d+)?)(%|view)?$/
-		, temp
-		;
-
-	if( argc === 1 ){   // 读操作
-
-		switch( arguments[0] ){
-			case 'top':
-				total = scrollTarget.scrollHeight;
-				curr = scrollTarget.scrollTop;
-				view = doc.clientHeight;
-				break;
-			case 'bottom':
-				total = scrollTarget.scrollHeight;
-				view = doc.clientHeight;
-				curr = total - scrollTarget.scrollTop - view;
-				break;
-			case 'left':
-				total = scrollTarget.scrollWidth;
-				curr = scrollTarget.scrollLeft;
-				view = doc.clientWidth;
-				break;
-			case 'right':
-				total = scrollTarget.scrollWidth;
-				view = doc.clientWidth;
-				curr = total - scrollTarget.scrollLeft - view;
-				break;
-			default:
-				break;
-		}
-
-		return {
-			px: curr
-			, percent: Math.floor(curr / total * 100)
-			, view: parseFloat((curr / view).toFixed(1))
-		};
-	}
-	else{   // 写 操作
-		temp = regexp.exec( value );
-
-		if( temp ){
-			switch( offset ){
-				case 'top':
-					curr = parseFloat(temp[1]);
-
-					if (temp[2] === '%') {  // 百分比
-						curr = curr * scrollTarget.scrollHeight / 100;
-					}
-					else if (temp[2] === 'view') {  // 屏数
-						curr = curr * doc.clientHeight;
-					}
-
-					scrollTarget.scrollTop = curr;
-					break;
-				case 'bottom':
-					curr = parseFloat(temp[1]);
-
-					if (temp[2] === '%') {  // 百分比
-						curr = Math.max(scrollTarget.scrollHeight * (1 - curr / 100), 0);
-					}
-					else if (temp[2] === 'view') {  // 屏数
-						curr = Math.max(scrollTarget.scrollHeight - curr * doc.clientHeight, 0);
-					}
-					else{
-						curr = Math.max(scrollTarget.scrollHeight - curr, 0);
-					}
-
-					scrollTarget.scrollTop = curr;
-					break;
-				case 'left':
-					curr = parseFloat(temp[1]);
-
-					if (temp[2] === '%') {  // 百分比
-						curr = curr * scrollTarget.scrollWidth / 100;
-					}
-					else if (temp[2] === 'view') {  // 屏数
-						curr = curr * doc.clientWidth;
-					}
-
-					scrollTarget.scrollLeft = curr;
-					break;
-				case 'right':
-					curr = parseFloat(temp[1]);
-
-					if (temp[2] === '%') {  // 百分比
-						curr = Math.max(scrollTarget.scrollWidth * (1 - curr / 100), 0);
-					}
-					else if (temp[2] === 'view') {  // 屏数
-						curr = Math.max(scrollTarget.scrollWidth - curr * doc.clientWidth, 0);
-					}
-					else{
-						curr = Math.max(scrollTarget.scrollWidth - curr, 0);
-					}
-
-					scrollTarget.scrollLeft = curr;
-					break;
-				default:
-					break;
-			}
-		}
-		else{
-			console.log('scrollBar 参数设置错误');
-		}
-	}
-};
-
-scroll.observer = new ScrollObserver();
-
-scroll.resetObserver = function(options={}){
-	scroll.observer.disconnect();
-	scroll.observer = new ScrollObserver( options );
-};
+scroll.observer = observer;
+scroll.unobserver = unobserver;
+scroll.scrollBar = scrollBar;
+scroll.disabled = disabled;
 
 export default scroll;
 
 export {
-	ScrollObserver
-};
+	scroll
+	, observer
+	, unobserver
+	, scrollBar
+	, disabled
+}

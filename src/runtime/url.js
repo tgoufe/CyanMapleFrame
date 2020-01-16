@@ -10,7 +10,8 @@
 // 	]
 // 	;
 
-import listener from '../listener.js';
+import Base     from '../base.js';
+import listener from '../util/listener.js';
 
 const INDEX = ['source'
 		, 'protocol'
@@ -32,13 +33,16 @@ const INDEX = ['source'
 /**
  * @class
  * @desc    url 解析
+ * @extends Base
  * */
-class Url{
+class Url extends Base{
 	/**
 	 * @constructor
 	 * @param   {string}    [url]
 	 * */
 	constructor(url){
+		super();
+
 		let target = Url.createParseTarget( url )
 			, temp
 			;
@@ -75,20 +79,16 @@ class Url{
 		target = null;   // 释放内存
 	}
 
-	// ---------- 静态属性 ----------
-	static get _INDEX(){
-		return INDEX;
-	}
-
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 创建解析 url 的对象
+	 * @static
 	 * @param   {string}    url
 	 * @return  {Object}
 	 * */
 	static createParseTarget(url){
 		let a
-		;
+			;
 
 		if( 'URL' in self ){
 			a = new URL(url || location.href, location.origin);
@@ -109,17 +109,22 @@ class Url{
 
 		return a;
 	}
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @static
+	 * @param   {Object}    app
+	 * @desc    注入为 $url
+	 * */
+	static inject(app){
+		app.inject('$url', url);
+		app.inject('$urlParams', url.params);
+		// todo
+		// app.inject('$hashParams', url.hash);
+	}
 
-	// ---------- 公有属性 ----------
-	get query(){    // 当前页面参数拼接字符串
-		let query = Object.entries( this.params ).reduce((all, [k, v])=>{
-				all.push( encodeURIComponent(k) +'='+ encodeURIComponent(v) );
-
-				return all;
-			}, [])
-			;
-
-		return query.length ? '?'+ query.join('&') : '';
+	// ---------- 静态属性 ----------
+	static get _INDEX(){
+		return INDEX;
 	}
 
 	// ---------- 公有方法 ----------
@@ -248,6 +253,21 @@ class Url{
 			return rs;
 		}, {});
 	}
+
+	// ---------- 公有属性 ----------
+	/**
+	 * @summary 当前页面参数拼接字符串
+	 * */
+	get query(){
+		let query = Object.entries( this.params ).reduce((all, [k, v])=>{
+				all.push( encodeURIComponent(k) +'='+ encodeURIComponent(v) );
+
+				return all;
+			}, [])
+			;
+
+		return query.length ? '?'+ query.join('&') : '';
+	}
 }
 
 let url = new Url()
@@ -302,7 +322,7 @@ url.reload = ()=>{
  * @memberOf    url
  * @return      {Url}   this
  * */
-url.back = ()=>{
+url.back = function(){
 	history.back();
 
 	return this;
@@ -313,7 +333,7 @@ url.back = ()=>{
  * @memberOf    url
  * @return      {Url}   this
  * */
-url.forward = ()=>{
+url.forward = function(){
 	history.forward();
 
 	return this;
@@ -325,7 +345,7 @@ url.forward = ()=>{
  * @param       {number}    index
  * @return      {Url}       this
  * */
-url.go = (index)=>{
+url.go = function(index){
 	history.go( index );
 
 	return this;
@@ -465,10 +485,15 @@ url.replacePage = function(href){
 // ---------- 相关事件处理 ----------
 /**
  * @summary     监听 hashChange 事件
- * @type        {Listener}
+ * @method
  * @memberOf    url
+ * @param       {Function}  callback
+ * @return      {Object}
  * */
-url.hashChange = listener('hashchange', (e, newUrl)=>{
+url.hashChange = function(callback){
+	return listener.on('hashchange', callback);
+};
+url.hashChange((e, newUrl)=>{
 	let temp
 		;
 
@@ -484,12 +509,18 @@ url.hashChange = listener('hashchange', (e, newUrl)=>{
 		url.changeTo( temp );
 	}
 });
+
 /**
  * @summary     监听 popstate 事件
- * @type        {Listener}
+ * @method
  * @memberOf    url
+ * @param       {Function}  callback
+ * @return      {Object}
  * */
-url.popState = listener('popstate', (e, newUrl)=>{
+url.popState = function(callback){
+	return listener.on('popstate', callback);
+};
+url.popState((e, newUrl)=>{
 	let temp
 		, state = e.state
 		;

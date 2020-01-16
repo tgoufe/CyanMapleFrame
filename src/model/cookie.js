@@ -43,9 +43,7 @@ class CookieModel extends Model{
 
 		if( navigator.cookieEnabled ){
 			this._enabled = true;
-			this._store = Promise.resolve().then(()=>{
-				return this.refresh();
-			});
+			this._store = Promise.resolve();
 		}
 		else{
 			this._enabled = false;
@@ -69,6 +67,14 @@ class CookieModel extends Model{
 		}
 
 		return date && date.toUTCString();
+	}
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $cookie
+	 * */
+	static inject(app){
+		app.inject('$cookie', new CookieModel( app.$options.cookie ));
 	}
 
 	// ---------- 静态属性 ----------
@@ -102,6 +108,7 @@ class CookieModel extends Model{
 	 * @param       {string}                [options.secure]
 	 * @return      {boolean}               在设置完成后返回 true
 	 * @desc        因为设置 cookie 和删除 cookie 使用是相同的代码，只是传入的过期时间不同，所以提出一个共通方法
+	 *              保存值得时候，同时会保持在内存中
 	 * */
 	_setCookie(topic, value, options){
 		if( typeof options !== 'object' ){
@@ -109,6 +116,9 @@ class CookieModel extends Model{
 				expires: options
 			};
 		}
+
+		let isRemove = options.expires < 0
+			;
 
 		if( options.expires ){
 			options.expires = CookieModel._transDate( options.expires );
@@ -121,19 +131,22 @@ class CookieModel extends Model{
 					;
 
 				if( t ){
-					a += '; '+ k +'='+ t;
+					a += `; ${k}=${t}`;
 				}
 
 				return a;
 			}, '');
 
+		super.setData(topic, isRemove ? null : value);
+
 		return true;
 	}
 	/**
-	 * @summary     设置 cookie
+	 * @summary     获取 cookie
 	 * @protected
 	 * @param       {string|string[]}   topic
 	 * @return      {Object|string}
+	 * @desc        获取数据时会将其存入内存中
 	 * */
 	_getCookie(topic){
 		let cookies = (document.cookie || '').split('; ')
@@ -162,6 +175,8 @@ class CookieModel extends Model{
 		}
 		else{
 			value = Promise.reject( null );
+
+			super.setData(topic, null);
 		}
 
 		return value;
@@ -195,7 +210,7 @@ class CookieModel extends Model{
 	 * @param       {Date|number|string}        [options.expires]
 	 * @param       {string}                    [options.secure]
 	 * @return      {Promise<boolean>}          返回一个 Promise 对象，在 resolve 时传回 true
-	 * @desc        保存值得时候，同时会保持在内存中，当 topic 类型为 object 时，value 会视为 options
+	 * @desc        当 topic 类型为 object 时，value 会视为 options
 	 * */
 	setData(topic, value, options){
 		let result
@@ -207,9 +222,7 @@ class CookieModel extends Model{
 			result = this._setByObject(topic, options);
 		}
 		else{
-			result = super.setData(topic, value).then(()=>{
-				return this._store;
-			}).then(()=>{
+			result = this._store.then(()=>{
 				return this._setCookie(topic, value, options);
 			});
 		}
@@ -222,7 +235,7 @@ class CookieModel extends Model{
 	 * @param   {string|string[]}   topic
 	 * @param   {...string}
 	 * @return  {Promise<*, null>}  返回一个 Promise 对象，若存在 topic 的值，在 resolve 时传回查询出来的 value，否则在 reject 时传回 null
-	 * @desc    获取数据时会优先从内存中取值，若没有则从 cookie 中取值并将其存入内存中，当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
+	 * @desc    当 topic 的类型为数组的时候，resolve 传入的结果为一个 json，key 为 topic 中的数据，value 为对应查找出来的值
 	 * */
 	getData(topic){
 		let argc = arguments.length
@@ -236,10 +249,8 @@ class CookieModel extends Model{
 			result = this._getByArray( [].slice.call(arguments) );
 		}
 		else{
-			result = super.getData( topic ).catch(()=>{  // 内存中不存在该值
-				return this._store.then(()=>{
-					return this._getCookie( topic );
-				});
+			result = this._store.then(()=>{
+				return this._getCookie( topic );
 			});
 		}
 
@@ -264,7 +275,7 @@ class CookieModel extends Model{
 			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
-			result = super.removeData( topic ).then(()=>{
+			result = this._store.then(()=>{
 				return this._setCookie(topic, '', -1);
 			});
 		}
@@ -289,7 +300,6 @@ class CookieModel extends Model{
 	 * @param   {Date|number|string}        [options.expires]
 	 * @param   {string}                    [options.secure]
 	 * @return  {boolean}
-	 * @desc    保存值得时候，同时会保存在内存中
 	 * */
 	setDataSync(topic, value, options){
 		let result = !!this._enabled
@@ -302,8 +312,6 @@ class CookieModel extends Model{
 
 					Object.entries( topic ).forEach(([k, v])=>{
 						this._setCookie(k, v, options);
-
-						super.setData(k, v);
 					});
 				}
 				else{
@@ -366,8 +374,6 @@ class CookieModel extends Model{
 						}
 						catch(e){}
 					}
-
-					super.setData(d, all[d]);
 				}
 
 				return all;
@@ -387,32 +393,7 @@ class CookieModel extends Model{
 	getCookieLength(){
 		return this._enabled ? document.cookie.length : 0;
 	}
-	/**
-	 * @summary 刷新当前 cookie 数据
-	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
-	 * @desc    从 document.cookie 读取 cookie，重新设置数据
-	 * */
-	refresh(){
-		return this.clearData().then(()=>{
-			return Promise.all( (document.cookie || '').split('; ').map((cookie)=>{
-				let value
-					;
-
-				cookie = cookie.split('=');
-
-				value = decodeURIComponent(cookie[1]);
-
-				try{
-					value = JSON.parse( value );
-				}
-				catch(e){}
-
-				return super.setData(decodeURIComponent(cookie[0]), value);
-			}) );
-		}).then(()=>{
-			return true;
-		});
-	}
+	
 	/**
 	 * @summary 类构造失败时的回调接口
 	 * @param   {Function}  callback

@@ -29,9 +29,11 @@ class FileSystemModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
+		config = merge(config, FileSystemModel._CONFIG);
+
 		super( config );
 
-		this._config = merge(config, FileSystemModel._CONFIG);
+		this._config = config;
 
 		this._fs = new Promise((resolve, reject)=>{
 			let requestFileSystem = self.requestFileSystem || self.webkitRequestFileSystem || null
@@ -235,7 +237,7 @@ class FileSystemModel extends Model{
 		if( writeTarget ){
 
 			Object.entries( writeTarget ).forEach(([k, v])=>{
-				return super.setData(k, v);
+				super.setData(k, v);
 			});
 
 			result = this._read().then((content)=>{
