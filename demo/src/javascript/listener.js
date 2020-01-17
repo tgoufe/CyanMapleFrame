@@ -23,7 +23,7 @@ maple.url.hashChange.add(function(e){
 	log('hashChange');
 	log(this, arguments);
 });
-console.log(maple.url.hashChange._eventQueue._queue.length);
+log(maple.url.hashChange._eventQueue._queue.length);
 
 maple.url.popState.add(function(e){
 	log('popState');

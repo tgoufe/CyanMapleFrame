@@ -3,7 +3,9 @@
     "@babel/preset-env"
   ],
   "plugins": [
-    "@babel/plugin-proposal-object-rest-spread"
+    "@babel/syntax-dynamic-import",
+    "@babel/plugin-proposal-object-rest-spread",
+    "@babel/plugin-transform-runtime"
   ],
   "ignore": [
     "dist/*.js"

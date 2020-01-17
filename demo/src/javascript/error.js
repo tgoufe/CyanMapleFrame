@@ -36,7 +36,7 @@ maple.unHandledRejection.add(function(e){
 });
 
 window.onerror = function(){
-	console.log('全局错误', arguments)
+	log('全局错误', arguments)
 };
 
 let vm = new Vue({

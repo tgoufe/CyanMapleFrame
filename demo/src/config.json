@@ -1,0 +1,58 @@
+{
+  "pages": [
+    {
+      "entry": "index",
+      "template": true
+    },
+    {
+      "entry": "debounce",
+      "title": "debounce 工具方法测试"
+    },
+    {
+      "entry": "throttle",
+      "title": "throttle 工具方法测试"
+    },
+    {
+      "entry": "listener",
+      "title": "listener 事件监听器功能测试"
+    },
+    {
+      "entry": "model",
+      "title": "model 数据 Model 功能测试"
+    },
+    {
+      "entry": "router",
+      "title": "router 功能测试"
+    },
+    {
+      "entry": "error",
+      "template": true,
+      "title": "异常捕获测试"
+    },
+    {
+      "entry": "eventSource",
+      "title": "sse 实验"
+    },
+    {
+      "entry": "socket",
+      "title": "socket 功能测试"
+    },
+    {
+      "entry": "intersectionObserver",
+      "template": true,
+      "title": "intersectionObserver 功能测试"
+    },
+    {
+      "entry": "load",
+      "template": true,
+      "title": "load 功能测试"
+    },
+    {
+      "entry": "asyncComponent"
+    }
+    , {
+      "entry": "handlerQueue",
+      "title": "函数队列执行测试"
+    }
+  ]
+}

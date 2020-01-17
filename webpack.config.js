@@ -7,13 +7,10 @@ module.exports = {
 	// webpack 4.0 插件项被 optimization 替代
 	, optimization: {
 		minimize: true
-		, splitChunks: {
-			name: 'index'
-		}
 	}
 	//页面入口文件配置
 	, entry: {
-		index: ['@babel/polyfill', path.resolve(__dirname, 'src/index.js')]
+		index: [path.resolve(__dirname, 'src/index.js')]
 		, 'worker/serviceWork': [path.resolve(__dirname, 'src/worker/serviceWorker.js')]
 		, 'worker/webWork': [path.resolve(__dirname, 'src/worker/webWorker.js')]
 	}
