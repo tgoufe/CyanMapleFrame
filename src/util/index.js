@@ -26,38 +26,44 @@ import HandlerQueue from './handlerQueue.js';
 
 import listener, {Listener} from './listener.js';
 
-// 验证
-// import validate     from './validate.js';
-
 // 工具函数
 import tools        from './tools.js';
 
 import thread       from './thread.js';
 
-export default {
-	debounce
-	, throttle
-	, lockup
-	, timeout
+let util = {
+		debounce
+		, throttle
+		, lockup
+		, timeout
 
-	// AOP
-	, aspect
-	, Aspect
+		// AOP
+		, aspect
+		, Aspect
 
-	, merge
-	, classify
+		, merge
+		, classify
 
-	, dateFormat
+		, dateFormat
 
-	, HandlerQueue
+		, HandlerQueue
 
-	// , validate
-	, tools
+		// , validate
+		, tools
 
-	, thread
+		, thread
 
-	, listener
-	, Listener
+		, listener
+		, Listener
+	}
+	;
+
+export default util;
+
+export const Util = {
+	inject(app){
+		app.inject('$util', util);
+	}
 };
 
 export {

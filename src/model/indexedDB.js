@@ -143,7 +143,7 @@ class IndexedDBModel extends Model{
 					, objectStoreRequest = objectStore.get( topic )
 					;
 
-				objectStoreRequest.onsuccess = function(e){
+				objectStoreRequest.onsuccess = (e)=>{
 					let value = e.target.result
 						;
 
@@ -151,7 +151,7 @@ class IndexedDBModel extends Model{
 
 					resolve( value );
 				};
-				objectStoreRequest.onerror = function(e){
+				objectStoreRequest.onerror = (e)=>{
 					console.log( e );
 					reject( e );
 				};
@@ -177,12 +177,12 @@ class IndexedDBModel extends Model{
 					})
 					;
 
-				objectStoreRequest.onsuccess = function(e){
+				objectStoreRequest.onsuccess = (e)=>{
 					super.setData(topic, value);
 
 					resolve( !!e.target.result );
 				};
-				objectStoreRequest.onerror = function(e){
+				objectStoreRequest.onerror = (e)=>{
 					console.log( e );
 					reject( e );
 				};
@@ -202,12 +202,12 @@ class IndexedDBModel extends Model{
 					, objectStoreRequest = objectStore.delete( topic )
 					;
 
-				objectStoreRequest.onsuccess = function(){
+				objectStoreRequest.onsuccess = ()=>{
 					super.removeData( topic );
 
 					resolve( true );
 				};
-				objectStoreRequest.onerror = function(e){
+				objectStoreRequest.onerror = (e)=>{
 					console.log( e );
 					reject( e );
 				};
@@ -226,12 +226,12 @@ class IndexedDBModel extends Model{
 					, objectStoreRequest = objectStore.clear()
 					;
 
-				objectStoreRequest.onsuccess = function(){
+				objectStoreRequest.onsuccess = ()=>{
 					super.clearData();
 
 					resolve( true );
 				};
-				objectStoreRequest.onerror = function(e){
+				objectStoreRequest.onerror = (e)=>{
 					console.log( e );
 					reject( e );
 				}

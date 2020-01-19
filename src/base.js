@@ -1,28 +1,31 @@
 'use strict';
 
-const MODULE_LIST = new Map()
-	;
-
+/**
+ * @class
+ * @desc    所有类的基类，实现了依赖注入功能，每个继承的应该提供一个静态的 inject 方法提供依赖注入
+ * */
 class Base{
 	constructor(options={}){
 		this.$options = options;
 		this.setInjection();
 	}
 
-	static use(module){
-		if( !this.modules.has(this) ){
-			this.modules.set(this, []);
+	static use(...module){
+		if( !this.modules ){
+			this.modules = new Set();
 		}
 
-		this.modules.get( this ).push( module );
-	}
-
-	static get modules(){
-		return MODULE_LIST;
+		module.forEach((mod)=>{
+			this.modules.add( mod );
+		});
 	}
 
 	setInjection(){
-		this.constructor.modules.get( this.constructor ).forEach((module)=>{
+		if( !this.constructor.modules ){
+			return ;
+		}
+
+		this.constructor.modules.forEach((module)=>{
 			module.inject && module.inject( this );
 		});
 	}

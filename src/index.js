@@ -86,9 +86,9 @@ import router, {Router}  from './router/index.js';
  * ---------- 错误处理 ----------
  * */
 // 全局错误
-import error    from './errorHandler/error.js';
+import error              from './view/error.js';
 // 为捕获的 promise reject
-import unHandledRejection   from './errorHandler/unHandledRejection.js';
+import unHandledRejection from './view/unHandledRejection.js';
 
 // /**
 //  * ---------- 动画库 ----------

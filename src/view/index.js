@@ -9,6 +9,10 @@ import listener from '../util/listener.js';
 
 import scroll, {Scroll} from './scroll.js';
 
+import error    from './error.js';
+
+import unHandledRejection   from './unHandledRejection.js';
+
 import postMessage  from './postMessage.js';
 
 import vibrate, {clearVibrate}  from './vibrate.js';
@@ -72,6 +76,10 @@ let needRefreshOn = false
 		, devicemotion(callback){
 			listener.on('devicemotion', callback);
 		}
+
+		, error
+
+		, unHandledRejection
 
 		, pageshow(callback){
 			listener.on('pageshow', callback);

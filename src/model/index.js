@@ -67,4 +67,4 @@ export {
 	, ServiceModel
 	, WebSocketModel
 	, EventSourceModel
-}
+};

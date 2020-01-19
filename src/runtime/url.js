@@ -5,11 +5,6 @@
  *          整合 location 和 history 功能
  * */
 
-// const PARAMS_FILTER = [
-// 		'10000skip' // 微信下 10000skip
-// 	]
-// 	;
-
 import Base     from '../base.js';
 import listener from '../util/listener.js';
 
@@ -148,9 +143,6 @@ class Url extends Base{
 				key = decodeURIComponent( temp[0] );
 				value = decodeURIComponent( temp[1] || '' );
 
-				// 解码
-				// all[decodeURIComponent(temp[0])] = decodeURIComponent(temp[1] || '').replace(/\?10000skip(=true)?/, '');  // 删除微信下的?10000skip todo ?
-
 				try{    // 对数据类型进行转换
 					value = JSON.parse( value );
 				}
@@ -220,10 +212,6 @@ class Url extends Base{
 
 			return target;
 		}, this);
-
-		// Url._INDEX.filter( k => k !== 'query' ).forEach((k)=>{
-		// 	this[k] = url[k];
-		// });
 
 		this.from = source;
 
@@ -364,6 +352,12 @@ url.setHash = function(hash){
 
 	return this;
 };
+
+Object.defineProperty(url, 'hashParams', {
+	get(){
+		return this.parseUrl( this.hash ).params;
+	}
+});
 
 // ---------- url 上的参数操作 ----------
 /**
