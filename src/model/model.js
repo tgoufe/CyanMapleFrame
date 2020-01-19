@@ -29,10 +29,23 @@ const MODEL_CONFIG = {
 	;
 
 /**
+ * @summary     数据改变事件触发回调函数
+ * @callback    ModelChangeEvent
+ * @param       {Event}     event
+ * @param       {string}    topic
+ * @param       {*}         newValue
+ * @param       {*}         [oldValue]
+ * @this        {Model}
+ * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
+ *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
+ * */
+
+/**
  * @class
  * @desc    数据层基类，将数据保存在内存中
  * @extends Base
  * @example
+<pre>
 let model = new Model();
 
 // 保存数据，以 key-value 的形式保存
@@ -63,6 +76,7 @@ model.getData(['isLogin', 'token', 'hybrid']).then(({isLogin, token, hybrid})=>{
 model.getData('isLogin', 'token', 'hybrid').then(({isLogin, token, hybrid})=>{
 	//
 })
+</pre>
  * */
 class Model extends Base{
 	/**
@@ -185,6 +199,7 @@ class Model extends Base{
 	}
 	/**
 	 * @summary 判断某一对象是否为 Model 类型
+	 * @static
 	 * @param   {*}         target
 	 * @return  {boolean}   返回结果
 	 * */
@@ -193,6 +208,7 @@ class Model extends Base{
 	}
 	/**
 	 * @summary     转为字符串，会将 null,undefined 转为空字符串
+	 * @static
 	 * @protected
 	 * @param       {*}     value
 	 * @return      {string}
@@ -207,18 +223,13 @@ class Model extends Base{
 	}
 	/**
 	 * @summary 与 App 类约定的注入接口
+	 * @static
 	 * @param   {Object}    app
 	 * @desc    注入为 $model，配置参数名 model
 	 * */
 	static inject(app){
 		app.inject('$model', new Model( app.$options.model ));
 	}
-	/**
-	 * todo
-	 * */
-	// static [Symbol.hasInstance](instance){
-	//
-	// }
 
 	// ---------- 静态属性 ----------
 	/**
@@ -330,23 +341,6 @@ class Model extends Base{
 		}
 	}
 
-	// /**
-	//  * @summary     在 Promise resolve 时调用的函数
-	//  * @callback    promiseResolve
-	//  * @param       {*}     result
-	//  * */
-	// /**
-	//  * @summary     在 Promise reject 时调用的函数
-	//  * @callback    promiseReject
-	//  * @param       {*}     result
-	//  * */
-	// /**
-	//  * @typedef     {Promise<Object,Error>} ModelPromise
-	//  * @property    {Object}
-	//  * @property    {Object}
-	//  * @throws      {Error}
-	//  * */
-
 	/**
 	 * @summary     当 setData 传入一个 json 时内部调用函数
 	 * @protected
@@ -401,7 +395,7 @@ class Model extends Base{
 	 * @param   {*}             [value] 为 null、undefined 时会被保存为空字符串，当 topic 为 object 类型时被忽略
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    设置数据的时候会使用 Object.defineProperty 定义该属性
-				目前子类的实现中都调用了 super.setData，若其它子类的实现中并没有调用，但需对数据监控，应在适当的时候调用 _trigger 方法
+	 *			目前子类的实现中都调用了 super.setData，若其它子类的实现中并没有调用，但需对数据监控，应在适当的时候调用 _trigger 方法
 	 * */
 	setData(topic, value){
 		let result
@@ -534,18 +528,6 @@ class Model extends Base{
 
 		return Promise.resolve( true );
 	}
-
-	/**
-	 * @summary     数据改变事件触发回调函数
-	 * @callback    ModelChangeEvent
-	 * @param       {Event}     event
-	 * @param       {string}    topic
-	 * @param       {*}         newValue
-	 * @param       {*}         [oldValue]
-	 * @this        {Model}
-	 * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
-	 *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
-	 * */
 
 	/**
 	 * @summary 绑定数据监视事件

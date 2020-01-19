@@ -7,7 +7,7 @@
 import url      from '../runtime/url.js';
 import listener from '../util/listener.js';
 
-import scroll   from './scroll.js';
+import scroll, {Scroll} from './scroll.js';
 
 import postMessage  from './postMessage.js';
 
@@ -143,20 +143,19 @@ let view = {
  * */
 export default view;
 
-const View = {
-		/**
-		 * @summary 与 App 类约定的注入接口
-		 * @param   {Object}    app
-		 * @desc    注入为 $view
-		 * */
-		inject(app){
-			app.inject('$view', view);
-		}
+export const View = {
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $view
+	 * */
+	inject(app){
+		app.inject('$view', view);
 	}
-	;
+};
 
 export {
-	View
-	, Geo
+	Geo
 	, Notify
+	, Scroll
 };

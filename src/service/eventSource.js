@@ -36,6 +36,18 @@ class EventSourceModel extends Model{
 
 		this._conn = this._createConn();
 	}
+
+	// ---------- 静态方法 ----------
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @static
+	 * @param   {Object}    app
+	 * @desc    注入为 $socket，配置参数名 sse
+	 * */
+	static inject(app){
+		app.inject('$sse', new EventSourceModel( app.$options.sse ));
+	}
+
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置

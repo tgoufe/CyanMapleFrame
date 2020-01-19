@@ -37,19 +37,10 @@ class WebSocketModel extends Model{
 		this._conn = this._createConn();
 	}
 
-	// // ---------- 静态方法 ----------
-	// static isOpen(){
-	// 	if( 'WebSocket' in self ){
-	// 		return WebSocket.OPEN;
-	// 	}
-	// 	else{
-	// 		return false;
-	// 	}
-	// }
-
-	// ---------- 静态属性 ----------
+	// ---------- 静态方法 ----------
 	/**
 	 * @summary 与 App 类约定的注入接口
+	 * @static
 	 * @param   {Object}    app
 	 * @desc    注入为 $socket，配置参数名 socket
 	 * */

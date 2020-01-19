@@ -550,6 +550,7 @@ url.popState((e, newUrl)=>{
  * @memberOf    maple
  * */
 export default url;
+
 export {
 	Url
 };

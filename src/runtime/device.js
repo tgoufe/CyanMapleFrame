@@ -5,8 +5,6 @@
  * @todo    评估一下是否有用，基本上只用到判断是否为微信，判断 app 使用了 cookie。。。
  * */
 
-// import $    from 'jquery';
-
 const alias = {
 		androidchorme: 'androidchrome'
 		, guge: 'chrome'
@@ -28,46 +26,46 @@ const alias = {
  * @desc        可以传多个参数，当同时满足时，返回 true，否则 false
  * */
 let device = function(){
-	let argc = arguments.length
-		, result = true
-		, i, temp
-		;
+		let argc = arguments.length
+			, result = true
+			, i, temp
+			;
 
-	if( argc === 0 ){
-		result = false;
-	}
-	else{
-		for(i = 0; i < argc; i++){
+		if( argc === 0 ){
+			result = false;
+		}
+		else{
+			for(i = 0; i < argc; i++){
 
-			temp = arguments[i];
+				temp = arguments[i];
 
-			if( temp in device && device.hasOwnProperty(temp) ){
-				result = result && device[temp];
-			}
-			else{
-				temp = temp.toLowerCase();
-
-				if( temp in alias ){
-					result = result && device[alias[temp]];
+				if( temp in device && device.hasOwnProperty(temp) ){
+					result = result && device[temp];
 				}
 				else{
-					result = result && false;
+					temp = temp.toLowerCase();
+
+					if( temp in alias ){
+						result = result && device[alias[temp]];
+					}
+					else{
+						result = result && false;
+					}
+				}
+
+				if( !result ){
+					break;
 				}
 			}
-
-			if( !result ){
-				break;
-			}
 		}
+
+		return result;
 	}
-
-	return result;
-};
-
-let android = ua.match(/(Android);?[\s\/]+([\d.]+)?/);
-let ipad    = ua.match(/(iPad).*OS\s([\d_]+)/);
-let ipod    = ua.match(/(iPod)(.*OS\s([\d_]+))?/);
-let iphone  = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/);
+	, android = ua.match(/(Android);?[\s\/]+([\d.]+)?/)
+	, ipad = ua.match(/(iPad).*OS\s([\d_]+)/)
+	, ipod = ua.match(/(iPod)(.*OS\s([\d_]+))?/)
+	, iphone = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/)
+	;
 
 device.ios = device.android = device.iphone = device.ipad = device.androidChrome = false;
 
@@ -109,19 +107,6 @@ if( device.ios && device.osVersion && ua.indexOf('Version/') >= 0 ){
 // WebView
 device.webView = (iphone || ipad || ipod) && ua.match(/.*AppleWebKit(?!.*Safari)/i);
 
-// // todo iOS8 移除了 minimal-ui 删掉？
-// // Minimal UI
-// if (device.os && device.os === 'ios') {
-// 	let osVersionArr = device.osVersion.split('.')
-// 		, $metaViewport = $('meta[name="viewport"]')
-// 		;
-// 	device.minimalUi = !device.webView &&
-// 		(ipod || iphone) &&
-// 		(osVersionArr[0] * 1 === 7 ? osVersionArr[1] * 1 >= 1 : osVersionArr[0] * 1 > 7) &&
-// 		$metaViewport.length > 0 &&
-// 		$metaViewport.attr('content').indexOf('minimal-ui') >= 0;
-// }
-
 // 微信，坑..
 device.wechat = device.weixin = /MicroMessenger/i.test( ua );
 
@@ -131,7 +116,6 @@ device.uc = ua.indexOf('UCBrowser') > -1;
 // 支付宝
 device.alipay = ua.indexOf("AlipayClient") > 0;
 
-
 /**
  * @exports     device
  * @type        {Object}
@@ -139,48 +123,13 @@ device.alipay = ua.indexOf("AlipayClient") > 0;
  * */
 export default device;
 
-
-// Pixel Ratio
-device.pixelRatio = window.devicePixelRatio || 1;
-
-// todo 更换位置，期望与 document 解耦
-// Check for status bar and fullscreen app mode
-let windowHeight = document.documentElement.clientHeight
-	, windowWidth = document.documentElement.clientWidth
-	;
-
-device.statusBar = device.webView && (windowWidth * windowHeight === screen.width * screen.height);
-
-// /**
-//  * todo 更换位置
-//  * */
-// let classNames = [];
-//
-// classNames.push('pixel-ratio-' + Math.floor(device.pixelRatio));
-// if( device.pixelRatio >= 2 ){
-// 	classNames.push('retina');
-// }
-//
-// // OS classes
-// if( device.os ){
-// 	classNames.push(device.os, device.os + '-' + device.osVersion.split('.')[0], device.os + '-' + device.osVersion.replace(/\./g, '-'));
-// 	if( device.os === 'ios'){
-// 		let major = parseInt(device.osVersion.split('.')[0], 10);
-// 		for (let i = major - 1; i >= 6; i--) {
-// 			classNames.push('ios-gt-' + i);
-// 		}
-// 	}
-//
-// }
-// // Status bar classes
-// if( device.statusBar ){
-// 	classNames.push('with-statusbar-overlay');
-// }
-// else{
-// 	$('html').removeClass('with-statusbar-overlay');
-// }
-//
-// // Add html classes
-// if( classNames.length > 0 ){
-// 	$('html').addClass(classNames.join(' '));
-// }
+export const Device = {
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $device
+	 * */
+	inject(app){
+		app.inject('$device', device);
+	}
+};

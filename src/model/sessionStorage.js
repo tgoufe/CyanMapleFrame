@@ -12,7 +12,7 @@ let sessionStorageModel = new SessionStorageModel()
 	, storage = Model.factory('sessionStorage')
 	, ss = Model.factory('ss')
 	;
- </pre>
+</pre>
  * */
 class SessionStorageModel extends Model{
 	/**
@@ -38,6 +38,7 @@ class SessionStorageModel extends Model{
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 与 App 类约定的注入接口
+	 * @static
 	 * @param   {Object}    app
 	 * @desc    注入为 $ss
 	 * */

@@ -55,6 +55,17 @@ class FileSystemModel extends Model{
 		});
 	}
 
+	// ---------- 静态方法 ----------
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @static
+	 * @param   {Object}    app
+	 * @desc    注入为 $fs，配置参数名 fs
+	 * */
+	static inject(app){
+		app.inject('$fs', new FileSystemModel( app.$options.fs ));
+	}
+
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置

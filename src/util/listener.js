@@ -455,6 +455,7 @@ const listener = new Listener()
 	;
 
 export default listener;
+
 export {
 	Listener
 };

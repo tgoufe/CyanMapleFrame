@@ -215,10 +215,13 @@ scroll.disabled = disabled;
 
 export default scroll;
 
-export {
-	scroll
-	, observer
-	, unobserver
-	, scrollBar
-	, disabled
-}
+export const Scroll = {
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Object}    app
+	 * @desc    注入为 $scroll
+	 * */
+	inject(app){
+		app.inject('$scroll', scroll);
+	}
+};

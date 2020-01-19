@@ -17,10 +17,12 @@ const CACHE_STORAGE_MODEL_CONFIG = {
  * @desc    对浏览器源生 CacheStorage 接口进行封装，统一调用接口，主要提供给 Service Worker 调用，普通页面使用场景有限，在 Model.factory 工厂方法注册为 cacheStorage，别名 cs，将可以使用工厂方法生成
  * @extends Model
  * @example
+<pre>
 let cacheStorageModel = new CacheStorageModel()
 	, storage = Model.factory('cacheStorage')
 	, cs = Model.factory('cs')
 	;
+</pre>
  * */
 class CacheStorageModel extends Model{
 	/**
@@ -44,20 +46,10 @@ class CacheStorageModel extends Model{
 		}
 	}
 
-	// ---------- 静态属性 ----------
-	/**
-	 * @summary 默认配置
-	 * @static
-	 * @const
-	 * */
-	static get _CONFIG(){
-		return CACHE_STORAGE_MODEL_CONFIG;
-	}
-
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 将 url 字符串转换为 Request 对象
-	 * @private
+	 * @static
 	 * @param   {string|Request}    url
 	 * @return  {Request}
 	 * */
@@ -69,6 +61,25 @@ class CacheStorageModel extends Model{
 		}
 
 		return url
+	}
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @static
+	 * @param   {Object}    app
+	 * @desc    注入为 $cache，配置参数名 cache
+	 * */
+	static inject(app){
+		app.inject('$cache', new CacheStorageModel( app.$options.cache ));
+	}
+
+	// ---------- 静态属性 ----------
+	/**
+	 * @summary 默认配置
+	 * @static
+	 * @const
+	 * */
+	static get _CONFIG(){
+		return CACHE_STORAGE_MODEL_CONFIG;
 	}
 
 	// ---------- 公有方法 ----------

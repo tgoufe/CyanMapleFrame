@@ -69,9 +69,18 @@ class CookieModel extends Model{
 		return date && date.toUTCString();
 	}
 	/**
+	 * @summary 设置默认参数的 domain 值
+	 * @static
+	 * @param   {string}    domain
+	 * */
+	static setDomain(domain){
+		COOKIE_DEFAULT.domain = domain;
+	}
+	/**
 	 * @summary 与 App 类约定的注入接口
+	 * @static
 	 * @param   {Object}    app
-	 * @desc    注入为 $cookie
+	 * @desc    注入为 $cookie，配置参数名 cookie
 	 * */
 	static inject(app){
 		app.inject('$cookie', new CookieModel( app.$options.cookie ));
@@ -85,14 +94,6 @@ class CookieModel extends Model{
 	 * */
 	static get _DEFAULT(){
 		return COOKIE_DEFAULT;
-	}
-	/**
-	 * @summary 设置默认参数的 domain 值
-	 * @static
-	 * @param   {string}    domain
-	 * */
-	static setDomain(domain){
-		COOKIE_DEFAULT.domain = domain;
 	}
 
 	// ---------- 私有方法 ----------

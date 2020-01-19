@@ -55,27 +55,32 @@ import listener, {Listener} from './util/listener.js';
  * ---------- 全局运行时检测 ----------
  * */
 // 运行参数
-import url      from './runtime/url.js';
+import url, {Url}   from './runtime/url.js';
 
 // 运行设备、系统、内核、浏览器
-import device   from './runtime/device.js';
+import device, {Device} from './runtime/device.js';
 
 /**
  * ---------- 数据层 ----------
  * */
-import model, * as Model    from './model/index.js';
+import model, * as ModelList    from './model/index.js';
 export * from './model/index.js';
 
 /**
  * ---------- View 监控对象 ----------
  * */
-import view     from './view/index.js';
+import view, {View} from './view/index.js';
+export * from './view/index.js';
+
+/**
+ * ---------- 获取地理位置 ----------
+ * */
+import geo from './view/geo.js';
 
 /**
  * ---------- Router 路由控制 ----------
  * */
 import router, {Router}  from './router/index.js';
-export * from './router/index.js';
 
 /**
  * ---------- 错误处理 ----------
@@ -84,11 +89,6 @@ export * from './router/index.js';
 import error    from './errorHandler/error.js';
 // 为捕获的 promise reject
 import unHandledRejection   from './errorHandler/unHandledRejection.js';
-
-/**
- * ---------- 获取地理位置 ----------
- * */
-import geo, {Geo} from './view/geo.js';
 
 // /**
 //  * ---------- 动画库 ----------
@@ -154,7 +154,7 @@ let maple = {
 	, url
 	, device
 
-	, ...Model
+	, ...ModelList
 	, model
 
 	, view
@@ -180,9 +180,9 @@ export default maple;
 
 export {
 	Base as App
-	, view as View
-	, device as Device
+	, Url
+	, Device
+	, View
 	, util as Util
-	, url as Url
-	, Geo
+	, Router
 };

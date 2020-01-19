@@ -35,6 +35,17 @@ const CONFIG = {
  * */
 
 /**
+ * @summary     数据改变事件触发回调函数
+ * @callback    RouterChangeEvent
+ * @param       {Event}     event
+ * @param       {string}    form
+ * @param       {string}    to
+ * @this        {Url}
+ * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
+ *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
+ * */
+
+/**
  * @class
  * @desc    路由配置类
  * @extends Base
@@ -412,17 +423,6 @@ class Router extends Base{
 	forward(){
 		this.$url.forward();
 	}
-
-	/**
-	 * @summary     数据改变事件触发回调函数
-	 * @callback    RouterChangeEvent
-	 * @param       {Event}     event
-	 * @param       {string}    form
-	 * @param       {string}    to
-	 * @this        {Url}
-	 * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
-	 *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
-	 * */
 
 	/**
 	 * @summary 添加事件监听

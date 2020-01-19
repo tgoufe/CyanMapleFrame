@@ -98,6 +98,17 @@ class WebSQLModel extends Model{
 		});
 	}
 
+	// ---------- 静态方法 ----------
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @static
+	 * @param   {Object}    app
+	 * @desc    注入为 $sql，配置参数名 sql
+	 * */
+	static inject(app){
+		app.inject('$sql', new WebSQLModel( app.$options.sql ));
+	}
+
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置

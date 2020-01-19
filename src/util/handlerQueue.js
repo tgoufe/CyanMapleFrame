@@ -19,6 +19,7 @@ class HandlerQueue extends Base{
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 判断某一对象是否为 HandlerQueue 类型
+	 * @static
 	 * @param   {*}         target
 	 * @return  {boolean}   返回结果
 	 * */
@@ -27,6 +28,7 @@ class HandlerQueue extends Base{
 	}
 	/**
 	 * @summary 与 App 类约定的注入接口
+	 * @static
 	 * @param   {Object}    app
 	 * @desc    注入为 $handlers
 	 * */

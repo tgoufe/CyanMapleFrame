@@ -110,6 +110,7 @@ class IndexedDBModel extends Model{
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 与 App 类约定的注入接口
+	 * @static
 	 * @param   {Object}    app
 	 * @desc    注入为 $idb，配置参数名 idb
 	 * */
