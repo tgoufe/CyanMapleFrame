@@ -93,10 +93,10 @@ class IndexedDBModel extends Model{
 						});
 					}
 				};
-				dbOpenRequest.onsuccess = function(e){
+				dbOpenRequest.onsuccess = (e)=>{
 					resolve( e.target.result );
 				};
-				dbOpenRequest.onerror = function(e){
+				dbOpenRequest.onerror = (e)=>{
 					console.log( e );
 					reject( e );
 				};
@@ -380,7 +380,7 @@ class IndexedDBModel extends Model{
 				// 		break;
 				// }
 
-				objectStoreRequest.onsuccess = function(e){
+				objectStoreRequest.onsuccess = (e)=>{
 					let cursor = e.target.result
 						;
 
@@ -393,7 +393,7 @@ class IndexedDBModel extends Model{
 						resolve( cursorList );
 					}
 				};
-				objectStoreRequest.onerror = function(e){
+				objectStoreRequest.onerror = (e)=>{
 					console.log( e );
 					reject( e );
 				};
