@@ -364,6 +364,12 @@ url.setHash = function(hash){
 	return this;
 };
 
+Object.defineProperty(url, 'hashParams', {
+	get(){
+		return this.parseUrl( this.hash ).params;
+	}
+});
+
 // ---------- url 上的参数操作 ----------
 /**
  * @summary     调整参数并指向调整后的路径，当前 url 添加到历史记录
