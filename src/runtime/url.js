@@ -118,8 +118,7 @@ class Url extends Base{
 	static inject(app){
 		app.inject('$url', url);
 		app.inject('$urlParams', url.params);
-		// todo
-		// app.inject('$hashParams', url.hash);
+		app.inject('$hashParams', url.hashParams);
 	}
 
 	// ---------- 静态属性 ----------

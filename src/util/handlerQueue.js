@@ -161,7 +161,7 @@ class HandlerQueue extends Base{
 				}
 
 				if( HandlerQueue.is(promise) ){
-					promise = promise.with( context )[method]( ...args );
+					promise = promise.with( context ).promise[method]( ...args );
 				}
 				else if( handler !== null ){
 					promise = Promise.resolve( promise.apply(context, args) );
@@ -203,7 +203,7 @@ class HandlerQueue extends Base{
 					}
 
 					if( HandlerQueue.is(handler) ){
-						return handler.with( context ).line( ...args );
+						return handler.with( context ).promise.line( ...args );
 					}
 					else{
 						return handler.apply(context, args);
