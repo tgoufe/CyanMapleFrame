@@ -12,7 +12,7 @@ import merge    from '../util/merge.js';
  * @return      {Promise}   返回一个 Promise 对象，在 resolve 时传入注册后的结果
  * */
 function registerServiceWorker(options={}, welcome=''){
-	let config = merge(options, registerServiceWorker._CONFIG)
+	let config = merge(options, registerServiceWorker.CONFIG)
 		;
 
 	return new Promise((resolve, reject)=>{
@@ -117,9 +117,16 @@ function registerServiceWorker(options={}, welcome=''){
 	});
 }
 
+/**
+ * @static
+ * @private
+ * */
 registerServiceWorker._CACHE = {};
 
-registerServiceWorker._CONFIG = {
+/**
+ * @static
+ * */
+registerServiceWorker.CONFIG = {
 	file: '/sw.js'
 	, scope: '/'
 };

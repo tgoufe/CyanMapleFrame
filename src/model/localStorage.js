@@ -38,7 +38,7 @@ class LocalStorageModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, LocalStorageModel._CONFIG);
+		config = merge(config, LocalStorageModel.CONFIG);
 
 		super( config );
 
@@ -106,7 +106,7 @@ class LocalStorageModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return LOCAL_STORAGE_MODEL_CONFIG;
 	}
 

@@ -92,7 +92,7 @@ class CookieModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _DEFAULT(){
+	static get CONFIG(){
 		return COOKIE_DEFAULT;
 	}
 
@@ -127,7 +127,7 @@ class CookieModel extends Model{
 
 		document.cookie = encodeURIComponent( topic ) +'='+
 			encodeURIComponent( CookieModel.stringify(value) ) +
-			Object.entries( CookieModel._DEFAULT ).reduce((a, [k, v])=>{    // 整理配置
+			Object.entries( CookieModel.CONFIG ).reduce((a, [k, v])=>{    // 整理配置
 				let t = options[k] || v
 					;
 

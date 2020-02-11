@@ -10,7 +10,7 @@ import merge from '../util/merge.js';
  * @return  {Promise<Worker, Error>}    返回一个 Promise 对象，在 resolve 时传入生成的 Web Worker 实例
  * */
 function registerWebWorker(options={}){
-	let config = merge(options, registerWebWorker._CONFIG)
+	let config = merge(options, registerWebWorker.CONFIG)
 		;
 	
 	return new Promise((resolve, reject)=>{
@@ -28,9 +28,16 @@ function registerWebWorker(options={}){
 	});
 }
 
+/**
+ * @static
+ * @private
+ * */
 registerWebWorker._WORKER_CACHE = {};
 
-registerWebWorker._CONFIG = {
+/**
+ * @static
+ * */
+registerWebWorker.CONFIG = {
 	file: 'ww.js'
 };
 

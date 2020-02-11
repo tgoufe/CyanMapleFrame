@@ -52,7 +52,7 @@ class IndexedDBModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, IndexedDBModel._CONFIG);
+		config = merge(config, IndexedDBModel.CONFIG);
 
 		super( config );
 
@@ -124,7 +124,7 @@ class IndexedDBModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return INDEXED_DB_CONFIG;
 	}
 

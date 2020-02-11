@@ -52,7 +52,7 @@ class ServiceModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, ServiceModel._CONFIG);
+		config = merge(config, ServiceModel.CONFIG);
 
 		super( config );
 
@@ -101,7 +101,7 @@ class ServiceModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return SERVICE_MODEL_CONFIG;
 	}
 	/**
@@ -121,7 +121,7 @@ class ServiceModel extends Model{
 	 * @return  {Object}
 	 * */
 	_setOpts(options){
-		return merge(options, ServiceModel._CONFIG);
+		return merge(options, ServiceModel.CONFIG);
 	}
 	/**
 	 * @summary 执行请求拦截器进行验证

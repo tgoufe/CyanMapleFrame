@@ -13,7 +13,7 @@
 import Base     from '../base.js';
 import listener from '../util/listener.js';
 
-const INDEX = ['source'
+const URL_KEY_INDEX = ['source'
 		, 'protocol'
 		, 'origin'
 		, 'host'
@@ -122,8 +122,8 @@ class Url extends Base{
 	}
 
 	// ---------- 静态属性 ----------
-	static get _INDEX(){
-		return INDEX;
+	static get INDEX(){
+		return URL_KEY_INDEX;
 	}
 
 	// ---------- 公有方法 ----------
@@ -211,7 +211,7 @@ class Url extends Base{
 		let source = this.source
 			;
 
-		Url._INDEX.reduce((target, k)=>{
+		Url.INDEX.reduce((target, k)=>{
 			
 			if( k !== 'query' ){
 				target[k] = url[k];
@@ -220,7 +220,7 @@ class Url extends Base{
 			return target;
 		}, this);
 
-		// Url._INDEX.filter( k => k !== 'query' ).forEach((k)=>{
+		// Url.INDEX.filter( k => k !== 'query' ).forEach((k)=>{
 		// 	this[k] = url[k];
 		// });
 
@@ -234,7 +234,7 @@ class Url extends Base{
 	 * @return  {string}
 	 * */
 	toString(){
-		return JSON.stringify( Url._INDEX.reduce((rs, k)=>{
+		return JSON.stringify( Url.INDEX.reduce((rs, k)=>{
 			rs[k] = this[k];
 
 			return rs;
@@ -246,7 +246,7 @@ class Url extends Base{
 	 * @desc    JSON.stringify 序列号 Model 及子类的实例对象时调用
 	 * */
 	toJSON(){
-		return Url._INDEX.reduce((rs, k)=>{
+		return Url.INDEX.reduce((rs, k)=>{
 			rs[k] = this[k];
 
 			return rs;

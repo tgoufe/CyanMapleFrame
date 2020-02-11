@@ -29,7 +29,7 @@ class FileSystemModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, FileSystemModel._CONFIG);
+		config = merge(config, FileSystemModel.CONFIG);
 
 		super( config );
 
@@ -72,7 +72,7 @@ class FileSystemModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return FILE_SYSTEM_CONFIG;
 	}
 	/**

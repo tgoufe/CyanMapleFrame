@@ -62,8 +62,8 @@ class WebSQLModel extends Model{
 	 * @desc    传入 sql 语句时，可用 {{tableName}} 来代替表名
 	 * */
 	constructor(config={}){
-		config = merge(config, WebSQLModel._CONFIG);
-		config.sql = merge(config.sql, WebSQLModel._CONFIG.sql);
+		config = merge(config, WebSQLModel.CONFIG);
+		config.sql = merge(config.sql, WebSQLModel.CONFIG.sql);
 
 		super( config );
 
@@ -115,7 +115,7 @@ class WebSQLModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return WEB_SQL_MODEL_CONFIG;
 	}
 

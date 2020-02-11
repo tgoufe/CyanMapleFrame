@@ -28,7 +28,7 @@ class WebSocketModel extends Model{
 	 * @param   {string}            [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, WebSocketModel._CONFIG);
+		config = merge(config, WebSocketModel.CONFIG);
 
 		super( config );
 
@@ -54,7 +54,7 @@ class WebSocketModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return WEB_SOCKET_CONFIG;
 	}
 
