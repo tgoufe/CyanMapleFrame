@@ -23,7 +23,7 @@ let geo = function(options={}){
 		result = new Promise(function(resolve, reject){
 			let opts = merge(options, geo.CONFIG);
 
-			navigator.geoposition.getCurrentPosition(resolve, reject, opts);
+			navigator.geolocation.getCurrentPosition(resolve, reject, opts);
 		});
 	}
 	else{
