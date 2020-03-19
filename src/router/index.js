@@ -10,7 +10,7 @@ import {Listener}   from '../util/listener.js';
  * 路由默认配置
  * @const
  * */
-const CONFIG = {
+const ROUTER_CONFIG = {
 		mode: 'history'
 		, baseUrl: ''   // 若设置 baseUrl 应以 / 结尾
 		, eventType: 'routerChange'
@@ -61,7 +61,7 @@ class Router extends Base{
 	 * @param   {string}        [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, Router._CONFIG);
+		config = merge(config, Router.CONFIG);
 
 		super( config );
 
@@ -149,8 +149,8 @@ class Router extends Base{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
-		return CONFIG;
+	static get CONFIG(){
+		return ROUTER_CONFIG;
 	}
 
 	// ---------- 私有方法 ----------

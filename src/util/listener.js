@@ -42,7 +42,7 @@ class Listener extends Base{
 	 * @param   {number}    [config.observerOptions.threshold]  监听目标与边界盒交叉区域的比例值，从 0.0 到 1.0 之间的数组
 	 * */
 	constructor(config={}){
-		config = merge(config, Listener._CONFIG);
+		config = merge(config, Listener.CONFIG);
 
 		super( config );
 
@@ -74,7 +74,7 @@ class Listener extends Base{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return LISTENER_CONFIG;
 	}
 	/**
@@ -190,6 +190,10 @@ class Listener extends Base{
 	 * @return  {string}
 	 * */
 	_getKey(type, capture){
+		if( type === Listener.IntersectionObserver || type === Listener.MutationObserver ){
+			return type;
+		}
+
 		return JSON.stringify({
 			type
 			, capture
@@ -384,6 +388,15 @@ class Listener extends Base{
 		let eventConfig
 			, handlers
 			;
+
+		if( typeof target === "string" ){
+			type = target;
+			target = null;
+		}
+
+		if( !target ){
+			target = self;
+		}
 
 		eventConfig = this._getEventConfig(target, type, capture);
 

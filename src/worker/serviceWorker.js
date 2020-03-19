@@ -81,9 +81,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 			cacheStorage.keys()
 			, cacheName
 		]).then(([keyList, cacheName])=>{
-
 			return Promise.all( keyList.reduce((all, key)=>{
-				
 				// 更新，将不是正在使用的缓存删除
 				if( cacheName !== key ){
 					all.push( cacheStorage.cacheDelete(key) );

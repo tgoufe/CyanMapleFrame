@@ -86,7 +86,7 @@ dateFormat._dateStrReplace = {
 	 * @return  {string}
 	 * */
 	, www(date){
-		return dateFormat._WEEK_EN[date.getDay()].slice(0, 3);
+		return dateFormat.WEEK_EN[date.getDay()].slice(0, 3);
 	}
 	/**
 	 * @summary 替换 week
@@ -94,7 +94,7 @@ dateFormat._dateStrReplace = {
 	 * @return  {string}
 	 * */
 	, week(date){
-		return dateFormat._WEEK_EN[date.getDay()];
+		return dateFormat.WEEK_EN[date.getDay()];
 	}
 	/**
 	 * @summary 替换星期
@@ -102,7 +102,7 @@ dateFormat._dateStrReplace = {
 	 * @return  {string}
 	 * */
 	, '星期': function(date){
-		return '星期'+ dateFormat._WEEK_CN[date.getDay()];
+		return '星期'+ dateFormat.WEEK_CN[date.getDay()];
 	}
 	/**
 	 * @summary 替换周
@@ -110,7 +110,7 @@ dateFormat._dateStrReplace = {
 	 * @return  {string}
 	 * */
 	, '周': function(date){
-		return '周'+ dateFormat._WEEK_CN[date.getDay()];
+		return '周'+ dateFormat.WEEK_CN[date.getDay()];
 	}
 };
 
@@ -141,23 +141,27 @@ dateFormat.formatTimeStr = function(str, unit='d'){
 };
 /**
  * 英文一周名称
+ * @static
  * */
-dateFormat._WEEK_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+dateFormat.WEEK_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 /**
  * 中文一周名称
+ * @static
  * */
-dateFormat._WEEK_CN = ['日', '一', '二', '三', '四', '五', '六'];
+dateFormat.WEEK_CN = ['日', '一', '二', '三', '四', '五', '六'];
 
 /**
  * 简短时间设置格式
- * @const
  * @static
+ * @private
+ * @const
  * */
 dateFormat._SHORT_TIME_EXPR = /^(-?\d+)([smhdy])?$/i;
 /**
  * 时间单位对应的毫秒数
- * @const
  * @static
+ * @private
+ * @const
  * */
 dateFormat._SHORT_TIME_NUM = {
 	s: 1e3

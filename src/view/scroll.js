@@ -24,7 +24,7 @@ let scroll = (callback)=>{
 	 * @param       {Element}   target
 	 * @param       {Function}  callback
 	 * */
-	, observer = (target, callback)=>{
+	, observe = (target, callback)=>{
 		listener.on(target, 'intersectionObserver', callback);
 	}
 	/**
@@ -34,7 +34,7 @@ let scroll = (callback)=>{
 	 * @param       {Element}   target
 	 * @param       {Function}  [callback]
 	 * */
-	, unobserver = (target, callback)=>{
+	, unobserve = (target, callback)=>{
 		listener.off(target, 'intersectionObserver', callback);
 	}
 	/**
@@ -45,7 +45,7 @@ let scroll = (callback)=>{
 	 * @param       {string|number} [value] 设置滚动条的位置
 	 * @return      {Object|null}
 	 * */
-	, scrollBar = (offset, value)=>{
+	, scrollBar = function(offset, value){
 		let argc = arguments.length
 			, curr = 0
 			, total = 1
@@ -208,8 +208,8 @@ else{
 	scrollTarget = doc;
 }
 
-scroll.observer = observer;
-scroll.unobserver = unobserver;
+scroll.observe = observe;
+scroll.unobserve = unobserve;
 scroll.scrollBar = scrollBar;
 scroll.disabled = disabled;
 

@@ -62,8 +62,8 @@ class WebSQLModel extends Model{
 	 * @desc    传入 sql 语句时，可用 {{tableName}} 来代替表名
 	 * */
 	constructor(config={}){
-		config = merge(config, WebSQLModel._CONFIG);
-		config.sql = merge(config.sql, WebSQLModel._CONFIG.sql);
+		config = merge(config, WebSQLModel.CONFIG);
+		config.sql = merge(config.sql, WebSQLModel.CONFIG.sql);
 
 		super( config );
 
@@ -82,6 +82,7 @@ class WebSQLModel extends Model{
 				// 打开数据库，若不存在则创建
 				db = openDatabase(this._config.dbName, ''+ this._config.dbVersion, this._config.dbName, this._config.dbSize);
 
+				// db.readTransaction()
 				db.transaction((tx)=>{
 					// 若没有数据表则创建
 					tx.executeSql(this._config.sql.create, [], ()=>{
@@ -90,6 +91,8 @@ class WebSQLModel extends Model{
 						console.log( e );
 						reject( e );
 					});
+				}, reject, ()=>{
+					resolve( db );
 				});
 			}
 			else{
@@ -115,7 +118,7 @@ class WebSQLModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return WEB_SQL_MODEL_CONFIG;
 	}
 
@@ -138,7 +141,7 @@ class WebSQLModel extends Model{
 	_select(topic){
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
-				db.transaction((tx)=>{
+				db.readTransaction((tx)=>{
 					tx.executeSql(this._config.sql.select, [topic], (tx, rs)=>{
 						resolve( rs.rows );
 					}, (tx, e)=>{
@@ -348,7 +351,7 @@ class WebSQLModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
 	 * */
 	clearData(){
-		this.clearData();
+		super.clearData();
 
 		return this._clear();
 	}

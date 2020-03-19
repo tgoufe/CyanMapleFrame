@@ -85,7 +85,7 @@ class Model extends Base{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, Model._CONFIG);
+		config = merge(config, Model.CONFIG);
 
 		super( config );
 		
@@ -237,12 +237,13 @@ class Model extends Base{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return MODEL_CONFIG;
 	}
 	/**
 	 * @summary 子类
 	 * @static
+	 * @private
 	 * @const
 	 * */
 	static get _MODEL(){
@@ -251,6 +252,7 @@ class Model extends Base{
 	/**
 	 * @summary 子类对象缓存
 	 * @static
+	 * @private
 	 * @const
 	 * */
 	static get _MODEL_CACHE(){
@@ -259,6 +261,7 @@ class Model extends Base{
 	/**
 	 * @summary 子类别名列表
 	 * @static
+	 * @private
 	 * @const
 	 * */
 	static get _MODEL_ALIAS(){

@@ -61,7 +61,7 @@ let device = function(){
 
 		return result;
 	}
-	, android = ua.match(/(Android);?[\s\/]+([\d.]+)?/)
+	, android = ua.match(/(Android);?[\s/]+([\d.]+)?/)
 	, ipad = ua.match(/(iPad).*OS\s([\d_]+)/)
 	, ipod = ua.match(/(iPod)(.*OS\s([\d_]+))?/)
 	, iphone = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/)

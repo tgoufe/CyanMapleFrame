@@ -32,7 +32,7 @@ class CacheStorageModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, CacheStorageModel._CONFIG);
+		config = merge(config, CacheStorageModel.CONFIG);
 
 		super( config );
 
@@ -78,7 +78,7 @@ class CacheStorageModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return CACHE_STORAGE_MODEL_CONFIG;
 	}
 

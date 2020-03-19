@@ -28,7 +28,7 @@ class EventSourceModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, EventSourceModel._CONFIG);
+		config = merge(config, EventSourceModel.CONFIG);
 		
 		super( config );
 
@@ -54,7 +54,7 @@ class EventSourceModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return EVENT_SOURCE_MODEL_CONFIG;
 	}
 

@@ -8,7 +8,7 @@
 import Base     from '../base.js';
 import listener from '../util/listener.js';
 
-const INDEX = ['source'
+const URL_KEY_INDEX = ['source'
 		, 'protocol'
 		, 'origin'
 		, 'host'
@@ -113,13 +113,12 @@ class Url extends Base{
 	static inject(app){
 		app.inject('$url', url);
 		app.inject('$urlParams', url.params);
-		// todo
-		// app.inject('$hashParams', url.hash);
+		app.inject('$hashParams', url.hashParams);
 	}
 
 	// ---------- 静态属性 ----------
-	static get _INDEX(){
-		return INDEX;
+	static get INDEX(){
+		return URL_KEY_INDEX;
 	}
 
 	// ---------- 公有方法 ----------

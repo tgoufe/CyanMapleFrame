@@ -21,9 +21,9 @@ let geo = function(options={}){
 
 	if( 'geolocation' in navigator ){
 		result = new Promise(function(resolve, reject){
-			let opts = merge(options, geo._CONFIG);
+			let opts = merge(options, geo.CONFIG);
 
-			navigator.geoposition.getCurrentPosition(resolve, reject, opts);
+			navigator.geolocation.getCurrentPosition(resolve, reject, opts);
 		});
 	}
 	else{
@@ -33,7 +33,7 @@ let geo = function(options={}){
 	return result;
 };
 
-geo._CONFIG = {
+geo.CONFIG = {
 	// 指示浏览器获取高精度的位置，默认为 false
 	enableHighAccuracy: true
 	// 指定获取地理位置的超时时间，默认不限时，单位为毫秒

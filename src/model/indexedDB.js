@@ -20,7 +20,13 @@ const INDEXED_DB_CONFIG = {
 			name: 'value'
 			, keyPath: 'value'
 			, unique: false
+		// }, {
+		// 	// 数组类型
+		// 	name: 'array'
+		// 	, keyPath: 'array'
+		// 	, multiEntry: true
 		}]
+		, autoIncrement: true
 	}
 	;
 
@@ -52,7 +58,7 @@ class IndexedDBModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, IndexedDBModel._CONFIG);
+		config = merge(config, IndexedDBModel.CONFIG);
 
 		super( config );
 
@@ -84,6 +90,7 @@ class IndexedDBModel extends Model{
 						// 创建存储对象
 						store = db.createObjectStore(this._config.tableName, {
 							keyPath: this._config.keyPath
+							// , autoIncrement: this._config.autoIncrement
 						});
 
 						this._config.index.forEach((d)=>{
@@ -124,7 +131,7 @@ class IndexedDBModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return INDEXED_DB_CONFIG;
 	}
 
@@ -139,7 +146,7 @@ class IndexedDBModel extends Model{
 	_select(topic){
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
-				let objectStore = db.transaction([this._config.tableName], 'readwrite').objectStore( this._config.tableName )
+				let objectStore = db.transaction([this._config.tableName], 'readonly').objectStore( this._config.tableName )
 					, objectStoreRequest = objectStore.get( topic )
 					;
 
@@ -202,6 +209,7 @@ class IndexedDBModel extends Model{
 					, objectStoreRequest = objectStore.delete( topic )
 					;
 
+				// 即使要删除的数据不存在，也会触发 success
 				objectStoreRequest.onsuccess = ()=>{
 					super.removeData( topic );
 
@@ -335,52 +343,58 @@ class IndexedDBModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	clearData(){
+		super.clearData();
+
 		return this._clear();
 	}
 	/**
 	 * @summary 获取通过 range 获取数据
-	 * @param   {number}            [min]
-	 * @param   {number|boolean}    [max]
-	 * @param   {boolean}           [eqMin=true]
-	 * @param   {boolean}           [eqMax=true]
+	 * @param   {Object}            options={}
+	 * @param   {string}            [options.index]
+	 * @param   {number|string}     [options.only]
+	 * @param   {number|string}     [options.min]
+	 * @param   {number|string}     [options.max]
+	 * @param   {boolean}           [options.eqMin=true]
+	 * @param   {boolean}           [options.eqMax=true]
+	 * @param   {IDBCursorDirection}    [options.direction]
 	 * @return  {Promise}           返回一个 Promise 对象，在 resolve 时传回 cursor 列表
 	 * @todo    区间取值功能
 	 * */
-	getDataByRange(min, max, eqMin=true, eqMax=true){
-		let argc = arguments.length
-			;
-
+	cursor(options={}){
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
-				let objectStore = db.transaction([this._config.tableName], 'readwrite').objectStore( this._config.tableName )
-					// , keyRangeValue = IDBKeyRange.bound(min, max, eqMin, eqMax)
-					// , objectStoreRequest = objectStore.openCursor( keyRangeValue )
-					, objectStoreRequest = objectStore.openCursor()
+				let transaction = db.transaction([this._config.tableName], 'readwrite')
+					, objectStore = transaction.objectStore( this._config.tableName )
+					, {index, only, min, max, eqMin=false, eqMax=false, direction} = options
+					, range
+					, target
+					, cursor
 					, cursorList = []
 					;
 
-				// switch( argc ){
-				// 	case 1:
-				// 		keyRangeValue = IDBKeyRange.bound( min );
-				// 		break;
-				// 	case 2:
-				// 		if( typeof max === 'boolean' ){
-				// 			keyRangeValue = IDBKeyRange.lowerBound(min, max);
-				// 		}
-				// 		else{
-				// 			keyRangeValue = IDBKeyRange.bound(min, max);
-				// 		}
-				// 		break;
-				// 	case 3:
-				// 		keyRangeValue = IDBKeyRange.bound()
-				// 		break;
-				// 	case 4:
-				// 		break;
-				// 	default:
-				// 		break;
-				// }
+				if( only ){
+					range = IDBKeyRange.only( only );
+				}
+				else if( min && max ){
+					range = IDBKeyRange.bound(min, max, eqMin, eqMax);
+				}
+				else if( max ){
+					range = IDBKeyRange.upperBound(max, eqMax);
+				}
+				else if( min ){
+					range = IDBKeyRange.lowerBound(min, eqMin);
+				}
 
-				objectStoreRequest.onsuccess = (e)=>{
+				if( index ){
+					target = objectStore.index( index );
+				}
+				else{
+					target = objectStore;
+				}
+
+				cursor = target.openCursor(range, direction);
+
+				cursor.onsuccess = (e)=>{
 					let cursor = e.target.result
 						;
 
@@ -389,9 +403,32 @@ class IndexedDBModel extends Model{
 
 						cursor.continue();
 					}
-					else{
-						resolve( cursorList );
-					}
+				};
+				cursor.onerror = (e)=>{
+					console.log( e );
+					reject( e );
+				};
+
+				transaction.oncomplete = ()=>{
+					resolve( cursorList );
+				};
+				transaction.onerror = (e)=>{
+					console.log( e );
+					reject( e );
+				}
+			});
+		});
+	}
+
+	count(){
+		return this._store.then((db)=>{
+			return new Promise((resolve, reject)=>{
+				let objectStore = db.transaction([this._config.tableName], 'readonly').objectStore( this._config.tableName )
+					, objectStoreRequest = objectStore.count()
+					;
+
+				objectStoreRequest.onsuccess = (e)=>{
+					resolve( e.target.result );
 				};
 				objectStoreRequest.onerror = (e)=>{
 					console.log( e );

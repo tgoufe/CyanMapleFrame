@@ -6,8 +6,6 @@ import HandlerQueue from '../util/handlerQueue.js';
 
 /**
  * @file    所有 ajax 请求基类
- *          目前数据请求依赖于 jQuery.ajax 方法
- * @todo    替换为自开发请求类库
  * */
 
 /**
@@ -16,10 +14,12 @@ import HandlerQueue from '../util/handlerQueue.js';
  * */
 const SERVICE_MODEL_CONFIG = {
 		baseUrl: ''
-		// , isCrossDomain: true
-		// , task: false
-		// , jsonp: false
+		, cache: false
+		, dataType: 'json'
 		, timeout: 10000
+		, xhrFields: {
+			withCredentials: true
+		}
 	}
 	/**
 	 * 拦截器
@@ -34,6 +34,7 @@ const SERVICE_MODEL_CONFIG = {
 /**
  * @class
  * @desc    对服务器接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 service，别名 s，将可以使用工厂方法生成
+ *          必须通过注入的方式注入一个 $request 方法用来发送请求
  * @extends Model
  *
  * @todo 支持 RESTful API
@@ -51,13 +52,13 @@ class ServiceModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * */
 	constructor(config={}){
-		config = merge(config, ServiceModel._CONFIG);
+		config = merge(config, ServiceModel.CONFIG);
 
 		super( config );
 
 		this._config = config;
 
-		if( !'$request' in this ){
+		if( !('$request' in this) ){
 			throw new Error(`$request 未注入，无法发送请求`);
 		}
 		
@@ -100,7 +101,7 @@ class ServiceModel extends Model{
 	 * @static
 	 * @const
 	 * */
-	static get _CONFIG(){
+	static get CONFIG(){
 		return SERVICE_MODEL_CONFIG;
 	}
 	/**
@@ -120,14 +121,7 @@ class ServiceModel extends Model{
 	 * @return  {Object}
 	 * */
 	_setOpts(options){
-		return merge(options, {
-			cache: false
-			, dataType: 'json'
-			, timeout: this._config.timeout || 10000
-			, xhrFields: {
-				withCredentials: true
-			}
-		});
+		return merge(options, ServiceModel.CONFIG);
 	}
 	/**
 	 * @summary 执行请求拦截器进行验证
@@ -137,15 +131,7 @@ class ServiceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	_reqInterceptor(topic, options){
-		// console.log(`执行全局请求拦截器 ${topic}`);
-
 		return this._execReqInterceptor.promise.line({topic, options});
-
-		// return ServiceModel.interceptor.req.fireReduce({topic, options}).then(({topic, options})=>{
-		// 	console.log(`执行局部请求拦截器 ${topic}`);
-		//
-		// 	return this.interceptor.req.fireReduce({topic, options});
-		// });
 	}
 	/**
 	 * @summary 执行响应拦截器进行验证
@@ -158,15 +144,7 @@ class ServiceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	_resInterceptor(result){
-		// console.log(`执行全局响应拦截器 ${result.topic}`);
-
 		return this._execResInterceptor.promise.line( result );
-
-		// return ServiceModel.interceptor.res.fireReduce( result ).then((result)=>{
-		// 	console.log(`执行局部响应拦截器 ${result.topic}`);
-		//
-		// 	return this.interceptor.res.fireReduce( result );
-		// });
 	}
 	/**
 	 * @summary 发送请求，在发送请求之前执行请求拦截器，在请求返回后执行响应拦截器
@@ -177,7 +155,7 @@ class ServiceModel extends Model{
 	 * */
 	_send(topic, options){
 		// 执行请求拦截器
-		return this._reqInterceptor(topic, options).then(({topic, options})=>{
+		return this._reqInterceptor(topic, options).then(()=>{
 			// 发送请求，向服务器发送数据
 			console.log(`发送 ${options.method} 请求 ${topic}`);
 
@@ -231,18 +209,18 @@ class ServiceModel extends Model{
 		if( topic ){
 			
 			// 执行请求拦截器
-			return this._send(topic, options).then((data)=>{
+			return this._send(topic, options).then((res)=>{
 				if( isCache && this._syncTo ){
-					return this._syncTo.setData(topic, data).then(()=>{
-						return data;
+					return this._syncTo.setData(topic, res).then(()=>{
+						return res.data;
 					}, (e)=>{
 						console.log( e );
 
-						return data;
+						return res;
 					});
 				}
 				else{
-					return data;
+					return res.data;
 				}
 			});
 		}
