@@ -216,11 +216,11 @@ class Router extends Base{
 				execute = this.$handlers.promise.line( tempParams );
 			}
 			else{
-				execute = Promise.reject('路由路径不匹配');
+				execute = Promise.reject( new Error('路由路径不匹配') );
 			}
 		}
 		else{
-			execute = Promise.reject('router 中不存在');
+			execute = Promise.reject( new Error('router 中不存在') );
 		}
 
 		return execute.catch((e)=>{

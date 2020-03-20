@@ -34,7 +34,12 @@ class EventSourceModel extends Model{
 
 		this._config = config;
 
-		this._conn = this._createConn();
+		if( this.config.url ){
+			this._conn = this._createConn();
+		}
+		else{
+			this._conn = Promise.reject( new Error('缺少参数 url，未建立连接') );
+		}
 	}
 
 	// ---------- 静态方法 ----------
@@ -175,6 +180,25 @@ class EventSourceModel extends Model{
 		return this;
 	}
 
+	/**
+	 * @summary 建立连接
+	 * @param   {string}  url 想要建立连接的路径
+	 * @return  {Promise}
+	 * @desc    当已经建立连接时调用此接口会报错
+	 * */
+	connect(url){
+		if( this.config.url ){
+			return Promise.reject( new Error('已建立连接，请先关闭') );
+		}
+		else{
+			this.config.url = url;
+			this._conn = this._createConn();
+
+			return this._conn.then(()=>{
+				return this;
+			});
+		}
+	}
 	/**
 	 * @summary 关闭服务器端事件推送
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
