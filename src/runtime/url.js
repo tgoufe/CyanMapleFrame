@@ -117,7 +117,7 @@ class Url extends Base{
 	}
 
 	// ---------- 静态属性 ----------
-	static get INDEX(){
+	static get _INDEX(){
 		return URL_KEY_INDEX;
 	}
 

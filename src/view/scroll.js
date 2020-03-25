@@ -185,12 +185,12 @@ let scroll = (callback)=>{
  * */
 scroll.disabled = function(disabled){
 	if( disabled ){
-		this._overflowState = window.getComputedStyle( body ).overflow || 'visible';
+		body.dataset.overflowState = window.getComputedStyle( body ).overflow || 'visible';
 
 		body.style.overflow = 'hidden';
 	}
 	else{
-		body.style.overflow = this._overflowState || 'visible';
+		body.style.overflow = body.dataset.overflowState || 'visible';
 	}
 };
 

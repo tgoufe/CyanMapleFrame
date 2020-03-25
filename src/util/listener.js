@@ -17,6 +17,12 @@ const LISTENER_CONFIG = {
 	}
 	, INTERSECTION_OBSERVER = 'intersectionObserver'
 	, MUTATION_OBSERVER = 'mutationObserver'
+	, RESIZE_OBSERVER = 'resizeObserver'
+	, ObSERVER_TYPE_LIST = [
+		INTERSECTION_OBSERVER
+		, MUTATION_OBSERVER
+		, RESIZE_OBSERVER
+	]
 	;
 
 /**
@@ -55,6 +61,9 @@ class Listener extends Base{
 
 		this._mutateInited = false;
 		this._mutate$ = null;
+
+		this._resizeInited = false;
+		this._resize$ = null;
 	}
 
 	// ---------- 静态方法 ----------
@@ -93,6 +102,20 @@ class Listener extends Base{
 	static get MutationObserver(){
 		return MUTATION_OBSERVER;
 	}
+	/**
+	 * @summary ResizeObserver 监听标识
+	 * @static
+	 * @const
+	 * */
+	static get ResizeObserver(){
+		return RESIZE_OBSERVER;
+	}
+	/**
+	 * @summary 所有 observer 类型的监听标识
+	 * */
+	static get ObserverTypeList(){
+		return ObSERVER_TYPE_LIST;
+	}
 
 	// ---------- 私有方法 ----------
 	/**
@@ -108,7 +131,7 @@ class Listener extends Base{
 			entries.forEach((entry)=>{
 				let target = entry.target
 					, handlers
-				;
+					;
 
 				if( this._callbackList.has(target) ){
 					handlers = this._callbackList.get( target )[Listener.IntersectionObserver];
@@ -133,11 +156,12 @@ class Listener extends Base{
 		if( this._mutateInited ){
 			return ;
 		}
+
 		this._mutate$ = new MutationObserver((mutations)=>{
 			mutations.forEach((mutation)=>{
 				let target = mutation.target
 					, handlers
-				;
+					;
 
 				if( this._callbackList.has(target) ){
 					handlers = this._callbackList.get( target )[Listener.MutationObserver];
@@ -155,6 +179,45 @@ class Listener extends Base{
 		this._mutateInited = true;
 	}
 	/**
+	 * @summary 初始化 ResizeObserver
+	 * @private
+	 * */
+	_initResizeObserver(){
+		if( this._resizeInited ){
+			return ;
+		}
+
+		this._resize$ = new ResizeObserver((entries)=>{
+			entries.forEach((entry)=>{
+				let target = entry.target
+					, handlers
+					;
+
+				if( this._callbackList.has(target) ){
+					handlers = this._callbackList.get( target )[Listener.ResizeObserver];
+
+					if( handlers && handlers.handlers ){
+						handlers.handlers.with( target ).line({
+							target
+							, type: Listener.ResizeObserver
+						}, entry);
+					}
+				}
+			});
+		});
+
+		this._resizeInited = true;
+	}
+	/**
+	 * @summary 判断 type 是否为 observer
+	 * @private
+	 * @return  {boolean}
+	 * */
+	_isObserver(type){
+		return Listener.ObserverTypeList.indexOf( type ) !== -1;
+	}
+
+	/**
 	 * @summary 获取事件配置
 	 * @private
 	 * @param   {Window|Document|Element|Object}    target
@@ -164,7 +227,7 @@ class Listener extends Base{
 	 * */
 	_getEventConfig(target, type, capture){
 		let targetConfig
-			, key
+			, key = this._getKey(type, capture)
 			;
 
 		if( !this._callbackList.has(target) ){
@@ -172,13 +235,6 @@ class Listener extends Base{
 		}
 
 		targetConfig = this._callbackList.get( target );
-
-		if( type !== Listener.IntersectionObserver || type !== Listener.MutationObserver ){
-			key = this._getKey(type, capture);
-		}
-		else{
-			key = type;
-		}
 
 		return targetConfig[key] || null;
 	}
@@ -190,14 +246,14 @@ class Listener extends Base{
 	 * @return  {string}
 	 * */
 	_getKey(type, capture){
-		if( type === Listener.IntersectionObserver || type === Listener.MutationObserver ){
-			return type;
+		if( this._isObserver(type) ){
+			return Symbol.for( type );
 		}
 
-		return JSON.stringify({
+		return Symbol.for( JSON.stringify({
 			type
 			, capture
-		});
+		}) );
 	}
 	/**
 	 * @summary 事件执行
@@ -292,6 +348,10 @@ class Listener extends Base{
 				this._initMutationObserver();
 				this._mutate$.observe(target, options);
 			}
+			else if( type === Listener.ResizeObserver ){
+				this._initResizeObserver();
+				this._resize$.observe( target );
+			}
 			else if( 'addEventListener' in target && typeof target.addEventListener === 'function' ){
 				eventConfig.callback = function(...args){
 					handlers.with( this ).line( ...args );
@@ -367,6 +427,9 @@ class Listener extends Base{
 		}
 		else if( type === Listener.MutationObserver ){
 			this._mutate$.unobserve(target, options);
+		}
+		else if( type === Listener.ResizeObserver ){
+			this._resize$.unobserve( target );
 		}
 		else if( 'removeEventListener' in target && typeof target.removeEventListener === 'function' ){
 			target.removeEventListener(type, eventConfig.callback, options);
