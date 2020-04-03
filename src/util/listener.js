@@ -354,7 +354,7 @@ class Listener extends Base{
 			}
 			else if( 'addEventListener' in target && typeof target.addEventListener === 'function' ){
 				eventConfig.callback = function(...args){
-					handlers.with( this ).line( ...args );
+					return handlers.with( this ).line( ...args );
 				};
 
 				target.addEventListener(type, eventConfig.callback, options);
