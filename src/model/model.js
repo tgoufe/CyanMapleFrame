@@ -321,27 +321,23 @@ class Model extends Base{
 	 * @param       {*}         value
 	 * */
 	_sync(topic, value){
-		if( this._syncToList.length ){
-			Promise.all( this._syncToList.map((m)=>{
-				let result
-					;
+		return Promise.all( this._syncToList.map((m)=>{
+			let result
+				;
 
-				if( value !== null ){
-					result = m.setData(topic, value);
-				}
-				else{
-					result = m.removeData( topic );
-				}
+			if( value !== null ){
+				result = m.setData(topic, value);
+			}
+			else{
+				result = m.removeData( topic );
+			}
 
-				result.catch(function(e){
-					console.log(`${m.constructor.name} ${topic} ${value} 同步失败`, e);
-				});
-
-				return result;
-			}) ).then(function(){
-				console.log('同步完成');
+			return result.catch(function(e){
+				console.log(`${m.constructor.name} ${topic} ${value} 同步失败`, e);
 			});
-		}
+		}) ).then(function(){
+			console.log('同步完成');
+		});
 	}
 
 	/**

@@ -33,6 +33,7 @@ class WebSocketModel extends Model{
 		super( config );
 
 		this._config = config;
+		this._syncTarget = null;
 
 		if( this.config.url ){
 			this._conn = this._createConn();
@@ -112,24 +113,18 @@ class WebSocketModel extends Model{
 								try{
 									data = JSON.parse( data );
 								}
-								catch(e){
-									data = {
-										topic: this._config.url
-										, data
-									}
-								}
+								catch(e){}
 							}
-							else if( typeof data !== 'object' ){
-								data = {};
-							}
-							else{
-
+							
+							if( typeof data !== 'object' || !data.topic ){
+								data = {
+									topic: this._config.url
+									, data
+								};
 							}
 						}
 
-						if( data.topic && data.data ){
-							super.setData(data.topic, data.data);
-						}
+						super.setData(data.topic, data.data);
 					};
 					conn.onerror = (e)=>{
 						let error = new Error('该 Web Socket 出现异常进而关闭')
@@ -171,6 +166,20 @@ class WebSocketModel extends Model{
 	 * */
 	_state(socket){
 		return socket.readyState === WebSocket.OPEN;
+	}
+	/**
+	 * @summary     数据同步的内部实现
+	 * @override
+	 * @protected
+	 * @param       {string}    topic
+	 * @param       {*}         value
+	 * */
+	_sync(topic, value){
+		if( !this._syncTarget ){
+			return ;
+		}
+
+		this._syncTarget.setData(topic, value);
 	}
 
 	// ---------- 公有方法 ----------
@@ -229,17 +238,16 @@ class WebSocketModel extends Model{
 		return Promise.reject( false );
 	}
 	/**
-	 * @summary     将数据同步到本地存储，一次只能设置一个本地缓存
+	 * @summary     将数据同步到本地存储，只能设置一个本地缓存
 	 * @override
 	 * @param       {Model}     model
 	 * @return      {Model}     返回 this
-	 * @todo        目前只能将数据同步到一个本地缓存中，是否考虑可以同步到多个本地缓存，亦或由本地缓存之间设置同步
+	 * @desc        目前只能将数据同步到一个本地缓存中，若想同步到多个本地缓存，可由本地缓存之间设置同步
 	 * */
 	syncTo(model){
-
 		// 判断 model 是继承自 Model 的类，且 Symbol.toStringTag 设置为 Model
 		if( Model.is( model ) ){
-			this._syncTo = model;
+			this._syncTarget = model;
 		}
 
 		return this;
