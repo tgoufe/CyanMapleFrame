@@ -134,7 +134,7 @@ class Listener extends Base{
 					;
 
 				if( this._callbackList.has(target) ){
-					handlers = this._callbackList.get( target )[Listener.IntersectionObserver];
+					handlers = this._callbackList.get( target )[this._getKey(Listener.IntersectionObserver)];
 
 					if( handlers && handlers.handlers ){
 						handlers.handlers.with( target ).line({
@@ -164,7 +164,7 @@ class Listener extends Base{
 					;
 
 				if( this._callbackList.has(target) ){
-					handlers = this._callbackList.get( target )[Listener.MutationObserver];
+					handlers = this._callbackList.get( target )[this._getKey(Listener.MutationObserver)];
 
 					if( handlers && handlers.handlers ){
 						handlers.handlers.with( target ).line({
@@ -194,7 +194,7 @@ class Listener extends Base{
 					;
 
 				if( this._callbackList.has(target) ){
-					handlers = this._callbackList.get( target )[Listener.ResizeObserver];
+					handlers = this._callbackList.get( target )[this._getKey(Listener.ResizeObserver)];
 
 					if( handlers && handlers.handlers ){
 						handlers.handlers.with( target ).line({
