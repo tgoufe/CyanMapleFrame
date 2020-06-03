@@ -74,7 +74,7 @@ class Router extends Base{
 			, time: Date.now()
 		}];
 
-		this._$trigger = this.$listener(this, this.config.eventType, ()=>{});
+		this._$trigger = this.$listener.on(this, this.config.eventType, ()=>{});
 
 		if( this.config.mode === 'history' ){
 			this.$url.popState((e)=>{
@@ -164,7 +164,7 @@ class Router extends Base{
 			, to = this._historyList[l -1]
 			;
 
-		this._$trigger(from, to);
+		this._$trigger.trigger(from, to);
 	}
 	/**
 	 * @summary 找到 path 对应 route 在 this.routers 中的位置
@@ -310,8 +310,8 @@ class Router extends Base{
 		if( typeof route === 'object' && !(route instanceof RegExp) ){
 			path = route.path;
 			callback = route.callback || (()=>{});
-			before = router.before;
-			after = router.after;
+			before = route.before;
+			after = route.after;
 		}
 		else{
 			path = route;

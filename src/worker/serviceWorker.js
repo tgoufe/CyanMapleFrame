@@ -279,6 +279,14 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 					title: 'Push'
 					, body: event.data.text()
 					, tag
+					// , url
+					// , icon
+					// , actions: [{
+					// 	action: 'ok', title: '确定'
+					// }, {
+					// 	action: 'cancel', title: '取消'
+					// }]
+					// , vibrate: [300, 100, 400]
 				};
 			}
 
@@ -289,47 +297,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 			/**
 			 * event.waitUntil 接收 Promise 类型参数，等到 Promise 完成时，事件才最终完成
 			 * */
-			event.waitUntil( self.registration.showNotification(data.title, data)
-			// 	.then(()=>{   // 未传入 Notification 实例，所以使用 getNotifications 方法获取对应实例
-			//
-			// 	self.registration.getNotifications({
-			// 		tag
-			// 	}).then((notifyList)=>{
-			// 		let notify
-			// 			;
-			//
-			// 		if( notifyList.length === 1 && data.url ){  // 如果推送信息中有 url，为桌面通知添加点击事件，浏览器打开 url 页面
-			//
-			// 			notify = notifyList[0];
-			//
-			// 			// todo 添加的事件并没有执行，原因未知
-			// 			notify.addEventListener('click', (e)=>{
-			// 			});
-			// 			notify.addEventListener('notificationclick', (e)=>{
-			// 			});
-			//
-			// 			notify.onclick = (e)=>{
-			// 				// self.clients.matchAll({
-			// 				// 	type: 'window'
-			// 				// }).then((clients)=>{
-			// 				// 	let client = clients.find((client)=>{
-			// 				// 			return client.url === data.url && 'focus' in client;
-			// 				// 		})
-			// 				// 		;
-			// 				//
-			// 				// 	if( client ){
-			// 				// 		return client.focus();
-			// 				// 	}
-			// 				//
-			// 				// 	if( clients.openWindow ){
-			// 				// 		return clients.openWindow( data.url );
-			// 				// 	}
-			// 				// });
-			// 			};
-			// 		}
-			// 	});
-			// })
-			);
+			event.waitUntil( self.registration.showNotification(data.title, data) );
 		}
 	});
 
@@ -352,10 +320,23 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 	 * 通知点击事件
 	 * */
 	self.addEventListener('notificationclick', (event)=>{
-
+		// 关闭点击的通知
 		event.notification.close();
-
 		console.log('桌面通知被点击');
+
+		let {action} = event
+			;
+
+		// 添加动作
+		switch( action ){
+			case 'ok':
+				// event.waitUntil( self.clients.openWindow(event.notification.data) );
+				break;
+			case 'cancel':
+				break;
+			default:
+				break;
+		}
 
 		if( event.notification.data ){
 			// 打开新窗口

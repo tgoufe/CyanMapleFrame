@@ -172,7 +172,7 @@ let maple = {
 	, register
 	, notify
 	, useAxios(){
-		Model.ServiceModel.use( useAxios );
+		ModelList.ServiceModel.use( useAxios );
 	}
 };
 

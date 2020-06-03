@@ -184,7 +184,7 @@ class WebSocketModel extends Model{
 
 	// ---------- 公有方法 ----------
 	/**
-	 * @summary 获取数据
+	 * @summary 设置数据
 	 * @override
 	 * @param   {string}    topic
 	 * @param   {*}         data
@@ -211,31 +211,37 @@ class WebSocketModel extends Model{
 		});
 	}
 	/**
-	 * @summary 重写覆盖父类 getData 方法
+	 * @summary 获取数据
 	 * @override
-	 * @return  {Promise}   返回 reject(null)
-	 * @desc    web socket 为单向，所以 getData 方法没有意义
+	 * @param   {string}    topic
+	 * @param   {*}         data
+	 * @return  {Promise}   数据发送是否成功
+	 * @desc    内部为调用 setData 方法，仅有语义上的区别
 	 * */
-	getData(){
-		return Promise.reject( null );
+	getData(topic, data){
+		return this.setData(topic, data);
 	}
 	/**
-	 * @summary 重写覆盖父类 removeData 方法
+	 * @summary 删除数据
 	 * @override
-	 * @return  {Promise}   返回 reject(false)
-	 * @desc    removeData 方法没有意义
+	 * @param   {string}    topic
+	 * @param   {*}         data
+	 * @return  {Promise}   数据是否发送成功
+	 * @desc    内部为调用 setData 方法，仅有语义上的区别
 	 * */
-	removeData(){
-		return Promise.reject( false );
+	removeData(topic, data){
+		return this.setData(topic, data);
 	}
 	/**
-	 * @summary 重写覆盖父类 clearData 方法
+	 * @summary 清空数据
 	 * @override
-	 * @return  {Promise}   返回 reject(false);
-	 * @desc    clearData 方法没有意义
+	 * @param   {string}    topic
+	 * @param   {*}         data
+	 * @return  {Promise}   数据是否发送成功
+	 * @desc    内部为调用 setData 方法，仅有语义上的区别
 	 * */
-	clearData(){
-		return Promise.reject( false );
+	clearData(topic, data){
+		return this.setData(topic, data);
 	}
 	/**
 	 * @summary     将数据同步到本地存储，只能设置一个本地缓存

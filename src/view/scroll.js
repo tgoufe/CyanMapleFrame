@@ -25,7 +25,17 @@ let scroll = (callback)=>{
 	 * @param       {Function}  callback
 	 * */
 	, observe = (target, callback)=>{
-		listener.on(target, 'intersectionObserver', callback);
+		if( target instanceof Element ){
+			listener.on(target, 'intersectionObserver', callback);
+		}
+		else if( target instanceof NodeList || target instanceof HTMLCollection ){
+			Array.from( target ).forEach((element)=>{
+				listener.on(element, 'intersectionObserver', callback);
+			});
+		}
+		else{
+			console.log('目标非 Element、NodeList、HTMLCollection 类型对象，无法监听');
+		}
 	}
 	/**
 	 * @summary     取消监控目标对象进程可视区
@@ -35,7 +45,17 @@ let scroll = (callback)=>{
 	 * @param       {Function}  [callback]
 	 * */
 	, unobserve = (target, callback)=>{
-		listener.off(target, 'intersectionObserver', callback);
+		if( target instanceof Element ){
+			listener.off(target, 'intersectionObserver', callback);
+		}
+		else if( target instanceof NodeList || target instanceof HTMLCollection ){
+			Array.from( target ).forEach((element)=>{
+				listener.off(element, 'intersectionObserver', callback);
+			});
+		}
+		else{
+			console.log('目标非 Element、NodeList、HTMLCollection 类型对象，无法监听');
+		}
 	}
 	/**
 	 * @summary     设置或读取当前页面滚动条位置

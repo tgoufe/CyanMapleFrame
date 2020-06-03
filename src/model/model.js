@@ -312,7 +312,7 @@ class Model extends Base{
 	 * @param       {*}         oldValue
 	 * */
 	_trigger(topic, newValue, oldValue){
-		this._$trigger(topic, newValue, oldValue);
+		this._$trigger.trigger(topic, newValue, oldValue);
 	}
 	/**
 	 * @summary     数据同步的内部实现
