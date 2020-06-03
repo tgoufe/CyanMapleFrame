@@ -3,6 +3,8 @@
 import maple    from 'maple';
 import log      from '../log.js';
 
+maple.useAxios();
+
 let service = maple.model.factory('s')
 	, socket
 	;

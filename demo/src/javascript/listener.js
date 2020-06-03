@@ -7,26 +7,26 @@ document.body.style.height = '10000px';
 
 window.tempMaple = maple;
 
-maple.view.scroll.add( maple.util.debounce(function(){
+maple.view.scroll( maple.util.debounce(function(){
 	log('debounce', Date.now());
-	log(this, arguments);
+	log(this, ...arguments);
 	log( maple.view.scroll.scrollBar('top') );
 }, 1000, 4000) );
 
-maple.view.scroll.add( maple.util.throttle(function(){
+maple.view.scroll( maple.util.throttle(function(){
 	log('throttle', Date.now());
-	log(this, arguments);
+	log(this, ...arguments);
 	log( maple.view.scroll.scrollBar('top') );
 }, 1000, true) );
 
-maple.url.hashChange.add(function(e){
+maple.url.hashChange(function(e){
 	log('hashChange');
-	log(this, arguments);
+	log(this, ...arguments);
 });
-log(maple.url.hashChange._eventQueue._queue.length);
+log(maple.listener._callbackList);
 
-maple.url.popState.add(function(e){
+maple.url.popState(function(e){
 	log('popState');
-	log(this, arguments);
+	log(this, ...arguments);
 });
-log(maple.url.popState._eventQueue._queue.length);
+log(maple.listener._callbackList);

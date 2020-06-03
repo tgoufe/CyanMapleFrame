@@ -7,7 +7,7 @@ let logArea = document.createElement('div')
 
 logArea.style.cssText = `
 position: fixed;
-top: 0;
+top: 50px;
 left: 0;
 right: 0;
 z-index: 10;

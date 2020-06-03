@@ -11,7 +11,7 @@ const ERROR_SRC = {
 	}
 	;
 
-maple.error.add(function(e){
+maple.error(function(e){
 	let target = e.target
 		;
 
@@ -29,7 +29,7 @@ maple.error.add(function(e){
 	return true;
 });
 
-maple.unHandledRejection.add(function(e){
+maple.unHandledRejection(function(e){
 	log('捕获到 Promise reject', arguments);
 
 	return true;

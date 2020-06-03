@@ -14,10 +14,10 @@ sse.on(function(e, topic, newValue, oldValue){
 	oldValue && log('与上次消息间隔', newValue.timestamp - oldValue.timestamp, '毫秒');
 });
 
-maple.listener(window, 'pagehide', ()=>{
+maple.listener.on(window, 'pagehide', ()=>{
 	sse.close();
 });
 
-maple.view.beforeunload.add(()=>{
+maple.view.beforeunload(()=>{
 	sse.close();
 });

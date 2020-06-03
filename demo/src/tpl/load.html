@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="cmn">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+	<title>Title</title>
+	<style>
+		.product{
+			height: 1000px;
+			width: 100%;
+			border: 1px solid #c0c0c0;
+			margin: 10px;
+		}
+	</style>
+</head>
+<body>
+<div id="app">
+	<input type="text">
+	<div class="product" v-for="img in imgList">
+		<img :src="img.src" alt="">
+	</div>
+</div>
+</body>
+</html>
