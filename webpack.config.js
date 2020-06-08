@@ -40,7 +40,7 @@ module.exports = {
 			, options: {
 				loaders: {
 					js: 'babel-loader'
-					, css: 'vue-style-loader!css-loader'
+					, css: 'css-loader'
 					, scss: 'style-loader!css-loader!sass-loader'
 					, sass: 'style-loader!css-loader!sass-loader?indentedSyntax'
 				}
