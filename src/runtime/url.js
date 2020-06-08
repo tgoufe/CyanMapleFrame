@@ -133,14 +133,11 @@ class Url extends Base{
 		}
 
 		return search ? search.split('&').reduce((all, d)=>{
-			let temp
-				, key, value
-				;
-
 			if( d ){
-				temp = d.split('=');
-				key = decodeURIComponent( temp[0] );
-				value = decodeURIComponent( temp[1] || '' );
+				let [, key, value] = /([^=]+)(?:=(.*))?/.exec( d );
+
+				key = decodeURIComponent( key );
+				value = decodeURIComponent( value || '' );
 
 				try{    // 对数据类型进行转换
 					value = JSON.parse( value );
