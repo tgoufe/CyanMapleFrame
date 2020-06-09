@@ -167,6 +167,16 @@ class ServiceModel extends Model{
 
 			// 执行响应拦截器
 			return this._resInterceptor( result );
+		}).then((result)=>{
+			if( 'res' in result ){
+				return result.res;
+			}
+			else if( 'error' in result ){
+				return Promise.reject( result.error );
+			}
+			else{
+				return Promise.reject( new Error('未知错误') );
+			}
 		});
 	}
 	/**
@@ -221,7 +231,7 @@ class ServiceModel extends Model{
 		return this._send(topic, options).then((res)=>{
 			super.setData(topic, {topic, options, res});
 
-			return res.data;
+			return res;
 		});
 	}
 	/**
@@ -254,7 +264,7 @@ class ServiceModel extends Model{
 		return this._send(topic, options).then((res)=>{   // 将数据同步
 			super.setData(topic, {topic, options, res});
 
-			return res.data;
+			return res;
 		});
 	}
 	/**
@@ -287,7 +297,7 @@ class ServiceModel extends Model{
 		return this._send(topic, options).then((res)=>{
 			super.setData(topic, {topic, options, res});
 
-			return res.data;
+			return res;
 		});
 	}
 	/**
