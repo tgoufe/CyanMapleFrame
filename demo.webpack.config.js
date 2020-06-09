@@ -9,7 +9,7 @@ const CONFIG = require('./demo/src/config.json')
 
 module.exports = {
 	mode: 'production'
-	, devtool: 'cheap-module-source-map'
+	, devtool: 'source-map'
 	// webpack 4.0 插件项被 optimization 替代
 	, optimization: {
 		minimize: true

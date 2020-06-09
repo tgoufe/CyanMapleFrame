@@ -164,10 +164,13 @@ class ServiceModel extends Model{
 
 			return this.$request(topic, options);
 		}).then((result)=>{
+			return Promise.all([
+				result
 
-			// 执行响应拦截器
-			return this._resInterceptor( result );
-		}).then((result)=>{
+				// 执行响应拦截器
+				, this._resInterceptor( result )
+			]);
+		}).then(([result])=>{
 			if( 'res' in result ){
 				return result.res;
 			}
