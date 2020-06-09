@@ -74,7 +74,7 @@ class Router extends Base{
 			, time: Date.now()
 		}];
 
-		this._$trigger = this.$listener.on(this, this.config.eventType, ()=>{});
+		this._$trigger = this.$listener.on(this, this.config.eventType);
 
 		if( this.config.mode === 'history' ){
 			this.$url.popState((e)=>{
@@ -429,7 +429,7 @@ class Router extends Base{
 	 * @param   {RouterChangeEvent} callback
 	 * */
 	on(callback){
-		this.$listener.on(this.config.eventType, callback);
+		this.$listener.on(this, this.config.eventType, callback);
 	}
 
 	// ---------- 公有属性 ----------
