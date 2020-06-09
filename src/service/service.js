@@ -167,16 +167,6 @@ class ServiceModel extends Model{
 
 			// 执行响应拦截器
 			return this._resInterceptor( result );
-		}).then((result)=>{
-			if( 'res' in result ){
-				return result.res;
-			}
-			else if( 'error' in result ){
-				return Promise.reject( result.error );
-			}
-			else{
-				return Promise.reject( new Error('未知错误') );
-			}
 		});
 	}
 	/**
