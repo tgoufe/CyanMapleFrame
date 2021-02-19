@@ -95,9 +95,7 @@ class Model extends Base{
 
 		this.config = config;
 
-		this._$trigger = this.$listener.on(this, this.config.eventType, (e, topic, value)=>{
-			this._sync(topic, value);
-		});
+		this._$trigger = this.$listener.on(this, this.config.eventType, this._sync);
 	}
 
 	// ---------- 静态方法 ----------
@@ -109,7 +107,6 @@ class Model extends Base{
 	 * @desc    若该子类已经被注册，并且缓存中没有该子类的实例，则覆盖
 	 * */
 	static register(name, model){
-
 		if( name in Model._MODEL && name in Model._MODEL_CACHE ){
 			console.log(`${name} 重复注册，并已生成实例，不能覆盖`);
 		}
@@ -124,7 +121,6 @@ class Model extends Base{
 	 * @param   {string|string[]}   aliasName   该子类的别名
 	 * */
 	static registerAlias(name, aliasName){
-
 		if( !Array.isArray(aliasName) ){
 			aliasName = [aliasName];
 		}
@@ -166,7 +162,6 @@ class Model extends Base{
 			if( type in Model._MODEL ){
 
 				if( notCache || !(type in Model._MODEL_CACHE) ){    // 不使用缓存或没有该子类实例
-
 					model = new Model._MODEL[type]( options );
 
 					if( !notCache ){
@@ -214,7 +209,6 @@ class Model extends Base{
 	 * @return      {string}
 	 * */
 	static stringify(value){
-
 		if( value === null || value === undefined ){
 			value = '';
 		}
@@ -224,7 +218,7 @@ class Model extends Base{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $model，配置参数名 model
 	 * */
 	static inject(app){
@@ -315,12 +309,14 @@ class Model extends Base{
 		this._$trigger.trigger(topic, newValue, oldValue);
 	}
 	/**
-	 * @summary     数据同步的内部实现
+	 * @summary     modelChange 事件监听回调，以实现数据同步
 	 * @protected
+	 * @param       {Event}     e
 	 * @param       {string}    topic
 	 * @param       {*}         value
+	 * @return      {Promise}
 	 * */
-	_sync(topic, value){
+	_sync = (e, topic, value)=>{
 		return Promise.all( this._syncToList.map((m)=>{
 			let result
 				;
@@ -430,7 +426,7 @@ class Model extends Base{
 			result = Promise.resolve( true );
 		}
 
-		return result
+		return result;
 	}
 	/**
 	 * @summary 获取数据
@@ -616,22 +612,6 @@ class Model extends Base{
 				, value: entries[i][1]
 			};
 		}
-
-		// let a = {
-		// 	a: 1
-		// 		, b: 2
-		// 		, c: 3
-		//
-		// 	, *[Symbol.iterator](){
-		// 		let keys = Object.keys( this );
-		// 		for(let i = 0, l = keys.length; i < l; i++){
-		// 			yield {
-		// 				topic: keys[i]
-		// 				, value: this[keys[i]]
-		// 			};
-		// 		}
-		// 	}
-		// }
 	}
 	/**
 	 * @summary 实现异步迭代器接口

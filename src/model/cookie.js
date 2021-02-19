@@ -41,14 +41,15 @@ class CookieModel extends Model{
 	constructor(config={}){
 		super( config );
 
-		if( navigator.cookieEnabled ){
-			this._enabled = true;
-			this._store = Promise.resolve();
-		}
-		else{
+		if( !navigator.cookieEnabled ){
 			this._enabled = false;
 			this._store = Promise.reject( new Error('此浏览器不支持 Cookie') );
+
+			return ;
 		}
+
+		this._enabled = true;
+		this._store = Promise.resolve();
 	}
 
 	// ---------- 静态方法 ----------
@@ -79,7 +80,7 @@ class CookieModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $cookie，配置参数名 cookie
 	 * */
 	static inject(app){

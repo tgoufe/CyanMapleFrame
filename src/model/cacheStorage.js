@@ -65,7 +65,7 @@ class CacheStorageModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $cache，配置参数名 cache
 	 * */
 	static inject(app){

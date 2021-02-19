@@ -78,26 +78,27 @@ class WebSQLModel extends Model{
 			let db
 				;
 
-			if( 'openDatabase' in self ){
-				// 打开数据库，若不存在则创建
-				db = openDatabase(this._config.dbName, ''+ this._config.dbVersion, this._config.dbName, this._config.dbSize);
-
-				// db.readTransaction()
-				db.transaction((tx)=>{
-					// 若没有数据表则创建
-					tx.executeSql(this._config.sql.create, [], ()=>{
-						resolve( db );
-					}, (tx, e)=>{
-						console.log( e );
-						reject( e );
-					});
-				}, reject, ()=>{
-					resolve( db );
-				});
-			}
-			else{
+			if( !('openDatabase' in self) ){
 				reject( new Error('此浏览器不支持 Web SQL Database') );
+
+				return ;
 			}
+
+			// 打开数据库，若不存在则创建
+			db = openDatabase(this._config.dbName, ''+ this._config.dbVersion, this._config.dbName, this._config.dbSize);
+
+			// db.readTransaction()
+			db.transaction((tx)=>{
+				// 若没有数据表则创建
+				tx.executeSql(this._config.sql.create, [], ()=>{
+					resolve( db );
+				}, (tx, e)=>{
+					console.log( e );
+					reject( e );
+				});
+			}, reject, ()=>{
+				resolve( db );
+			});
 		});
 	}
 
@@ -105,7 +106,7 @@ class WebSQLModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $sql，配置参数名 sql
 	 * */
 	static inject(app){

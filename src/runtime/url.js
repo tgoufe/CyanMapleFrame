@@ -6,7 +6,7 @@
  * */
 
 import Base     from '../base.js';
-import listener from '../util/listener.js';
+import listener, {Listener} from '../util/listener.js';
 
 const URL_KEY_INDEX = ['source'
 		, 'protocol'
@@ -107,7 +107,7 @@ class Url extends Base{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $url
 	 * */
 	static inject(app){
@@ -253,6 +253,8 @@ class Url extends Base{
 		return query.length ? '?'+ query.join('&') : '';
 	}
 }
+
+Url.use( Listener );
 
 let url = new Url()
 	;
@@ -481,7 +483,7 @@ url.replacePage = function(href){
  * @return      {Object}
  * */
 url.hashChange = function(callback){
-	return listener.on('hashchange', callback);
+	return this.$listener.on(this, 'hashchange', callback);
 };
 url.hashChange((e, newUrl)=>{
 	let temp
@@ -508,7 +510,7 @@ url.hashChange((e, newUrl)=>{
  * @return      {Object}
  * */
 url.popState = function(callback){
-	return listener.on('popstate', callback);
+	return this.$listener.on(this, 'popstate', callback);
 };
 url.popState((e, newUrl)=>{
 	let temp

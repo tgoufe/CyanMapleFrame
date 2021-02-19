@@ -50,6 +50,7 @@ class ServiceModel extends Model{
 	 // * @param   {boolean}   [config.useLock]
 	 * @param   {number}    [config.timeout]
 	 * @param   {string}    [config.eventType]
+	 * @param   {Object}    [config.api]
 	 * */
 	constructor(config={}){
 		config = merge(config, ServiceModel.CONFIG);
@@ -85,13 +86,17 @@ class ServiceModel extends Model{
 		// 	console.log(`执行局部响应拦截器 ${topic}`);
 		// });
 		this._execResInterceptor.add( this.interceptor.res );
+
+		if( 'resource' in config ){
+			Object.entries( (k, v)=>this.resource(k, v) );
+		}
 	}
 
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $service，配置参数名 service
 	 * */
 	static inject(app){
@@ -327,6 +332,66 @@ class ServiceModel extends Model{
 		}
 
 		return this;
+	}
+
+	/**
+	 * @summary 定义资源
+	 * @param   {string}    name
+	 * @param   {string}    pathPattern
+	 * @param   {Function}  [keyTrans]
+	 * @desc    每个资源会返回包含 get、post、put、delete 方法的集合，以 RESTful api 规范的方式来使用
+	 *          路径内的参数已 :key 的方式使用
+	 * */
+	resource(name, pathPattern, keyTrans){
+		if( name in this ){
+			throw new Error(`${name} 接口已经存在，不能重复定义`);
+		}
+
+		Object.defineProperty(this, name, {
+			enumerable: true
+			, configurable: false
+			, get(){
+				return {
+					get: (data)=>{
+						return this.getData(this.transPath(pathPattern, data, keyTrans), {
+							data
+						});
+					}
+					, post: (data)=>{
+						return this.setData(this.transPath(pathPattern, data, keyTrans), {
+							data
+						});
+					}
+					, put: (data)=>{
+						return this.setData(this.transPath(pathPattern, data, keyTrans), {
+							methods: 'PUT'
+							, data
+						});
+					}
+					, delete: (data)=>{
+						return this.removeData(this.transPath(pathPattern, data, keyTrans), {
+							data
+						});
+					}
+				};
+			}
+		});
+	}
+	/**
+	 * @summary 转换 path
+	 * @param   {string}    pathPattern
+	 * @param   {Object}    data
+	 * @param   {Function}  [keyTrans]
+	 * @return  {string}
+	 * */
+	transPath(pathPattern, data, keyTrans){
+		return pathPattern.replace(/:([^\/]*)/g, (m, key)=>{
+			if( keyTrans ){
+				return keyTrans(key, data);
+			}
+
+			return data[key];
+		});
 	}
 
 	// ---------- 公有属性 ----------

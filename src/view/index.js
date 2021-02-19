@@ -154,7 +154,7 @@ export default view;
 export const View = {
 	/**
 	 * @summary 与 App 类约定的注入接口
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $view
 	 * */
 	inject(app){

@@ -123,6 +123,14 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 			});
 		}
 
+		event.respondWith( fetch(request).then((response)=>{
+			return cacheStorage.setData(request.clone(), response.clone()).then(()=>{
+				return response;
+			});
+		}, ()=>{
+			return cacheStorage.getData( request.clone() );
+		}) );
+
 		// 克隆该请求，Request 对象是 stream 类型的，只能读取一次
 		event.respondWith( cacheStorage.getData( request.clone() ).then((response)=>{
 			let result
@@ -246,9 +254,16 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 	 * 收到消息事件
 	 * */
 	self.addEventListener('message', (event)=>{
+		let {data, source} = event
+			, {id, url, focused, visibilityState} = source
+			;
+
+		// 向所有打开的窗口通信
 		// todo 消息处理
 		self.clients.matchAll().then((clients)=>{
 			clients.forEach((client)=>{
+			    let {id} = client
+			        ;
 
 				// event.source 为消息来源的页面
 				client.postMessage( event.data );

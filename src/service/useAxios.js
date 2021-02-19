@@ -50,10 +50,17 @@ let request = (topic, options)=>{
 	}
 };
 
-// export default request;
-
 export default {
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Base}  app
+	 * @desc    注入为 $request
+	 * */
 	inject(app){
 		app.inject('$request', request);
 	}
 }
+
+export {
+	request
+};

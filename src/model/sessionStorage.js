@@ -23,23 +23,24 @@ class SessionStorageModel extends Model{
 	constructor(config={}){
 		super( config );
 
-		if( 'sessionStorage' in self ){
-			this._enabled = true;
-			this._storeSync = self.sessionStorage;
-			this._store = Promise.resolve( self.sessionStorage );
-		}
-		else{
+		if( !('sessionStorage' in self) ){
 			this._enabled = false;
 			this._storeSync = null;
 			this._store = Promise.reject( new Error('此浏览器不支持 sessionStorage') );
+
+			return ;
 		}
+
+		this._enabled = true;
+		this._storeSync = self.sessionStorage;
+		this._store = Promise.resolve( self.sessionStorage );
 	}
 
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $ss
 	 * */
 	static inject(app){

@@ -35,19 +35,19 @@ class WebSocketModel extends Model{
 		this._config = config;
 		this._syncTarget = null;
 
-		if( this.config.url ){
-			this._conn = this._createConn();
-		}
-		else{
+		if( !this.config.url ){
 			this._conn = Promise.reject( new Error('缺少参数 url，未建立连接') );
+			return ;
 		}
+
+		this._conn = this._createConn();
 	}
 
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $socket，配置参数名 socket
 	 * */
 	static inject(app){
@@ -75,86 +75,77 @@ class WebSocketModel extends Model{
 			let conn
 				;
 
-			if( this._config.url ){
-				if( 'WebSocket' in self ){
-
-					if( !/^wss?:\/\//.test( this._config.url ) ){
-						this._config.url = (this.$url.protocol === 'https'? 'wss' :'ws') +'://'+ this._config.url;
-					}
-
-					conn = new WebSocket(this._config.url, this._config.protocol);
-
-					conn.onopen = ()=>{
-						console.log('建立 Web Socket 连接');
-						resolve( conn );
-					};
-					conn.onmessage = (e)=>{
-						let data = e.data
-							;
-
-						if( data instanceof ArrayBuffer ){ // 二进制数据流
-							// 处理数据流，不能直接操作，而是要通过类型数组对象或 DataView 对象来操作
-							console.log('ArrayBuffer', data);
-							data = {
-								topic: 'ArrayBuffer'
-								, data
-							};
-						}
-						else if( data instanceof Blob ){
-							// 处理二进制数据，可用于文件传输
-							console.log('Blob', data);
-							data = {
-								topic: 'Blob'
-								, data
-							}
-						}
-						else{
-							if( typeof data === 'string' ){
-								try{
-									data = JSON.parse( data );
-								}
-								catch(e){}
-							}
-							
-							if( typeof data !== 'object' || !data.topic ){
-								data = {
-									topic: this._config.url
-									, data
-								};
-							}
-						}
-
-						super.setData(data.topic, data.data);
-					};
-					conn.onerror = (e)=>{
-						let error = new Error('该 Web Socket 出现异常进而关闭')
-							;
-
-						console.log( e );
-						this._conn = Promise.reject( error );
-
-						reject( error );
-					};
-					conn.onclose = (e)=>{
-						let error = new Error('该 Web Socket 连接已经被关闭')
-							;
-
-						console.log( e );
-						this._conn = Promise.reject( error );
-
-						reject( error );
-					};
-
-					if( this._config.binaryType ){
-						conn.binaryType = this._config.binaryType;
-					}
-				}
-				else{
-					reject( new Error('此浏览器不支持 Web Socket') );
-				}
-			}
-			else{
+			if( !this._config.url ){
 				reject( new Error('缺少参数 url') );
+
+				return ;
+			}
+
+			if( !('WebSocket' in self) ){
+				reject( new Error('此浏览器不支持 Web Socket') );
+				
+				return ;
+			}
+
+			if( !/^wss?:\/\//.test( this._config.url ) ){
+				this._config.url = (this.$url.protocol === 'https'? 'wss' :'ws') +'://'+ this._config.url;
+			}
+
+			conn = new WebSocket(this._config.url, this._config.protocol);
+
+			this.$listener.on(conn, 'open', ()=>{
+				console.log('建立 Web Socket 连接');
+				resolve( conn );
+			});
+			this.$listener.on(conn, 'error', (e)=>{
+				let error = new Error('该 Web Socket 出现异常进而关闭')
+				;
+
+				console.log( e );
+				this._conn = Promise.reject( error );
+
+				reject( error );
+			});
+			this.$listener.on(conn, 'close', (e)=>{
+				let error = new Error('该 Web Socket 连接已经被关闭')
+				;
+
+				console.log( e );
+				this._conn = Promise.reject( error );
+
+				reject( error );
+			});
+			this.$listener.on(conn, 'message', this._onMessage);
+
+			// todo
+			// this.$listener.on(conn, {
+			// 	open: ()=>{
+			// 		console.log('建立 Web Socket 连接');
+			// 		resolve( conn );
+			// 	}
+			// 	, error: ()=>{
+			// 		let error = new Error('该 Web Socket 出现异常进而关闭')
+			// 			;
+			//
+			// 		console.log( e );
+			// 		this._conn = Promise.reject( error );
+			//
+			// 		reject( error );
+			// 	}
+			// 	, close: ()=>{
+			// 		let error = new Error('该 Web Socket 出现异常进而关闭')
+			// 			;
+			//
+			// 		console.log( e );
+			// 		this._conn = Promise.reject( error );
+			//
+			// 		reject( error );
+			// 	}
+			// 	, message: this._onMessage
+			// });
+
+			if( this._config.binaryType ){
+				conn.binaryType = this._config.binaryType;
 			}
 		});
 	}
@@ -171,16 +162,62 @@ class WebSocketModel extends Model{
 	 * @summary     数据同步的内部实现
 	 * @override
 	 * @protected
+	 * @param       {Event}     e
 	 * @param       {string}    topic
 	 * @param       {*}         value
 	 * */
-	_sync(topic, value){
+	_sync = (e, topic, value)=>{
 		if( !this._syncTarget ){
 			return ;
 		}
 
 		this._syncTarget.setData(topic, value);
 	}
+	/**
+	 * @summary     接收数据事件回调
+	 * @protected
+	 * @param       {Event} e
+	 * @return      {Promise<boolean>}
+	 * */
+	_onMessage = (e)=>{
+		let data = e.data
+			;
+
+		if( data instanceof ArrayBuffer ){ // 二进制数据流
+			// 处理数据流，不能直接操作，而是要通过类型数组对象或 DataView 对象来操作
+			console.log('ArrayBuffer', data);
+			data = {
+				topic: 'ArrayBuffer'
+				, data
+			};
+		}
+		else if( data instanceof Blob ){
+			// 处理二进制数据，可用于文件传输
+			console.log('Blob', data);
+			data = {
+				topic: 'Blob'
+				, data
+			}
+		}
+		else{
+			if( typeof data === 'string' ){
+				try{
+					data = JSON.parse( data );
+				}
+				catch(e){}
+			}
+
+			if( typeof data !== 'object' || !data.topic ){
+				data = {
+					topic: this._config.url
+					, data
+				};
+			}
+		}
+
+		return super.setData(data.topic, data.data);
+	}
+
 
 	// ---------- 公有方法 ----------
 	/**

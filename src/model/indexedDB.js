@@ -27,6 +27,7 @@ const INDEXED_DB_CONFIG = {
 		// 	, multiEntry: true
 		}]
 		, autoIncrement: true
+		, persist: false
 	}
 	;
 
@@ -112,13 +113,21 @@ class IndexedDBModel extends Model{
 				reject( new Error('此数据库不支持 IndexedDB') );
 			}
 		});
+
+		if( navigator.storage && navigator.storage.persist() ){
+			navigator.storage.persist().then((granted)=>{
+				if( granted ){
+					// todo
+				}
+			});
+		}
 	}
 
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $idb，配置参数名 idb
 	 * */
 	static inject(app){

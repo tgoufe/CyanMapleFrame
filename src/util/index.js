@@ -61,6 +61,11 @@ let util = {
 export default util;
 
 export const Util = {
+	/**
+	 * @summary 与 App 类约定的注入接口
+	 * @param   {Base}  app
+	 * @desc    注入为 $util
+	 * */
 	inject(app){
 		app.inject('$util', util);
 	}

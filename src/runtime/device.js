@@ -126,7 +126,7 @@ export default device;
 export const Device = {
 	/**
 	 * @summary 与 App 类约定的注入接口
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $device
 	 * */
 	inject(app){

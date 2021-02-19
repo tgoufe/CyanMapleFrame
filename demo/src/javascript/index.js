@@ -20,3 +20,5 @@ let vm = new Vue({
 	;
 
 window.vm = vm;
+
+window.maple = maple;

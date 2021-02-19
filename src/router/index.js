@@ -77,52 +77,10 @@ class Router extends Base{
 		this._$trigger = this.$listener.on(this, this.config.eventType);
 
 		if( this.config.mode === 'history' ){
-			this.$url.popState((e)=>{
-				let tempUrl = this.$url.parseUrl( location.href )
-					;
-
-				if( this.has(tempUrl.path) ){
-
-					this._get( tempUrl ).then(()=>{
-						this._historyList.push({
-							url: tempUrl.source
-							, time: Date.now()
-						});
-					}).then(()=>{
-						this._trigger();
-					});
-				}
-				else{
-					console.log(`router 中不存在 ${location.href}`, e);
-					this.config.fallback && this.config.fallback( tempUrl );
-				}
-			});
+			this.$url.popState( this._popState );
 		}
 		else if( this.config.mode === 'hash' ){
-			this.$url.hashChange((e)=>{
-				let newUrl = e.newURL
-					, tempUrl = this.$url.parseUrl( newUrl )
-					, newHash = tempUrl.hash
-					;
-
-				tempUrl = this.$url.parseUrl( newHash );
-
-				if( this.has( tempUrl.path ) ){
-
-					this._get( tempUrl ).then(()=>{
-						this._historyList.push({
-							url: newUrl
-							, time: Date.now()
-						});
-					}).then(()=>{
-						this._trigger();
-					});
-				}
-				else{
-					console.log(`router 中不存在 ${tempUrl.path}`, e);
-					this.config.fallback && this.config.fallback( tempUrl.path );
-				}
-			});
+			this.$url.hashChange( this._hashChange );
 		}
 
 		if( 'routers' in this.config && Array.isArray(this.config.routers) ){
@@ -136,7 +94,7 @@ class Router extends Base{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $router，配置参数名 router
 	 * */
 	static inject(app){
@@ -258,6 +216,58 @@ class Router extends Base{
 	 * */
 	_goHash(targetUrl){
 		this.$url.setHash( targetUrl.path + targetUrl.query );
+	}
+	/**
+	 * @summary popState 事件监听回调
+	 * @param   {Event} e
+	 * */
+	_popState = (e)=>{
+		let tempUrl = this.$url.parseUrl( location.href )
+			;
+
+		if( this.has(tempUrl.path) ){
+
+			this._get( tempUrl ).then(()=>{
+				this._historyList.push({
+					url: tempUrl.source
+					, time: Date.now()
+				});
+			}).then(()=>{
+				this._trigger();
+			});
+		}
+		else{
+			console.log(`router 中不存在 ${location.href}`, e);
+			this.config.fallback && this.config.fallback( tempUrl );
+		}
+	}
+	/**
+	 * @summary hashChange 事件监听回调
+	 * @param   {Event} e
+	 * */
+	_hashChange = (e)=>{
+		let newUrl = e.newURL
+			, tempUrl = this.$url.parseUrl( newUrl )
+			, newHash = tempUrl.hash
+			;
+
+		tempUrl = this.$url.parseUrl( newHash );
+
+		if( this.has( tempUrl.path ) ){
+
+			this._get( tempUrl ).then(()=>{
+				this._historyList.push({
+					url: newUrl
+					, time: Date.now()
+				});
+			}).then(()=>{
+				this._trigger();
+			});
+		}
+		else{
+			console.log(`router 中不存在 ${tempUrl.path}`, e);
+			this.config.fallback && this.config.fallback( tempUrl.path );
+		}
 	}
 
 	// ---------- 公有方法 ----------

@@ -44,30 +44,20 @@ class LocalStorageModel extends Model{
 
 		this._config = config;
 
-		if( 'localStorage' in self ){
-			this._enabled = true;
-			this._storeSync = self.localStorage;
-			this._store = Promise.resolve( self.localStorage );
-
-			if( this._config.listen ){
-				LocalStorageModel.listenOn((e)=>{
-					let topic = e.key
-						, newVal = e.newValue
-						;
-
-					try{
-						newVal = JSON.parse( newVal );
-					}
-					catch(e){}
-
-					this.setData(topic, newVal);
-				});
-			}
-		}
-		else{
+		if( !('localStorage' in self) ){
 			this._enabled = false;
 			this._storeSync = null;
 			this._store = Promise.reject( new Error('此浏览器不支持 localStorage') );
+			
+			return ;
+		}
+
+		this._enabled = true;
+		this._storeSync = self.localStorage;
+		this._store = Promise.resolve( self.localStorage );
+
+		if( this._config.listen ){
+			LocalStorageModel.listenOn( this._listenOn );
 		}
 	}
 
@@ -93,7 +83,7 @@ class LocalStorageModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $ls，配置参数名 ls
 	 * */
 	static inject(app){
@@ -108,6 +98,25 @@ class LocalStorageModel extends Model{
 	 * */
 	static get CONFIG(){
 		return LOCAL_STORAGE_MODEL_CONFIG;
+	}
+
+	// ---------- 私有方法 ----------
+	/**
+	 * @summary 全局 localStorage 改变事件监听回调
+	 * @param   {Event} e
+	 * @return  {Promise<boolean>}
+	 * */
+	_listenOn = (e)=>{
+		let topic = e.key
+			, newVal = e.newValue
+			;
+
+		try{
+			newVal = JSON.parse( newVal );
+		}
+		catch(e){}
+
+		return this.setData(topic, newVal);
 	}
 
 	// ---------- 公有方法 ----------

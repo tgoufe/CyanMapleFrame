@@ -47,7 +47,7 @@ class EventSourceModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $socket，配置参数名 sse
 	 * */
 	static inject(app){
@@ -75,71 +75,109 @@ class EventSourceModel extends Model{
 			let conn
 				;
 
-			if( this._config.url ){
-				if( 'EventSource' in self ){
-					conn = new EventSource(this._config.url, this._config);
+			if( !this._config.url ){
+				reject(new Error('缺少参数 url'));
 
-					conn.onopen = ()=>{
-						resolve( conn );
-					};
-					conn.onmessage = (e)=>{
-						let data = e.data
-							;
-
-						try{    // 尝试解析
-							data = JSON.parse( data );
-						}
-						catch( e ){   // 纯字符串类型数据
-							data = {
-								topic: this._config.url
-								, data
-							};
-						}
-
-						super.setData(data.topic, data.data);
-					};
-					conn.onerror = (e)=>{
-						let error = new Error('该 Event Source 出现异常进而关闭')
-							;
-
-						console.log( e );
-						this._conn = Promise.reject( error );
-
-						reject( error );
-					};
-					conn.onclose = (e)=>{
-						let error = new Error('该 Event Source 连接已被关闭')
-							;
-
-						console.log( e );
-						this._conn = Promise.reject( error );
-
-						reject( error );
-					}
-				}
-				else{
-					reject( new Error('此浏览器不支持 Event Source') );
-				}
+				return ;
 			}
-			else{
-				reject( new Error('缺少参数 url') );
+			
+			if( !('EventSource' in self) ){
+				reject( new Error('此浏览器不支持 Event Source') );
+
+				return ;
 			}
+
+			conn = new EventSource(this._config.url, this._config);
+
+			this.$listener.on(conn, 'open', ()=>{
+				console.log('建立 Event Source 连接');
+				resolve( conn );
+			});
+			this.$listener.on(conn, 'error', (e)=>{
+				let error = new Error('该 Event Source 出现异常进而关闭')
+					;
+
+				console.log( e );
+				this._conn = Promise.reject( error );
+
+				reject( error );
+			});
+			this.$listener.on(conn, 'close', (e)=>{
+				let error = new Error('该 Event Source 出现异常进而关闭')
+					;
+
+				console.log( e );
+				this._conn = Promise.reject( error );
+
+				reject( error );
+			});
+			this.$listener.on(conn, 'message', this._onMessage);
+
+			// todo
+			// this.$listener.on(conn, {
+			// 	open: ()=>{
+			// 		console.log('建立 Event Source 连接');
+			// 		resolve( conn );
+			// 	}
+			// 	, error: (e)=>{
+			// 		let error = new Error('该 Event Source 出现异常进而关闭')
+			// 			;
+			//
+			// 		console.log( e );
+			// 		this._conn = Promise.reject( error );
+			//
+			// 		reject( error );
+			// 	}
+			// 	, close: (e)=>{
+			// 		let error = new Error('该 Event Source 出现异常进而关闭')
+			// 			;
+			//
+			// 		console.log( e );
+			// 		this._conn = Promise.reject( error );
+			//
+			// 		reject( error );
+			// 	}
+			// 	, message: this._onMessage
+			// });
 		});
 	}
 	/**
 	 * @summary     数据同步的内部实现
 	 * @override
 	 * @protected
+	 * @param       {Event}     e
 	 * @param       {string}    topic
 	 * @param       {*}         value
 	 * */
-	_sync(topic, value){
+	_sync = (e, topic, value)=>{
 		if( !this._syncTarget ){
 			return ;
 		}
 
 		this._syncTarget.setData(topic, value);
 	}
+	/**
+	 * @summary     接收数据事件回调
+	 * @protected
+	 * @param       {Event} e
+	 * @return      {Promise<boolean>}
+	 * */
+	_onMessage = (e)=>{
+		let data = e.data
+			;
+
+		try{    // 尝试解析
+			data = JSON.parse( data );
+		}
+		catch( e ){   // 纯字符串类型数据
+			data = {
+				topic: this._config.url
+				, data
+			};
+		}
+
+		return super.setData(data.topic, data.data);
+	};
 
 	// ---------- 公有方法 ----------
 	/**

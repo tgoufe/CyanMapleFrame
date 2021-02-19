@@ -46,12 +46,12 @@ class FileSystemModel extends Model{
 			// 		});
 			// 	});
 			// }
-			if( requestFileSystem ){
-				requestFileSystem(self.PERSISTENT, this._config.fileSize, resolve, reject);
-			}
-			else{
+			if( !requestFileSystem ){
 				reject( new Error('此浏览器不支持 Local File System') );
+				return ;
 			}
+
+			requestFileSystem(self.PERSISTENT, this._config.fileSize, resolve, reject);
 		});
 	}
 
@@ -59,7 +59,7 @@ class FileSystemModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Object}    app
+	 * @param   {Base}  app
 	 * @desc    注入为 $fs，配置参数名 fs
 	 * */
 	static inject(app){
