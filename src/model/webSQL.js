@@ -3,6 +3,23 @@
 import Model from './model.js';
 import merge from '../util/merge.js';
 
+function sqlTpl(strings, ...keys){
+	return function(...values){
+		let dict = values[values.length -1] || {}
+			, result = [strings[0]]
+			;
+
+		keys.forEach((k, i)=>{
+			let value = Number.isInteger(k) ? values[k] : dict[k]
+				;
+
+			result.push(value, strings[i +1]);
+		});
+
+		return result.join('');
+	}
+}
+
 /**
  * 默认配置
  * @const
@@ -14,13 +31,13 @@ const WEB_SQL_MODEL_CONFIG = {
 		// 数据库可用空间大小，如果指定太大，浏览器会提示用户是否允许使用这么多空间
 		, dbSize: 2<<20
 		, sql: {
-			create:         'create table if not exists `{{tableName}}`(id integer primary key autoincrement,topic text unique,value text)'
-			, select:       'select * from `{{tableName}}` where topic=?'
-			, update:       'update `{{tableName}}` set value=? where topic=?'
-			, insert:       'insert into `{{tableName}}`(topic,value) values(?,?)'
-			, delete:       'delete from `{{tableName}}` where topic=?'
-			, clear:        'delete from `{{tableName}}`'
-			, createIndex:  'create index if not exists index_{{col}} on `{{tableName}}`(`{{col}}`)'
+			create:         sqlTpl`create table if not exists \`${'tableName'}\`(id integer primary key autoincrement,topic text unique,value text)`
+			, select:       sqlTpl`select * from \`${'tableName'}\` where topic=?`
+			, update:       sqlTpl`update \`${'tableName'}\` set value=? where topic=?`
+			, insert:       sqlTpl`insert into \`${'tableName'}\`(topic,value) values(?,?)`
+			, delete:       sqlTpl`delete from \`${'tableName'}\` where topic=?`
+			, clear:        sqlTpl`delete from \`${'tableName'}\``
+			, createIndex:  sqlTpl`create index if not exists index_${'col'} on \`${'tableName'}\`(\`${'col'}\`)`
 		}
 	}
 	;
@@ -52,14 +69,14 @@ class WebSQLModel extends Model{
 	 * @param   {number}    [config.dbVersion]
 	 * @param   {number}    [config.dbSize] 单位字节
 	 * @param   {Object}    [config.sql]
-	 * @param   {string}    [config.sql.create] 创建表时执行的 sql 语句
-	 * @param   {string}    [config.sql.select] 查询时执行的 sql 语句
-	 * @param   {string}    [config.sql.update] 更新时执行的 sql 语句
-	 * @param   {string}    [config.sql.insert] 插入时执行的 sql 语句
-	 * @param   {string}    [config.sql.delete] 删除时执行的 sql 语句
-	 * @param   {string}    [config.sql.clear]  clearData 时执行的 sql 语句
-	 * @param   {string}    [config.eventType]
-	 * @desc    传入 sql 语句时，可用 {{tableName}} 来代替表名
+	 * @param   {string|Function}   [config.sql.create] 创建表时执行的 sql 语句
+	 * @param   {string|Function}   [config.sql.select] 查询时执行的 sql 语句
+	 * @param   {string|Function}   [config.sql.update] 更新时执行的 sql 语句
+	 * @param   {string|Function}   [config.sql.insert] 插入时执行的 sql 语句
+	 * @param   {string|Function}   [config.sql.delete] 删除时执行的 sql 语句
+	 * @param   {string|Function}   [config.sql.clear]  clearData 时执行的 sql 语句
+	 * @param   {string}            [config.eventType]
+	 * @desc    自定义 sql 语句时，若动态可用可以设置为函数类型
 	 * */
 	constructor(config={}){
 		config = merge(config, WebSQLModel.CONFIG);
@@ -68,10 +85,6 @@ class WebSQLModel extends Model{
 		super( config );
 
 		this._config = config;
-
-		Object.entries( this._config.sql ).forEach(([k, v])=>{
-			this._config.sql[k] = this._replaceTableName( v );
-		});
 
 		// this._store 为 Promise 类型，会在 resolve 中传入 db 实例，因为要保证数据表存在才可以操作
 		this._store = new Promise((resolve, reject)=>{
@@ -127,11 +140,19 @@ class WebSQLModel extends Model{
 	/**
 	 * @summary 替换表名
 	 * @private
-	 * @param   {string}    sql
-	 * @return  {string}    替换完成的 sql 语句
+	 * @param   {string|Function}   sql
+	 * @param   {Object}            [data={}]
+	 * @return  {string}            替换完成的 sql 语句
 	 * */
-	_replaceTableName(sql){
-		return sql.replace(/{{tableName}}/g, this._config.tableName);
+	_transSql(sql, data={}){
+		if( typeof sql === 'function' ){
+			return sql({
+				tableName: this._config.tableName
+				, ...data
+			});
+		}
+
+		return sql;
 	}
 	/**
 	 * @summary 查询
@@ -143,7 +164,7 @@ class WebSQLModel extends Model{
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
 				db.readTransaction((tx)=>{
-					tx.executeSql(this._config.sql.select, [topic], (tx, rs)=>{
+					tx.executeSql(this._transSql( this._config.sql.select ), [topic], (tx, rs)=>{
 						resolve( rs.rows );
 					}, (tx, e)=>{
 						console.log( e );
@@ -164,7 +185,7 @@ class WebSQLModel extends Model{
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
 				db.transaction((tx)=>{
-					tx.executeSql(this._config.sql.update, [value, topic], (tx, rs)=>{
+					tx.executeSql(this._transSql(this._config.sql.update, value), [value, topic], (tx, rs)=>{
 						resolve( !!rs.rowsAffected );
 					}, (tx, e)=>{
 						console.log( e );
@@ -185,7 +206,7 @@ class WebSQLModel extends Model{
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
 				db.transaction((tx)=>{
-					tx.executeSql(this._config.sql.insert, [topic, value], (tx, rs)=>{
+					tx.executeSql(this._transSql(this._config.sql.insert, value), [topic, value], (tx, rs)=>{
 						resolve( !!rs.insertId );
 					}, (tx, e)=>{
 						console.log( e );
@@ -205,7 +226,7 @@ class WebSQLModel extends Model{
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
 				db.transaction((tx)=>{
-					tx.executeSql(this._config.sql.delete, [topic], (tx, rs)=>{
+					tx.executeSql(this._transSql( this._config.sql.delete ), [topic], (tx, rs)=>{
 						resolve( !!rs.rowsAffected );
 					}, (tx, e)=>{
 						console.log( e );
@@ -224,7 +245,7 @@ class WebSQLModel extends Model{
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
 				db.transaction((tx)=>{
-					tx.executeSql(this._config.sql.clear, [], (tx, rs)=>{
+					tx.executeSql(this._transSql( this._config.sql.clear ), [], (tx, rs)=>{
 						resolve( !!rs.rowsAffected );
 					}, (tx, e)=>{
 						console.log( e );
@@ -386,7 +407,17 @@ class WebSQLModel extends Model{
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
 				db.transaction((tx)=>{
-					tx.executeSql(this._config.sql.createIndex.replace(/{{col}}/g, col), [], (tx, rs)=>{
+					let sql = this._config.sql.createIndex
+						;
+
+					if( typeof sql === 'function' ){
+						sql = sql({
+							tableName: this._config.tableName
+							, col
+						});
+					}
+
+					tx.executeSql(sql, [], (tx, rs)=>{
 						resolve( !!rs.rowsAffected );
 					}, (tx, e)=>{
 						reject( e );

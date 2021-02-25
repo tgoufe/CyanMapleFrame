@@ -337,8 +337,10 @@ class ServiceModel extends Model{
 	/**
 	 * @summary 定义资源
 	 * @param   {string}    name
-	 * @param   {string}    pathPattern
-	 * @param   {Function}  [keyTrans]
+	 * @param   {string|Object} pathPattern
+	 * @param   {string}        pathPattern.url
+	 * @param   {string}        [pathPattern.method]
+	 * @param   {Function}      [keyTrans]
 	 * @desc    每个资源会返回包含 get、post、put、delete 方法的集合，以 RESTful api 规范的方式来使用
 	 *          路径内的参数已 :key 的方式使用
 	 * */
@@ -347,33 +349,47 @@ class ServiceModel extends Model{
 			throw new Error(`${name} 接口已经存在，不能重复定义`);
 		}
 
+		if( typeof pathPattern === 'string' ){
+			pathPattern = {
+				url: pathPattern
+			};
+		}
+
+		let config = {
+				get: 'getData'
+				, post: 'setData'
+				, put: 'setData'
+				, delete: 'removeData'
+			}
+			, {method, url} = pathPattern
+			;
+
 		Object.defineProperty(this, name, {
 			enumerable: true
 			, configurable: false
 			, get(){
-				return {
-					get: (data)=>{
-						return this.getData(this.transPath(pathPattern, data, keyTrans), {
+				let runner = (data)=>{
+						return this[config[method.toLowerCase()] || config.get](this.transPath(url, data, keyTrans), merge(pathPattern, {
 							data
-						});
+						}));
 					}
-					, post: (data)=>{
-						return this.setData(this.transPath(pathPattern, data, keyTrans), {
-							data
+					;
+
+				if( !method ){
+					Object.entries(([key, method])=>{
+						Object.defineProperty(runner, key, {
+							enumerable: true
+							, configurable: false
+							, get: (data)=>{
+								return this[method](this.transPath(url, data, keyTrans), merge(pathPattern, {
+									data
+								}));
+							}
 						});
-					}
-					, put: (data)=>{
-						return this.setData(this.transPath(pathPattern, data, keyTrans), {
-							methods: 'PUT'
-							, data
-						});
-					}
-					, delete: (data)=>{
-						return this.removeData(this.transPath(pathPattern, data, keyTrans), {
-							data
-						});
-					}
-				};
+					});
+				}
+
+				return runner;
 			}
 		});
 	}
