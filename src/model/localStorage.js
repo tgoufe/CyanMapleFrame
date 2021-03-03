@@ -23,6 +23,7 @@ const LOCAL_STORAGE_MODEL_CONFIG = {
 let localStorageModel = new LocalStorageModel()
 	, storage = Model.factory('localStorage')
 	, ls = Model.factory('ls')
+    , v = ls.sync.getData('fittingShow/index/first')
 	;
 
 storage.getData('fittingShow/index/first').then((value)=>{
@@ -344,8 +345,7 @@ class LocalStorageModel extends Model{
 			 * @desc    内部为调用 setDataSync 方法
 			 * */
 			setData: (...argv)=>{
-				this.setDataSync( ...argv );
-				return true;
+				return this.setDataSync( ...argv );
 			}
 			/**
 			 * @summary 语义化的同步保存数据接口

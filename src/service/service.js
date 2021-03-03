@@ -36,8 +36,49 @@ const SERVICE_MODEL_CONFIG = {
  * @desc    对服务器接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 service，别名 s，将可以使用工厂方法生成
  *          必须通过注入的方式注入一个 $request 方法用来发送请求
  * @extends Model
+<pre>
+let serviceModel = new ServiceModel()
+    , service = Model.factory('service')
+    , s = Model.factory('s')
+    , api = new ServiceModel({
+		baseUrl: 'a.b.com'
+		, resource: {
+			a: 'a/x'
+			, b: 'b/x'
+			, c: 'c/:id'
+		}
+    })
+    ;
+
+s.getData('/a/x', {
+	data: {
+		a: 1
+	}
+});
+s.resource('b', 'b/x');
+s.b({
+	data: {
+		a: 1
+	}
+})
+s.b.post({
+	data: {
+		a: 1
+	}
+});
+
+api.a({
+	data: {
+		a: 1
+	}
+}); // get 方法请求
+api.a.post({
+	data: {
+		b: 1
+	}
+}); // post 方法请求
+</pre>
  *
- * @todo 支持 RESTful API
  * @todo 通道功能，一个 topic 一次只能发送一条，其余保存在队列中，等待当前发送的返回，再发送下一条
  * @todo 限制同时发送的请求的最大数量
  * */
@@ -46,11 +87,10 @@ class ServiceModel extends Model{
 	 * @constructor
 	 * @param   {Object}    [config={}]
 	 * @param   {string}    [config.baseUrl]
-	 // * @param   {boolean}   [config.isCrossDomain]
-	 // * @param   {boolean}   [config.useLock]
 	 * @param   {number}    [config.timeout]
 	 * @param   {string}    [config.eventType]
-	 * @param   {Object}    [config.api]
+	 * @param   {Object}    [config.resource]
+	 * @param   {boolean}   [config.pipe]
 	 * */
 	constructor(config={}){
 		config = merge(config, ServiceModel.CONFIG);
@@ -75,20 +115,16 @@ class ServiceModel extends Model{
 
 		this._execReqInterceptor = new HandlerQueue();
 		this._execReqInterceptor.add( ServiceModel.interceptor.req );
-		// this._execReqInterceptor.add(({topic})=>{
-		// 	console.log(`执行局部请求拦截器 ${topic}`);
-		// });
 		this._execReqInterceptor.add( this.interceptor.req );
 
 		this._execResInterceptor = new HandlerQueue();
 		this._execResInterceptor.add( ServiceModel.interceptor.res );
-		// this._execResInterceptor.add(({topic})=>{
-		// 	console.log(`执行局部响应拦截器 ${topic}`);
-		// });
 		this._execResInterceptor.add( this.interceptor.res );
 
 		if( 'resource' in config ){
-			Object.entries( (k, v)=>this.resource(k, v) );
+			Object.entries( config.resource ).forEach(([k, v])=>{
+				this.resource(k, v);
+			});
 		}
 	}
 
@@ -371,12 +407,11 @@ class ServiceModel extends Model{
 				let runner = (data)=>{
 						return this[config[method.toLowerCase()] || config.get](this.transPath(url, data, keyTrans), merge(pathPattern, {
 							data
-						}));
-					}
+						}));					}
 					;
 
 				if( !method ){
-					Object.entries(([key, method])=>{
+					Object.entries( config ).forEach(([key, method])=>{
 						Object.defineProperty(runner, key, {
 							enumerable: true
 							, configurable: false

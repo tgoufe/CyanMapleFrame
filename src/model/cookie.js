@@ -24,6 +24,7 @@ const COOKIE_DEFAULT = {
 let cookieModel = new CookieModel()
 	, cookie = Model.factory('cookie')
     , c = Model.factory('c')
+    , v = c.sync.getData('memberId')
 	;
 
 console.log( cookie === c );    // 因为将对象实例进行了缓存，所以结果为 true
@@ -193,7 +194,7 @@ class CookieModel extends Model{
 	 * @desc        因为设置 cookie 时有相关配置，故重写覆盖父类的 _setByObject 方法
 	 * */
 	_setByObject(topic, options){
-		return Promise.all( Object.entries(topic).map(([k, v])=>{
+		return Promise.all( Object.entries( topic ).map(([k, v])=>{
 			return this.setData(k, v, options);
 		}) ).then((resultList)=>{
 			return resultList.every( rs=>rs );
