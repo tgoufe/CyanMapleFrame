@@ -29,6 +29,7 @@ const SERVICE_MODEL_CONFIG = {
 		req: new HandlerQueue()
 		, res: new HandlerQueue()
 	}
+	, SUPPORT_METHOD = ['get', 'post', 'put', 'delete']
 	;
 
 /**
@@ -60,7 +61,7 @@ s.b({
 	data: {
 		a: 1
 	}
-})
+});
 s.b.post({
 	data: {
 		a: 1
@@ -91,6 +92,7 @@ class ServiceModel extends Model{
 	 * @param   {string}    [config.eventType]
 	 * @param   {Object}    [config.resource]
 	 * @param   {boolean}   [config.pipe]
+	 * @param   {number}    [config.pool]
 	 * */
 	constructor(config={}){
 		config = merge(config, ServiceModel.CONFIG);
@@ -104,10 +106,17 @@ class ServiceModel extends Model{
 		}
 		
 		this._value = new Map();
-		
+
+		// 同步相关
 		this._syncTarget = null;
 		this._syncHandler = null;
 
+		// 请求池
+		this.poolSize = config.pool || 0;
+		this.poolCurrent = 0;
+		this.pool = [];
+
+		// 拦截器
 		this.interceptor = {
 			req: new HandlerQueue()
 			, res: new HandlerQueue()
@@ -121,6 +130,7 @@ class ServiceModel extends Model{
 		this._execResInterceptor.add( ServiceModel.interceptor.res );
 		this._execResInterceptor.add( this.interceptor.res );
 
+		// 资源
 		if( 'resource' in config ){
 			Object.entries( config.resource ).forEach(([k, v])=>{
 				this.resource(k, v);
@@ -190,16 +200,105 @@ class ServiceModel extends Model{
 	_resInterceptor(result){
 		return this._execResInterceptor.promise.line( result );
 	}
+
+
+	createRequest({pool}){
+		let count = 0
+			, waitQueue = []
+			;
+
+		function next(rs){
+			count--;
+
+			if( count < pool && waitQueue.length > 0 ){
+				let {url, params, resolve} = waitQueue.pop();
+
+				fetch(url, params).catch(()=>{return 1;}).then((rs)=>{
+					resolve( rs );
+
+					count++;
+					next();
+				});
+			}
+
+			return rs;
+		}
+
+		return function(url, params){
+			if( count < pool ){
+				let t = fetch(url, params).catch(()=>{return 1;});
+
+				count++
+
+				return t.then( next );
+			}
+			else{
+				return new Promise((resolve)=>{
+					waitQueue.push({
+						url
+						, params
+						, resolve
+					});
+				});
+			}
+		}
+	}
+
+	/**
+	 * @summary
+	 * @private
+	 * @desc
+	 * */
+	_poolNext(){
+		this.poolCurrent--;
+
+		if( this.poolCurrent < this.poolSize && this.pool.length > 0 ){
+			let {args, resolve, reject} = this.pool.pop()
+				;
+
+			this._send( ...args).then(resolve, reject).then(()=>{
+				this.poolCurrent++;
+
+				this._poolNext();
+			});
+		}
+	}
 	/**
 	 * @summary 发送请求，在发送请求之前执行请求拦截器，在请求返回后执行响应拦截器
 	 * @private
-	 * @param   {string}    topic
-	 * @param   {Object}    options
+	 * @param   {string|Object} topic
+	 * @param   {Object}        options
+	 * @param   {string}        [method='GET']
 	 * @return  {Promise}
 	 * */
-	_send(topic, options){
+	_send(topic, options, method='GET'){
+		if( this.poolCurrent >= this.poolSize ){
+			return new Promise((resolve, reject)=>{
+				this.pool.push({
+					args: [topic, options, method]
+					, resolve
+					, reject
+				});
+			});
+		}
+
+		if( typeof topic === 'object' ){
+			options = topic;
+			topic = topic.url;
+		}
+
+		if( !topic ){   // topic 无值不做任何处理
+			return Promise.reject( new Error('缺少 topic 参数') );
+		}
+
+		topic = this._config.baseUrl + topic;
+
+		options = this._setOpts( options );
+
+		options.method = options.method || method;
+
 		// 执行请求拦截器
-		return this._reqInterceptor(topic, options).then(()=>{
+		let result = this._reqInterceptor(topic, options).then(()=>{
 			// 发送请求，向服务器发送数据
 			console.log(`发送 ${options.method} 请求 ${topic}`);
 
@@ -221,7 +320,20 @@ class ServiceModel extends Model{
 			else{
 				return Promise.reject( new Error('未知错误') );
 			}
+		}).then((res)=>{
+			// 将数据同步
+			super.setData(topic, {topic, options, res});
+
+			return res;
 		});
+
+		if( this.poolSize ){
+			result.catch(()=>{}).then(()=>{
+				this._poolNext();
+			});
+		}
+
+		return result;
 	}
 	/**
 	 * @summary     数据同步的内部实现
@@ -256,60 +368,20 @@ class ServiceModel extends Model{
 	 * @return      {Promise}
 	 * */
 	setData(topic, options={}){
-		if( typeof topic === 'object' ){
-			options = topic;
-			topic = topic.url
-		}
-
-		if( !topic ){   // topic 无值不做任何处理
-			return Promise.reject( new Error('缺少 topic 参数') );
-		}
-
-		topic = this._config.baseUrl + topic;
-
-		options = this._setOpts( options );
-
-		options.method = options.method || 'POST';
-
-		// 执行请求拦截器
-		return this._send(topic, options).then((res)=>{
-			super.setData(topic, {topic, options, res});
-
-			return res;
-		});
+		return this._send(topic, options, 'POST');
 	}
 	/**
 	 * @summary     获取数据，默认视为发送 GET 请求到服务器，可以将返回结果保存到本地缓存
 	 * @override
 	 * @param       {string|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
 	 * @param       {string}            topic.url
-	 * @param       {Object}            [options={}]        对象类型为 ajax 参数，boolean 类型时将其赋值给 isCache，自身设置为 {}
+	 * @param       {Object}            [options={}]
 	 * @param       {Object}            [options.data]
 	 * @param       {string}            [options.method]
 	 * @return      {Promise}
-	 * @desc        优先从本地 syncTo model 中读取数据，若没有则发送请求
 	 * */
 	getData(topic, options={}){
-		if( typeof topic === 'object' ){
-			options = topic;
-			topic = topic.url;
-		}
-
-		if( !topic ){   // topic 无值不做任何处理
-			return Promise.reject( new Error('缺少 topic 参数') );
-		}
-
-		topic = this._config.baseUrl + topic;
-
-		options = this._setOpts( options );
-
-		options.method = options.method || 'GET';
-
-		return this._send(topic, options).then((res)=>{   // 将数据同步
-			super.setData(topic, {topic, options, res});
-
-			return res;
-		});
+		return this._send(topic, options, 'GET');
 	}
 	/**
 	 * @summary     删除数据
@@ -320,29 +392,10 @@ class ServiceModel extends Model{
 	 * @param       {Object}            [options.data]
 	 * @param       {string}            [options.method]
 	 * @return      {Promise<boolean>}  返回 resolve(true)
-	 * @todo        可以考虑支持 RESTful API，发送 delete 类型的请求
+	 * @desc        若未设置 method 则会视为 DELETE
 	 * */
 	removeData(topic, options={}){
-		if( typeof topic === 'object' ){
-			options = topic;
-			topic = topic.url;
-		}
-
-		if( !topic ){   // topic 无值不做任何处理
-			return Promise.reject( new Error('缺少 topic 参数') );
-		}
-
-		topic = this._config.baseUrl + topic;
-
-		options = this._setOpts( options );
-
-		options.method = options.method || 'DELETE';
-
-		return this._send(topic, options).then((res)=>{
-			super.setData(topic, {topic, options, res});
-
-			return res;
-		});
+		return this._send(topic, options, 'DELETE');
 	}
 	/**
 	 * @summary 清空数据，实际不做任何处理
@@ -371,6 +424,30 @@ class ServiceModel extends Model{
 	}
 
 	/**
+	 * @summary 使用 get 方式发请求，与 getData 相同
+	 * @param       {string|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
+	 * @param       {string}            topic.url
+	 * @param       {Object}            [options={}]        对象类型为 ajax 参数
+	 * @param       {Object}            [options.data]
+	 * @param       {string}            [options.method]
+	 * @return      {Promise}
+	 * */
+	get(topic, options={}){
+		return this._send(topic, options, 'GET');
+	}
+	/**
+	 * @summary 使用 set 方式发请求，与 setData 相同
+	 * @param       {string|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
+	 * @param       {string}            topic.url
+	 * @param       {Object}            [options={}]        对象类型为 ajax 参数
+	 * @param       {Object}            [options.data]
+	 * @param       {string}            [options.method]
+	 * @return      {Promise}
+	 * */
+	post(topic, options){
+		return this._send(topic, options, 'POST');
+	}
+	/**
 	 * @summary 定义资源
 	 * @param   {string}    name
 	 * @param   {string|Object} pathPattern
@@ -391,13 +468,7 @@ class ServiceModel extends Model{
 			};
 		}
 
-		let config = {
-				get: 'getData'
-				, post: 'setData'
-				, put: 'setData'
-				, delete: 'removeData'
-			}
-			, {method, url} = pathPattern
+		let {method, url} = pathPattern
 			;
 
 		Object.defineProperty(this, name, {
@@ -405,20 +476,21 @@ class ServiceModel extends Model{
 			, configurable: false
 			, get(){
 				let runner = (data)=>{
-						return this[config[method.toLowerCase()] || config.get](this.transPath(url, data, keyTrans), merge(pathPattern, {
+						return this._send(this.transPath(url, data, keyTrans), merge(pathPattern, {
 							data
-						}));					}
+						}), method.toUpperCase());
+					}
 					;
 
 				if( !method ){
-					Object.entries( config ).forEach(([key, method])=>{
-						Object.defineProperty(runner, key, {
+					SUPPORT_METHOD.forEach((method)=>{
+						Object.defineProperty(runner, method, {
 							enumerable: true
 							, configurable: false
 							, get: (data)=>{
-								return this[method](this.transPath(url, data, keyTrans), merge(pathPattern, {
+								return this._send(this.transPath(url, data, keyTrans), merge(pathPattern, {
 									data
-								}));
+								}), method.toUpperCase());
 							}
 						});
 					});
