@@ -11,8 +11,8 @@ module.exports = {
 	//页面入口文件配置
 	, entry: {
 		index: [path.resolve(__dirname, 'src/index.js')]
-		, 'worker/serviceWork': [path.resolve(__dirname, 'src/worker/serviceWorker.js')]
-		, 'worker/webWork': [path.resolve(__dirname, 'src/worker/webWorker.js')]
+		, 'worker/serviceWorker': [path.resolve(__dirname, 'src/worker/serviceWorker.js')]
+		, 'worker/webWorker': [path.resolve(__dirname, 'src/worker/webWorker.js')]
 	}
 	//入口文件输出配置
 	, output: {
