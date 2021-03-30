@@ -123,13 +123,13 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 			});
 		}
 
-		event.respondWith( fetch(request).then((response)=>{
-			return cacheStorage.setData(request.clone(), response.clone()).then(()=>{
-				return response;
-			});
-		}, ()=>{
-			return cacheStorage.getData( request.clone() );
-		}) );
+		// event.respondWith( fetch(request).then((response)=>{
+		// 	return cacheStorage.setData(request.clone(), response.clone()).then(()=>{
+		// 		return response;
+		// 	});
+		// }, ()=>{
+		// 	return cacheStorage.getData( request.clone() );
+		// }) );
 
 		// 克隆该请求，Request 对象是 stream 类型的，只能读取一次
 		event.respondWith( cacheStorage.getData( request.clone() ).then((response)=>{
