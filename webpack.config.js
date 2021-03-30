@@ -19,6 +19,7 @@ module.exports = {
 		path: path.resolve(__dirname, 'dist/')
 		, filename: '[name].js'
 		, libraryTarget: 'umd'
+		, globalObject: 'this'
 	}
 	, module: {
 		//加载器配置

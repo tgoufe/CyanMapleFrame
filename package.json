@@ -63,7 +63,8 @@
   "scripts": {
     "dev": "webpack-dev-server",
     "build": "webpack",
-    "bulidDemo": "webpack --config demo.webpack.config.js",
+    "buildWorker": "webpack --config webpack.worker.config.js",
+    "bulidDemo": "webpack --config webpack.demo.config.js",
     "runDemoServer": "node demo/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:unit": "karma start test/unit/karma.config.js --single-run"
