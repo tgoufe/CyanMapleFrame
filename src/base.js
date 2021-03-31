@@ -46,7 +46,15 @@ class Base{
 	 * @param   {...Base}
 	 * */
 	static use(...module){
-		if( !this.modules ){
+		if( this.modules ){
+			if( !this.hasOwnProperty('modules') ){
+				let modules = this.modules
+					;
+
+				this.modules = new Set( Array.from(modules) );
+			}
+		}
+		else{
 			this.modules = new Set();
 		}
 

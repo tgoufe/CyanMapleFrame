@@ -272,7 +272,7 @@ class ServiceModel extends Model{
 	 * @return  {Promise}
 	 * */
 	_send(topic, options, method='GET'){
-		if( this.poolCurrent >= this.poolSize ){
+		if( this.poolSize && this.poolCurrent >= this.poolSize ){
 			return new Promise((resolve, reject)=>{
 				this.pool.push({
 					args: [topic, options, method]

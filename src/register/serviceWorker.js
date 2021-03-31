@@ -2,11 +2,14 @@
 
 import merge    from '../util/merge.js';
 
-let serviceWorkerReady = Promise.reject( new Error('该浏览器不支持 Service Worker') )
+let serviceWorkerReady
 	;
 
 if( 'serviceWorker' in navigator ){
 	serviceWorkerReady = navigator.serviceWorker.ready;
+}
+else{
+	serviceWorkerReady = Promise.reject( new Error('该浏览器不支持 Service Worker') );
 }
 
 function urlBase64ToUnit8Array(base64String){
