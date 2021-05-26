@@ -253,7 +253,7 @@ class Listener extends Base{
 			, type
 			, callback
 			, options
-			, capture: !!options.capture
+			, capture: !!options && options.capture
 		};
 	}
 
