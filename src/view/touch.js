@@ -50,31 +50,63 @@ let start
 	;
 
 if( 'PointerEvent' in window ){
-	start   = listener('pointerdown');
-	move    = listener('pointermove');
-	end     = listener('pointerup');
+	start   = (callback)=>{
+		return listener.on('pointerdown', callback);
+	};
+	move    = (callback)=>{
+		return listener.on('pointermove', callback);
+	};
+	end     = (callback)=>{
+		return listener.on('pointerup', callback);
+	};
 
 	// todo 用途？
-	over    = listener('pointerover');
-	out     = listener('pointerout');
-	enter   = listener('pointerenter');
-	leave   = listener('pointerleave');
+	over    = (callback)=>{
+		return listener.on('pointerover', callback);
+	};
+	out     = (callback)=>{
+		return listener.on('pointerout', callback);
+	};
+	enter   = (callback)=>{
+		return listener.on('pointerenter', callback);
+	};
+	leave   = (callback)=>{
+		return listener.on('pointerleave', callback);
+	};
 }
 else if( 'TouchEvent' in window ){
-	start   = listener('touchstart');
-	move    = listener('touchmove');
-	end     = listener('touchend');
+	start   = (callback)=>{
+		return listener.on('touchstart', callback);
+	};
+	move    = (callback)=>{
+		return listener.on('touchmove', callback);
+	};
+	end     = (callback)=>{
+		return listener.on('touchend', callback);
+	};
 }
 else{
-	start   = listener('mousedown');
-	move    = listener({
-		type: 'mousemove'
-	});
-	end     = listener('mouseup');
+	start   = (callback)=>{
+		return listener.on('mousedown', callback);
+	};
+	move    = (callback)=>{
+		return listener.on('mousemove', callback);
+	};
+	end     = (callback)=>{
+		return listener.on('mouseup', callback);
+	};
 
 	// todo 用途？
-	over    = listener('mouseover');
-	out     = listener('mouseout');
-	enter   = listener('mouseenter');
-	leave   = listener('mouseleave');
+	over    = (callback)=>{
+		return listener.on('mouseover', callback);
+	};
+	out     = (callback)=>{
+		return listener.on('mouseout', callback);
+	};
+	enter   = (callback)=>{
+		return listener.on('mouseenter', callback);
+	};
+	leave   = (callback)=>{
+		return listener.on('mouseleave', callback);
+	};
 }

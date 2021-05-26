@@ -17,6 +17,17 @@ const IMAGE_EXT = [
 	]
 	;
 
+function clientIsIFrame(client){
+	if( client.frameType === 'top-level' ){
+		return false;
+	}
+	else if( client.frameType === 'nested' ){
+		return true;
+	}
+
+	return false;
+}
+
 /**
  * @summary     执行 Service Worker 监听事件
  * @function

@@ -216,6 +216,46 @@ class Listener extends Base{
 	_isObserver(type){
 		return Listener.ObserverTypeList.indexOf( type ) !== -1;
 	}
+	/**
+	 * @summary 处理 on 和 off 参数的内部方法
+	 * @private
+	 * @param   {Window|Document|Element|Object|string} target
+	 * @param   {string|ListenerCallback}   type
+	 * @param   {ListenerCallback|Object}   [callback={}]
+	 * @param   {Object}                    [options={}]
+	 * @param   {boolean}                   [options.capture]
+	 * @param   {boolean}                   [options.passive]
+	 * @param   {boolean}                   [options.once]
+	 * @return  {Object}
+	 * */
+	_handleArgs(target, type, callback, options){
+		if( typeof callback === 'object' ){
+			options = callback;
+			callback = null;
+		}
+
+		if( typeof type === 'function' ){
+			callback = type;
+			type = null;
+		}
+
+		if( typeof target === 'string' ){
+			type = target;
+			target = null;
+		}
+
+		if( !target ){
+			target = self;
+		}
+
+		return {
+			target
+			, type
+			, callback
+			, options
+			, capture: !!options.capture
+		};
+	}
 
 	/**
 	 * @summary 获取事件配置
@@ -242,8 +282,8 @@ class Listener extends Base{
 	 * @summary 获取事件键值
 	 * @private
 	 * @param   {string}    type
-	 * @param   {boolean}   capture
-	 * @return  {string}
+	 * @param   {boolean}   [capture]
+	 * @return  {symbol}
 	 * */
 	_getKey(type, capture){
 		if( this._isObserver(type) ){
@@ -290,29 +330,14 @@ class Listener extends Base{
 			, eventConfig
 			, handlers
 			, key
+			, {
+			target
+			, type
+			, callback
+			, options
 			, capture
+			} = this._handleArgs( ...arguments )
 			;
-
-		if( typeof callback === 'object' ){
-			options = callback;
-			callback = null;
-		}
-
-		if( typeof type === 'function' ){
-			callback = type;
-			type = null;
-		}
-
-		if( typeof target === 'string' ){
-			type = target;
-			target = null;
-		}
-
-		if( !target ){
-			target = self;
-		}
-
-		capture = !!options.capture;
 
 		if( !this._callbackList.has(target) ){
 			this._callbackList.set(target, {});
@@ -382,29 +407,14 @@ class Listener extends Base{
 	off(target, type, callback={}, options={}){
 		let eventConfig
 			, handlers
+			, {
+			target
+			, type
+			, callback
+			, options
 			, capture
+			} = this._handleArgs( ...arguments )
 			;
-
-		if( typeof callback === 'object' ){
-			options = callback;
-			callback = null;
-		}
-
-		if( typeof type === 'function' ){
-			callback = type;
-			type = null;
-		}
-
-		if( typeof target === 'string' ){
-			type = target;
-			target = null;
-		}
-
-		if( !target ){
-			target = self;
-		}
-
-		capture = !!options.capture;
 
 		eventConfig = this._getEventConfig(target, type, capture);
 

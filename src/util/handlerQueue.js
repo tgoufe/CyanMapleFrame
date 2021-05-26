@@ -247,7 +247,7 @@ class HandlerQueue extends Base{
 			findBy = this._handlers.indexOf( findBy );
 		}
 		else if( typeof findBy === 'number' ){
-			findBy = parseInt( findBy );    // 去掉小数
+			findBy = Math.floor( findBy );    // 去掉小数
 		}
 		else{
 			return;

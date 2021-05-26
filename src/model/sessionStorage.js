@@ -97,7 +97,7 @@ class SessionStorageModel extends Model{
 		else{
 			result = this._store.then((store)=>{
 				let value = store.getItem( topic )
-				;
+					;
 
 				if( value === null ){
 					value = Promise.reject( null );

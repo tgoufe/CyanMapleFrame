@@ -130,7 +130,7 @@ class FileSystemModel extends Model{
 				})
 				;
 
-			fileWriter.onwriteend = function(e){
+			fileWriter.onwriteend = function(){
 				resolve( true );
 			};
 			fileWriter.onerror = function(e){
@@ -379,7 +379,7 @@ class FileSystemModel extends Model{
 	 * @desc    返回结果为一个对象，包括 usage、all、percent 属性，对应为 已使用字节数、总字节数、已用百分比
 	 * */
 	getUsage(){
-		return new Promise((resolve, reject)=>{
+		return new Promise((resolve)=>{
 			navigator.webkitPersistentStorage.queryUsageAndQuota((usage, quota)=>{
 				resolve({
 					usage

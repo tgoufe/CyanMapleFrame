@@ -103,7 +103,7 @@ class WebSQLModel extends Model{
 			// db.readTransaction()
 			db.transaction((tx)=>{
 				// 若没有数据表则创建
-				tx.executeSql(this._config.sql.create, [], ()=>{
+				tx.executeSql(this._transSql( this._config.sql.create ), [], ()=>{
 					resolve( db );
 				}, (tx, e)=>{
 					console.log( e );
@@ -155,104 +155,38 @@ class WebSQLModel extends Model{
 		return sql;
 	}
 	/**
+	 * @summary 通用执行 sql 方法
+	 * @param   {string}    sql
+	 * @param   {Array}     [value=[]]
+	 * @param   {boolean}   [isRead]
+	 * @return  {Promise<*, ErrorEvent>} 返回一个 Promise 对象，在 resolve 时传回 sql 语句的执行结果
+	 * */
+	_executeSql(sql, value=[], isRead=false){
+		let transaction = isRead ? 'readTransaction' : 'transaction'
+			;
+
+		return this._store.then((db)=>{
+			return new Promise((resolve, reject)=>{
+				db[transaction]((tx)=>{
+					tx.executeSql(sql, value, (tx, rs)=>{
+						resolve( rs );
+					}, (tx, e)=>{
+						console.log( e );
+						reject( e );
+					});
+				});
+			});
+		});
+	}
+	/**
 	 * @summary 查询
 	 * @private
 	 * @param   {string}    topic
 	 * @return  {Promise<string, ErrorEvent>}    返回一个 Promise 对象，在 resolve 时传回查询出来的数组
 	 * */
 	_select(topic){
-		return this._store.then((db)=>{
-			return new Promise((resolve, reject)=>{
-				db.readTransaction((tx)=>{
-					tx.executeSql(this._transSql( this._config.sql.select ), [topic], (tx, rs)=>{
-						resolve( rs.rows );
-					}, (tx, e)=>{
-						console.log( e );
-						reject( e );
-					});
-				});
-			});
-		});
-	}
-	/**
-	 * @summary 更新
-	 * @private
-	 * @param   {string}    topic
-	 * @param   {string}    value
-	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
-	 * */
-	_update(topic, value){
-		return this._store.then((db)=>{
-			return new Promise((resolve, reject)=>{
-				db.transaction((tx)=>{
-					tx.executeSql(this._transSql(this._config.sql.update, value), [value, topic], (tx, rs)=>{
-						resolve( !!rs.rowsAffected );
-					}, (tx, e)=>{
-						console.log( e );
-						reject( e );
-					});
-				});
-			});
-		});
-	}
-	/**
-	 * @summary 新建
-	 * @private
-	 * @param   {string}    topic
-	 * @param   {string}    value
-	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回新插入行 id 的 boolean 值
-	 * */
-	_insert(topic, value){
-		return this._store.then((db)=>{
-			return new Promise((resolve, reject)=>{
-				db.transaction((tx)=>{
-					tx.executeSql(this._transSql(this._config.sql.insert, value), [topic, value], (tx, rs)=>{
-						resolve( !!rs.insertId );
-					}, (tx, e)=>{
-						console.log( e );
-						reject( e );
-					})
-				});
-			});
-		});
-	}
-	/**
-	 * @summary 删除
-	 * @private
-	 * @param   {string}    topic
-	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
-	 * */
-	_delete(topic){
-		return this._store.then((db)=>{
-			return new Promise((resolve, reject)=>{
-				db.transaction((tx)=>{
-					tx.executeSql(this._transSql( this._config.sql.delete ), [topic], (tx, rs)=>{
-						resolve( !!rs.rowsAffected );
-					}, (tx, e)=>{
-						console.log( e );
-						reject( e );
-					});
-				});
-			});
-		});
-	}
-	/**
-	 * @summary 清空表
-	 * @private
-	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回影响行数的 boolean 值
-	 * */
-	_clear(){
-		return this._store.then((db)=>{
-			return new Promise((resolve, reject)=>{
-				db.transaction((tx)=>{
-					tx.executeSql(this._transSql( this._config.sql.clear ), [], (tx, rs)=>{
-						resolve( !!rs.rowsAffected );
-					}, (tx, e)=>{
-						console.log( e );
-						reject( e );
-					});
-				});
-			});
+		return this._executeSql(this._transSql( this._config.sql.select ), [topic], true).then((rs)=>{
+			return rs.rows;
 		});
 	}
 
@@ -278,10 +212,14 @@ class WebSQLModel extends Model{
 					;
 
 				if( rs && rs.length ){    // topic 已存在
-					result = this._update(topic, value);
+					result = this._executeSql(this._transSql(this._config.sql.update, value), [value, topic]).then((rs)=>{
+						return !!rs.rowsAffected;
+					});
 				}
 				else{
-					result = this._insert(topic, value);
+					result = this._executeSql(this._transSql(this._config.sql.insert, value), [topic, value]).then((rs)=>{
+						return !!rs.insertId;
+					});
 				}
 
 				super.setData(topic, value);
@@ -313,7 +251,7 @@ class WebSQLModel extends Model{
 		}
 		else{
 			result = this._select( topic ).then((rs)=>{
-				let value = ''
+				let value
 					;
 
 				if( rs && rs.length ){
@@ -360,7 +298,9 @@ class WebSQLModel extends Model{
 			result = this._removeByArray( [].slice.call(arguments) );
 		}
 		else{
-			result = this._delete( topic );
+			result = this._executeSql(this._transSql( this._config.sql.delete ), [topic]).then((rs)=>{
+				return !!rs.rowsAffected;
+			});
 
 			super.removeData( topic );
 		}
@@ -375,7 +315,9 @@ class WebSQLModel extends Model{
 	clearData(){
 		super.clearData();
 
-		return this._clear();
+		return this._executeSql( this._transSql(this._config.sql.clear) ).then((rs)=>{
+			return !!rs.rowsAffected;
+		});
 	}
 
 	/**
@@ -385,18 +327,7 @@ class WebSQLModel extends Model{
 	 * @return  {Promise<*, ErrorEvent>} 返回一个 Promise 对象，在 resolve 时传回 sql 语句的执行结果
 	 * */
 	executeSql(sql, value=[]){
-		return this._store.then((db)=>{
-			return new Promise((resolve, reject)=>{
-				db.transaction((tx)=>{
-					tx.executeSql(sql, value, (tx, rs)=>{
-						resolve( rs );
-					}, (tx, e)=>{
-						console.log( e );
-						reject( e );
-					});
-				});
-			});
-		});
+		return this._executeSql(sql, value);
 	}
 	/**
 	 * @summary 针对某列建立索引

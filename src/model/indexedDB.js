@@ -53,7 +53,7 @@ class IndexedDBModel extends Model{
 	 * @param   {number}    [config.dbVersion]
 	 * @param   {string}    [config.keyPath]
 	 * @param   {Object[]}  [config.index]
-	 * @param   {string}    config.index[].name
+	 * @param   {string}    [config.index[].name]
 	 * @param   {string}    [config.index[].keyPath]    未设置时默认使用 name
 	 * @param   {boolean}   [config.index[].unique=false]   默认值 false
 	 * @param   {string}    [config.eventType]

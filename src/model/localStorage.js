@@ -108,8 +108,10 @@ class LocalStorageModel extends Model{
 	 * @return  {Promise<boolean>}
 	 * */
 	_listenOn = (e)=>{
-		let topic = e.key
-			, newVal = e.newValue
+		let {
+			key: topic
+			, newValue: newVal
+			} = e
 			;
 
 		try{

@@ -42,8 +42,8 @@ class Base{
 	/**
 	 * @summary 声明依赖
 	 * @static
-	 * @param   {Base}  module
-	 * @param   {...Base}
+	 * @param   {Base|Object}  module
+	 * @param   {...Base|Object}
 	 * */
 	static use(...module){
 		if( this.modules ){

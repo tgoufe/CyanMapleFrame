@@ -483,8 +483,8 @@ class ServiceModel extends Model{
 					;
 
 				if( !method ){
-					SUPPORT_METHOD.forEach((method)=>{
-						Object.defineProperty(runner, method, {
+					Object.defineProperties(runner, SUPPORT_METHOD.reduce((rs, method)=>{
+						rs[method] = {
 							enumerable: true
 							, configurable: false
 							, get: (data)=>{
@@ -492,8 +492,10 @@ class ServiceModel extends Model{
 									data
 								}), method.toUpperCase());
 							}
-						});
-					});
+						}
+
+						return rs;
+					}, {}))
 				}
 
 				return runner;

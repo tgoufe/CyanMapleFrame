@@ -363,7 +363,7 @@ class CookieModel extends Model{
 				}
 				else{
 					let temp = this._getCookie( d )
-					;
+						;
 
 					if( temp instanceof Promise ){  // 不存在该 topic 的值
 						all[d] = null;

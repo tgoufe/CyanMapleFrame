@@ -13,7 +13,7 @@ import merge from '../util/merge.js';
  * @param       {boolean}   [options.enableHighAccuracy=false]  是否浏览器获取高精度的位置
  * @param       {number}    [options.timeout=2000]              超时时间，单位毫秒
  * @param       {number}    [options.maximumAge=5000]           最长有效期
- * @return      {Promise<Position, PositionError>}
+ * @return      {Promise<Position, Error>}
  * */
 let geo = function(options={}){
 	let result

@@ -14,7 +14,7 @@ else{
 
 function urlBase64ToUnit8Array(base64String){
 	let padding = '='.repeat((4 - base64String.length %4) %4)
-		, base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
+		, base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
 		, rawData = window.atob( base64 )
 		, outputArray = new Uint8Array( rawData.length )
 		;
@@ -45,6 +45,7 @@ function registerServiceWorker(options={}, welcome=''){
 	}
 
 	if( 'serviceWorker' in navigator ){
+		// todo 好像有问题
 		registerServiceWorker._CACHE[config.file] = navigator.serviceWorker.register(config.file, {
 			scope: config.scope
 		}).then((regist)=>{
@@ -62,10 +63,11 @@ function registerServiceWorker(options={}, welcome=''){
 		}).catch((e)=>{
 			// 注册失败 todo 发送 log
 
-			console.log(e);
+			console.log( e );
+			return Promise.reject( new Error('Service Worker 注册失败') );
 		});
 
-		navigator.serviceWorker.addEventListener('message', (e)=>{
+		navigator.serviceWorker.addEventListener('message', ()=>{
 			// todo 处理事件
 		});
 	}
@@ -103,7 +105,7 @@ function registerServiceWorker(options={}, welcome=''){
 
 			return regist.pushManager.subscribe({
 				userVisibleOnly: true   // 所有推送消息必须对用户可见
-				, applicationServerKey: urlBase64ToUnit8Array(options.applicationServerKey)
+				, applicationServerKey: urlBase64ToUnit8Array( options.applicationServerKey )
 			}).then((sub)=>{
 				console.log(`订阅成功 ${sub.endpoint}`);
 
@@ -118,16 +120,24 @@ function registerServiceWorker(options={}, welcome=''){
 			// 将 endpoint 订阅信息发送到服务器端保存
 		}, ()=>{});
 
-		/**
-		 * 当 Service Worker 未注册成功时
-		 * navigator.serviceWorker.controller 的值为 null
-		 * */
-		if( navigator.serviceWorker.controller ){
-			return navigator.serviceWorker.controller;
-		}
-		else{
-			return Promise.reject( new Error('Service Worker 注册失败') );
-		}
+		return new Promise((resolve)=>{
+			function resolveWithRegistration(){
+				navigator.serviceWorker.getRegistration().then((registration)=>{
+					resolve( registration );
+				});
+			}
+
+			/**
+			 * 当 Service Worker 未注册成功时
+			 * navigator.serviceWorker.controller 的值为 null
+			 * */
+			if( navigator.serviceWorker.controller ){
+				resolveWithRegistration();
+			}
+			else{
+				navigator.serviceWorker.addEventListener('controllerchange', resolveWithRegistration);
+			}
+		});
 	});
 }
 

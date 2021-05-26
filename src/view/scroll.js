@@ -58,6 +58,54 @@ let scroll = (callback)=>{
 		}
 	}
 	/**
+	 * @summary 处理上、左方向的滚动量
+	 * @param   {number}    curr        滚动数据
+	 * @param   {string}    unit        滚动单位
+	 * @param   {string}    direction   滚动方向
+	 * @return  {number}
+	 * */
+	, _handleTopLeft = (curr, unit, direction)=>{
+		if( unit === '%' ){  // 百分比
+			curr = curr * scrollTarget[`scroll${direction}`] / 100;
+		}
+		else if( unit === 'view' ){  // 屏数
+			curr = curr * doc[`client${direction}`];
+		}
+
+		return curr;
+	}
+	/**
+	 * @summary 处理下、右方向的滚动量
+	 * @param   {number}    curr        滚动数据
+	 * @param   {string}    unit        滚动单位
+	 * @param   {string}    direction   滚动方向
+	 * @return  {number}
+	 * */
+	, _handleBottomRight = (curr, unit, direction)=>{
+		if( unit === '%' ){  // 百分比
+			curr = Math.max(scrollTarget[`scroll${direction}`] * (1 - curr / 100), 0);
+		}
+		else if( unit === 'view' ){  // 屏数
+			curr = Math.max(scrollTarget[`scroll${direction}`] - curr * doc[`client${direction}`], 0);
+		}
+		else{
+			curr = Math.max(scrollTarget[`scroll${direction}`] - curr, 0);
+		}
+
+		if( unit === '%' ){  // 百分比
+			curr = Math.max(scrollTarget.scrollWidth * (1 - curr / 100), 0);
+		}
+		else if( unit === 'view' ){  // 屏数
+			curr = Math.max(scrollTarget.scrollWidth - curr * doc.clientWidth, 0);
+		}
+		else{
+			curr = Math.max(scrollTarget.scrollWidth - curr, 0);
+		}
+
+		return curr;
+	}
+
+	/**
 	 * @summary     设置或读取当前页面滚动条位置
 	 * @memberOf    scroll
 	 * @method
@@ -103,66 +151,34 @@ let scroll = (callback)=>{
 
 			return {
 				px: curr
-				, percent: Math.floor(curr / total * 100)
-				, view: parseFloat((curr / view).toFixed(1))
+				, percent: Math.floor( curr / total * 100 )
+				, view: parseFloat( (curr / view).toFixed(1) )
 			};
 		}
 		else{   // 写 操作
 			temp = regexp.exec( value );
 
 			if( temp ){
+				curr = parseFloat( temp[1] );
+
 				switch( offset ){
 					case 'top':
-						curr = parseFloat(temp[1]);
-
-						if (temp[2] === '%') {  // 百分比
-							curr = curr * scrollTarget.scrollHeight / 100;
-						}
-						else if (temp[2] === 'view') {  // 屏数
-							curr = curr * doc.clientHeight;
-						}
+						curr = _handleTopLeft(curr, temp[2], 'Height');
 
 						scrollTarget.scrollTop = curr;
 						break;
 					case 'bottom':
-						curr = parseFloat(temp[1]);
-
-						if (temp[2] === '%') {  // 百分比
-							curr = Math.max(scrollTarget.scrollHeight * (1 - curr / 100), 0);
-						}
-						else if (temp[2] === 'view') {  // 屏数
-							curr = Math.max(scrollTarget.scrollHeight - curr * doc.clientHeight, 0);
-						}
-						else{
-							curr = Math.max(scrollTarget.scrollHeight - curr, 0);
-						}
+						curr = _handleBottomRight(curr, temp[2], 'Height');
 
 						scrollTarget.scrollTop = curr;
 						break;
 					case 'left':
-						curr = parseFloat(temp[1]);
-
-						if (temp[2] === '%') {  // 百分比
-							curr = curr * scrollTarget.scrollWidth / 100;
-						}
-						else if (temp[2] === 'view') {  // 屏数
-							curr = curr * doc.clientWidth;
-						}
+						curr = _handleTopLeft(curr, temp[2], 'Width');
 
 						scrollTarget.scrollLeft = curr;
 						break;
 					case 'right':
-						curr = parseFloat(temp[1]);
-
-						if (temp[2] === '%') {  // 百分比
-							curr = Math.max(scrollTarget.scrollWidth * (1 - curr / 100), 0);
-						}
-						else if (temp[2] === 'view') {  // 屏数
-							curr = Math.max(scrollTarget.scrollWidth - curr * doc.clientWidth, 0);
-						}
-						else{
-							curr = Math.max(scrollTarget.scrollWidth - curr, 0);
-						}
+						curr = _handleBottomRight(curr, temp[2], 'Width');
 
 						scrollTarget.scrollLeft = curr;
 						break;

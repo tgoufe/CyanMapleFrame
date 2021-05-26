@@ -5,8 +5,8 @@
  *          整合 location 和 history 功能
  * */
 
-import Base     from '../base.js';
-import listener, {Listener} from '../util/listener.js';
+import Base       from '../base.js';
+import {Listener} from '../util/listener.js';
 
 const URL_KEY_INDEX = ['source'
 		, 'protocol'
@@ -256,235 +256,255 @@ class Url extends Base{
 
 Url.use( Listener );
 
-let url = new Url()
+let url = Object.create(new Url(), Object.entries({
+		/**
+		 * @summary     Url 类对象
+		 * @type        {Url}
+		 * @memberOf    url
+		 * */
+		Url
+		/**
+		 * @summary     对 url 进行解析
+		 * @method
+		 * @memberOf    url
+		 * @param       {string|Url}    url
+		 * @return      {Url}           若出入的 url 参数是一个 Url 对象，则不做处理直接返回
+		 * */
+		, parseUrl(url){
+			if( url instanceof Url ){
+				return url;
+			}
+			else if( typeof url === 'string' ){
+				return new Url( url );
+			}
+			else{
+				return new Url();
+			}
+		}
+		/**
+		 * @summary     对没有协议头（以 // 开头）的路径加上协议头
+		 * @method
+		 * @memberOf    url
+		 * @param       {string}    url
+		 * @return      {string}
+		 * */
+		, addProtocol(url){
+			return /^\/\//.test( url ) ? this.protocol + url : url;
+		}
+
+		/**
+		 * @summary     刷新当前页面
+		 * @method
+		 * @memberOf    url
+		 * */
+		, reload(){
+			location.reload();
+		}
+		/**
+		 * @summary     页面后退
+		 * @method
+		 * @memberOf    url
+		 * @return      {Url}   this
+		 * */
+		, back(){
+			history.back();
+
+			return this;
+		}
+		/**
+		 * @summary     页面前进
+		 * @method
+		 * @memberOf    url
+		 * @return      {Url}   this
+		 * */
+		, forward(){
+			history.forward();
+
+			return this;
+		}
+		/**
+		 * @summary     调整到某一位置页面
+		 * @method
+		 * @memberOf    url
+		 * @param       {number}    index
+		 * @return      {Url}       this
+		 * */
+		,go(index){
+			history.go( index );
+
+			return this;
+		}
+
+		/**
+		 * @summary     设置页面 hash
+		 * @method
+		 * @memberOf    url
+		 * @param       {string}    hash
+		 * @return      {Url}       this
+		 * */
+		, setHash(hash){
+			this.hash = hash;
+			location.hash = hash;
+
+			return this;
+		}
+
+		// ---------- url 上的参数操作 ----------
+		/**
+		 * @summary     pushParams 和 replaceParams 内部调用处理参数操作的方法，不应直接调用
+		 * @private
+		 * @method
+		 * @memberOf    url
+		 * @param       {string[]|Object}   params
+		 * @param       {*|Object}          [state=null]
+		 * @return      {Object|null}
+		 * */
+		, _handlerParams(params, state=null){
+			let argc = arguments.length
+				, argv = arguments
+				;
+
+			if( argc > 1 ){
+				if( typeof params === 'object' ){
+					state = argv[1];
+				}
+				else if( typeof argv[argc -1] === 'object' ){
+					state = argv[argc -1];
+					argv = [].slice.call(argv, 0, -1);
+				}
+			}
+
+			this.changeParams(...argv);
+
+			return state
+		}
+		/**
+		 * @summary     调整参数并指向调整后的路径，当前 url 添加到历史记录
+		 * @method
+		 * @memberOf    url
+		 * @param       {string[]|Object}   params
+		 * @param       {*|Object}          [pushState]
+		 * @return      {Url}               this
+		 * @desc        只有两种情况下 pushState 才有效：
+		 *              1.当 params 是 Object 类型时
+		 *              2.当不满足 1 条件时，参数中的最后一个为 Object 类型时，视为 pushState
+		 * */
+		, pushParams(params, pushState){
+			let state = this._handlerParams(params, pushState)
+				;
+
+			// 将当前浏览器上 url 换为替换后组装出来的链接，当期 url 进入
+			history.pushState(state, '', this.pack());
+
+			return this;
+		}
+		/**
+		 * @summary     替换当前 url 上的参数
+		 * @method
+		 * @memberOf    url
+		 * @param       {Object|string[]}   params
+		 * @param       {*|Object}          [replaceState]
+		 * @return      {Url}               this
+		 * @desc        执行效果
+		 * */
+		, replaceParams(params, replaceState){
+			let state = this._handlerParams(params, replaceState)
+				;
+
+			// 将当前浏览器上 url 换为替换后组装出来的链接
+			history.replaceState(state, '', this.pack());
+
+			return this;
+		}
+
+		// ---------- 修改 url 历史记录 ----------
+		/**
+		 * @summary     将 url 指向目标路径，当前 url 添加到历史记录
+		 * @method
+		 * @memberOf    url
+		 * @param       {string}    href
+		 * @param       {Object}    [state=null]
+		 * @return      {Url}       this
+		 * */
+		, pushHistory(href, state=null){
+			history.pushState(state, '', href);
+
+			this.changeTo( this.parseUrl(href) );
+
+			return this;
+		}
+		/**
+		 * @summary     替换当前 url 为目标路径
+		 * @method
+		 * @memberOf    url
+		 * @param       {string}    href
+		 * @param       {Object}    [state=null]
+		 * @return      {Url}       this
+		 * */
+		, replaceHistory(href, state=null){
+			history.replaceState(state, '', href);
+
+			this.changeTo( this.parseUrl(href) );
+
+			return this;
+		}
+
+		// ---------- 页面跳转操作 ----------
+		/**
+		 * @summary     跳转到目标页面，当前 url 添加到历史记录
+		 * @method
+		 * @memberOf    url
+		 * @param       {string}    href
+		 * */
+		, changePage(href){
+			location.assign( href );
+		}
+		/**
+		 * @summary     替换当前 url 为目标路径，页面刷新
+		 * */
+		, replacePage(href){
+			location.replace( href );
+		}
+
+		// ---------- 相关事件处理 ----------
+		/**
+		 * @summary     监听 hashChange 事件
+		 * @method
+		 * @memberOf    url
+		 * @param       {Function}  callback
+		 * @return      {Object}
+		 * */
+		, hashChange(callback){
+			return this.$listener.on(this, 'hashchange', callback);
+		}
+		/**
+		 * @summary     监听 popstate 事件
+		 * @method
+		 * @memberOf    url
+		 * @param       {Function}  callback
+		 * @return      {Object}
+		 * */
+		, popState(callback){
+			return this.$listener.on(this, 'popstate', callback);
+		}
+	}).reduce((rs, [key, value])=>{
+		rs[key] = {
+			value
+			, enumerable: true
+			, freeze: true
+		};
+
+		return rs;
+	}, {
+		hashParams: {
+			enumerable: true
+			, get(){
+				return this.parseUrl( this.hash ).params;
+			}
+		}
+	}))
 	;
 
-/**
- * @summary     Url 类对象
- * @type        {Url}
- * @memberOf    url
- * */
-url.Url = Url;
-/**
- * @summary     对 url 进行解析
- * @method
- * @memberOf    url
- * @param       {string|Url}    url
- * @return      {Url}           若出入的 url 参数是一个 Url 对象，则不做处理直接返回
- * */
-url.parseUrl = (url)=>{
-	if( url instanceof Url ){
-		return url;
-	}
-	else if( typeof url === 'string' ){
-		return new Url( url );
-	}
-	else{
-		return new Url();
-	}
-};
-/**
- * @summary     对没有协议头（以 // 开头）的路径加上协议头
- * @method
- * @memberOf    url
- * @param       {string}    url
- * @return      {string}
- * */
-url.addProtocol = (url)=>{
-	return /^\/\//.test( url ) ? this.protocol + url : url;
-};
-
-/**
- * @summary     刷新当前页面
- * @method
- * @memberOf    url
- * */
-url.reload = ()=>{
-	location.reload();
-};
-/**
- * @summary     页面后退
- * @method
- * @memberOf    url
- * @return      {Url}   this
- * */
-url.back = function(){
-	history.back();
-
-	return this;
-};
-/**
- * @summary     页面前进
- * @method
- * @memberOf    url
- * @return      {Url}   this
- * */
-url.forward = function(){
-	history.forward();
-
-	return this;
-};
-/**
- * @summary     调整到某一位置页面
- * @method
- * @memberOf    url
- * @param       {number}    index
- * @return      {Url}       this
- * */
-url.go = function(index){
-	history.go( index );
-
-	return this;
-};
-
-/**
- * @summary     设置页面 hash
- * @method
- * @memberOf    url
- * @param       {string}    hash
- * @return      {Url}       this
- * */
-url.setHash = function(hash){
-	this.hash = hash;
-	location.hash = hash;
-
-	return this;
-};
-
-Object.defineProperty(url, 'hashParams', {
-	get(){
-		return this.parseUrl( this.hash ).params;
-	}
-});
-
-// ---------- url 上的参数操作 ----------
-/**
- * @summary     调整参数并指向调整后的路径，当前 url 添加到历史记录
- * @method
- * @memberOf    url
- * @param       {string[]|Object}   params
- * @param       {*|Object}          [pushState]
- * @return      {Url}               this
- * @desc        只有两种情况下 pushState 才有效：
- *              1.当 params 是 Object 类型时
- *              2.当不满足 1 条件时，参数中的最后一个为 Object 类型时，视为 pushState
- * */
-url.pushParams = function(params, pushState){
-	let argc = arguments.length
-		, argv = arguments
-		, state = null
-		;
-
-	if( argc > 1 ){
-		if( typeof params === 'object' ){
-			state = argv[1];
-		}
-		else if( typeof argv[argc -1] === 'object' ){
-			state = argv[argc -1];
-			argv = [].slice.call(argv, 0, -1);
-		}
-	}
-
-	this.changeParams(...argv);
-
-	// 将当前浏览器上 url 换为替换后组装出来的链接，当期 url 进入
-	history.pushState(state, '', this.pack());
-
-	return this;
-};
-/**
- * @summary     替换当前 url 上的参数
- * @method
- * @memberOf    url
- * @param       {Object|string[]}   params
- * @param       {*|Object}          [replaceState]
- * @return      {Url}               this
- * @desc        执行效果
- * */
-url.replaceParams = function(params, replaceState){
-	let argc = arguments.length
-		, argv = arguments
-		, state = null
-		;
-
-	if( argc > 1 ){
-		if( typeof params === 'object' ){
-			state = argv[1];
-		}
-		else if( typeof argv[argc -1] === 'object' ){
-			state = argv[argc -1];
-			argv = [].slice.call(argv, 0, -1);
-		}
-	}
-
-	this.changeParams(...argv);
-
-	// 将当前浏览器上 url 换为替换后组装出来的链接
-	history.replaceState(state, '', this.pack());
-
-	return this;
-};
-
-// ---------- 修改 url 历史记录 ----------
-/**
- * @summary     将 url 指向目标路径，当前 url 添加到历史记录
- * @method
- * @memberOf    url
- * @param       {string}    href
- * @param       {Object}    [state=null]
- * @return      {Url}       this
- * */
-url.pushHistory = function(href, state=null){
-	history.pushState(state, '', href);
-
-	this.changeTo( this.parseUrl(href) );
-
-	return this;
-};
-/**
- * @summary     替换当前 url 为目标路径
- * @method
- * @memberOf    url
- * @param       {string}    href
- * @param       {Object}    [state=null]
- * @return      {Url}       this
- * */
-url.replaceHistory = function(href, state=null){
-	history.replaceState(state, '', href);
-
-	this.changeTo( this.parseUrl(href) );
-
-	return this;
-};
-
-// ---------- 页面跳转操作 ----------
-/**
- * @summary     跳转到目标页面，当前 url 添加到历史记录
- * @method
- * @memberOf    url
- * @param       {string}    href
- * */
-url.changePage = function(href){
-	location.assign( href );
-};
-/**
- * @summary     替换当前 url 为目标路径，页面刷新
- * */
-url.replacePage = function(href){
-	location.replace( href );
-};
-
-// ---------- 相关事件处理 ----------
-/**
- * @summary     监听 hashChange 事件
- * @method
- * @memberOf    url
- * @param       {Function}  callback
- * @return      {Object}
- * */
-url.hashChange = function(callback){
-	return this.$listener.on(this, 'hashchange', callback);
-};
 url.hashChange((e, newUrl)=>{
 	let temp
 		;
@@ -502,16 +522,6 @@ url.hashChange((e, newUrl)=>{
 	}
 });
 
-/**
- * @summary     监听 popstate 事件
- * @method
- * @memberOf    url
- * @param       {Function}  callback
- * @return      {Object}
- * */
-url.popState = function(callback){
-	return this.$listener.on(this, 'popstate', callback);
-};
 url.popState((e, newUrl)=>{
 	let temp
 		, state = e.state
