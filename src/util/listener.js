@@ -330,14 +330,14 @@ class Listener extends Base{
 			, eventConfig
 			, handlers
 			, key
-			, {
-			target
-			, type
-			, callback
-			, options
-			, capture
-			} = this._handleArgs( ...arguments )
+			, args = this._handleArgs( ...arguments )
+			, {capture} = args
 			;
+
+		target = args.target;
+		type = args.type;
+		callback = args.callback;
+		options = args.options;
 
 		if( !this._callbackList.has(target) ){
 			this._callbackList.set(target, {});
