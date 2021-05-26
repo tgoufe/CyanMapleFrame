@@ -407,14 +407,14 @@ class Listener extends Base{
 	off(target, type, callback={}, options={}){
 		let eventConfig
 			, handlers
-			, {
-			target
-			, type
-			, callback
-			, options
-			, capture
-			} = this._handleArgs( ...arguments )
+			, args = this._handleArgs( ...arguments )
+			, {capture} = args
 			;
+
+		target = args.target;
+		type = args.type;
+		callback = args.callback;
+		options = args.options;
 
 		eventConfig = this._getEventConfig(target, type, capture);
 
