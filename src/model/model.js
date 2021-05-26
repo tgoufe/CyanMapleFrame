@@ -317,6 +317,10 @@ class Model extends Base{
 	 * @return      {Promise}
 	 * */
 	_sync = (e, topic, value)=>{
+		if( !this._syncToList.length ){
+			return  Promise.resolve();
+		}
+
 		return Promise.all( this._syncToList.map((m)=>{
 			let result
 				;
