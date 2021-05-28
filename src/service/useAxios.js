@@ -18,37 +18,43 @@ import axios    from 'axios';
  *                      在 reject 是返回由 {topic, options, error} 所组成的对象
  * */
 let request = (topic, options)=>{
-	try{
-		return axios(topic, options).then(({data})=>{
-			return {
-				topic
-				, options
-				, res: data
-			};
-		}, (error)=>{
-			if( error.response ){
-				// 请求完成，返回非 2xx 状态码
-			}
-			else if( error.request ){
-				// 请求未响应
-			}
-			else{
-				console.log( error.message );
-				return Promise.reject( error );
-			}
+		try{
+			return axios(topic, options).then(({data})=>{
+				return {
+					topic
+					, options
+					, res: data
+				};
+			}, (error)=>{
+				if( error.response ){
+					// 请求完成，返回非 2xx 状态码
+				}
+				else if( error.request ){
+					// 请求未响应
+				}
+				else{
+					console.log( error.message );
+					return Promise.reject( error );
+				}
 
-			return {
-				topic
-				, options
-				, error
-			};
+				return {
+					topic
+					, options
+					, error
+				};
+			});
+		}
+		catch(e){
+			console.log( e.message );
+			return Promise.reject( e );
+		}
+	}
+	, setOpts = (options={})=>{
+		Object.entries( options ).forEach(([key, value])=>{
+			axios.defaults[key] = value;
 		});
 	}
-	catch(e){
-		console.log( e.message );
-		return Promise.reject( e );
-	}
-};
+	;
 
 export default {
 	/**
@@ -57,10 +63,15 @@ export default {
 	 * @desc    注入为 $request
 	 * */
 	inject(app){
+		Object.entries( app.$options.request || {} ).forEach(([key, value])=>{
+			axios.defaults[key] = value;
+		});
+
 		app.inject('$request', request);
 	}
 }
 
 export {
 	request
+	, setOpts
 };

@@ -143,7 +143,7 @@ import notify     from './view/notify.js';
 // 	}
 // }
 
-import useAxios from './service/useAxios.js';
+import useAxios, {setOpts} from './service/useAxios.js';
 
 let maple = {
 	App: Base
@@ -171,7 +171,9 @@ let maple = {
 	// , animate
 	, register
 	, notify
-	, useAxios(){
+	, useAxios(options){
+		setOpts( options );
+
 		ModelList.ServiceModel.use( useAxios );
 	}
 };

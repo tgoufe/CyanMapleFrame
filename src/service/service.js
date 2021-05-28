@@ -17,9 +17,8 @@ const SERVICE_MODEL_CONFIG = {
 		, cache: false
 		, dataType: 'json'
 		, timeout: 10000
-		, xhrFields: {
-			withCredentials: true
-		}
+		, withCredentials: true
+		, crossDomain: true
 	}
 	/**
 	 * 拦截器
