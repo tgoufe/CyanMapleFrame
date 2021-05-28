@@ -109,11 +109,16 @@ class Url extends Base{
 	 * @static
 	 * @param   {Base}  app
 	 * @desc    注入为 $url
+	 *          同时会注入 $urlParams、$hashParams，为函数类型，返回当前 url 上的参数
 	 * */
 	static inject(app){
 		app.inject('$url', url);
-		app.inject('$urlParams', url.params);
-		app.inject('$hashParams', url.hashParams);
+		app.inject('$urlParams', ()=>{
+			return url.params;
+		});
+		app.inject('$hashParams', ()=>{
+			return url.hashParams;
+		});
 	}
 
 	// ---------- 静态属性 ----------
@@ -475,7 +480,7 @@ let url = Object.create(new Url(), Object.entries({
 		 * @return      {Object}
 		 * */
 		, hashChange(callback){
-			return this.$listener.on(this, 'hashchange', callback);
+			return this.$listener.on('hashchange', callback);
 		}
 		/**
 		 * @summary     监听 popstate 事件
@@ -485,7 +490,7 @@ let url = Object.create(new Url(), Object.entries({
 		 * @return      {Object}
 		 * */
 		, popState(callback){
-			return this.$listener.on(this, 'popstate', callback);
+			return this.$listener.on('popstate', callback);
 		}
 	}).reduce((rs, [key, value])=>{
 		rs[key] = {
