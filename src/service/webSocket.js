@@ -17,6 +17,7 @@ const WEB_SOCKET_CONFIG = {
  * @class
  * @desc    WebSocket 接口，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 webSocket，别名 socket，将可以使用工厂方法生成
  * @extends Model
+ * @requires    Url
  * */
 class WebSocketModel extends Model{
 	/**
@@ -31,6 +32,8 @@ class WebSocketModel extends Model{
 		config = merge(config, WebSocketModel.CONFIG);
 
 		super( config );
+
+		this.$url = this.$url || null;
 
 		this._config = config;
 		this._syncTarget = null;

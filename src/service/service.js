@@ -36,6 +36,7 @@ const SERVICE_MODEL_CONFIG = {
  * @desc    对服务器接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 service，别名 s，将可以使用工厂方法生成
  *          必须通过注入的方式注入一个 $request 方法用来发送请求
  * @extends Model
+ * @requires    $request
 <pre>
 let serviceModel = new ServiceModel()
     , service = Model.factory('service')
@@ -100,7 +101,9 @@ class ServiceModel extends Model{
 
 		this._config = config;
 
-		if( !('$request' in this) ){
+		this.$request = this.$request || null
+
+		if( !this.$request ){
 			throw new Error(`$request 未注入，无法发送请求`);
 		}
 		

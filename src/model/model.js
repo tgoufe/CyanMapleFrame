@@ -44,6 +44,7 @@ const MODEL_CONFIG = {
  * @class
  * @desc    数据层基类，将数据保存在内存中
  * @extends Base
+ * @requires    Listener
  * @example
 <pre>
 let model = new Model();
@@ -88,6 +89,8 @@ class Model extends Base{
 		config = merge(config, Model.CONFIG);
 
 		super( config );
+
+		this.$listener = this.$listener || null;
 		
 		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 等方法
 		this._history = Object.create( null );  // 历史记录

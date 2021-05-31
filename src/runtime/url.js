@@ -29,6 +29,7 @@ const URL_KEY_INDEX = ['source'
  * @class
  * @desc    url 解析
  * @extends Base
+ * @requires    Listener
  * */
 class Url extends Base{
 	/**
@@ -37,6 +38,8 @@ class Url extends Base{
 	 * */
 	constructor(url){
 		super();
+
+		this.$listener = this.$listener || null;
 
 		let target = Url.createParseTarget( url )
 			, temp
