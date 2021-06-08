@@ -19,6 +19,13 @@ import axios    from 'axios';
  * */
 let request = (topic, options)=>{
 		try{
+			let {method, data} = options
+				;
+
+			if( method === 'GET' ){
+				options.params = data;
+			}
+
 			return axios(topic, options).then(({data})=>{
 				return {
 					topic
