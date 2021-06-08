@@ -55,7 +55,7 @@ import listener, {Listener} from './util/listener.js';
  * ---------- 全局运行时检测 ----------
  * */
 // 运行参数
-import url, {Url}   from './runtime/url.js';
+import url, {Url, CurrentUrl}   from './runtime/url.js';
 
 // 运行设备、系统、内核、浏览器
 import device, {Device} from './runtime/device.js';
@@ -183,6 +183,7 @@ export default maple;
 export {
 	Base as App
 	, Url
+	, CurrentUrl
 	, Device
 	, View
 	, util as Util
