@@ -89,7 +89,10 @@ class Base{
 				, get(){
 					return module;
 				}
-			})
+				, set(){
+					console.log(`${key} 为注入接口，不能修改`);
+				}
+			});
 		}
 	}
 }
