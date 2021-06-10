@@ -2,6 +2,7 @@
 
 import Model from './model.js';
 import merge from '../util/merge.js';
+import log   from '../util/log.js';
 
 /**
  * 默认配置
@@ -105,7 +106,7 @@ class IndexedDBModel extends Model{
 					resolve( e.target.result );
 				};
 				dbOpenRequest.onerror = (e)=>{
-					console.log( e );
+					log( e );
 					reject( e );
 				};
 			}
@@ -168,7 +169,7 @@ class IndexedDBModel extends Model{
 					resolve( value );
 				};
 				objectStoreRequest.onerror = (e)=>{
-					console.log( e );
+					log( e );
 					reject( e );
 				};
 			});
@@ -199,7 +200,7 @@ class IndexedDBModel extends Model{
 					resolve( !!e.target.result );
 				};
 				objectStoreRequest.onerror = (e)=>{
-					console.log( e );
+					log( e );
 					reject( e );
 				};
 			});
@@ -225,7 +226,7 @@ class IndexedDBModel extends Model{
 					resolve( true );
 				};
 				objectStoreRequest.onerror = (e)=>{
-					console.log( e );
+					log( e );
 					reject( e );
 				};
 			});
@@ -249,7 +250,7 @@ class IndexedDBModel extends Model{
 					resolve( true );
 				};
 				objectStoreRequest.onerror = (e)=>{
-					console.log( e );
+					log( e );
 					reject( e );
 				}
 			});
@@ -414,7 +415,7 @@ class IndexedDBModel extends Model{
 					}
 				};
 				cursor.onerror = (e)=>{
-					console.log( e );
+					log( e );
 					reject( e );
 				};
 
@@ -422,25 +423,52 @@ class IndexedDBModel extends Model{
 					resolve( cursorList );
 				};
 				transaction.onerror = (e)=>{
-					console.log( e );
+					log( e );
 					reject( e );
 				}
 			});
 		});
 	}
 
-	count(){
+	/**
+	 * @summary 统计数据
+	 * @param   {string|IDBKeyRange}    [query]
+	 * @return  {Promise}               返回一个 Promise 对象，在 resolve 时传回统计结果
+	 * */
+	count(query){
 		return this._store.then((db)=>{
 			return new Promise((resolve, reject)=>{
 				let objectStore = db.transaction([this._config.tableName], 'readonly').objectStore( this._config.tableName )
-					, objectStoreRequest = objectStore.count()
+					, objectStoreRequest = objectStore.count( query )
 					;
 
 				objectStoreRequest.onsuccess = (e)=>{
 					resolve( e.target.result );
 				};
 				objectStoreRequest.onerror = (e)=>{
-					console.log( e );
+					log( e );
+					reject( e );
+				};
+			});
+		});
+	}
+	/**
+	 * @summary 获取全部数据
+	 * @param   {string|IDBKeyRange}    [query]
+	 * @param   {number}                [count]
+	 * */
+	all(query, count){
+		return this._store.then((db)=>{
+			return new Promise((resolve, reject)=>{
+				let objectStore = db.transaction([this._config.tableName], 'readonly').objectStore( this._config.tableName )
+					, objectStoreRequest = objectStore.getAll(query, count)
+					;
+
+				objectStoreRequest.onsuccess = (e)=>{
+					resolve( e.target.result );
+				};
+				objectStoreRequest.onerror = (e)=>{
+					log( e );
 					reject( e );
 				};
 			});
