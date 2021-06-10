@@ -1,5 +1,7 @@
 'use strict';
 
+import log from './util/log.js';
+
 /**
  * @class
  * @desc    所有类的基类，实现了依赖注入功能，每个继承的应该提供一个静态的 inject 方法提供依赖注入
@@ -90,7 +92,7 @@ class Base{
 					return module;
 				}
 				, set(){
-					console.log(`${key} 为注入接口，不能修改`);
+					log(`${key} 为注入接口，不能修改`);
 				}
 			});
 		}

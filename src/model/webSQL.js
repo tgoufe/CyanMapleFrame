@@ -2,6 +2,7 @@
 
 import Model from './model.js';
 import merge from '../util/merge.js';
+import log   from '../util/log.js';
 
 function sqlTpl(strings, ...keys){
 	return function(...values){
@@ -106,7 +107,7 @@ class WebSQLModel extends Model{
 				tx.executeSql(this._transSql( this._config.sql.create ), [], ()=>{
 					resolve( db );
 				}, (tx, e)=>{
-					console.log( e );
+					log( e );
 					reject( e );
 				});
 			}, reject, ()=>{
@@ -171,7 +172,7 @@ class WebSQLModel extends Model{
 					tx.executeSql(sql, value, (tx, rs)=>{
 						resolve( rs );
 					}, (tx, e)=>{
-						console.log( e );
+						log( e );
 						reject( e );
 					});
 				});

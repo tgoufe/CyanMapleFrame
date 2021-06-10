@@ -1,5 +1,7 @@
 'use strict';
 
+import log from '../util/log.js';
+
 /**
  * @file    全局事件 scroll
  *          使用捕捉方式
@@ -34,7 +36,7 @@ let scroll = (callback)=>{
 			});
 		}
 		else{
-			console.log('目标非 Element、NodeList、HTMLCollection 类型对象，无法监听');
+			log('目标非 Element、NodeList、HTMLCollection 类型对象，无法监听');
 		}
 	}
 	/**
@@ -54,7 +56,7 @@ let scroll = (callback)=>{
 			});
 		}
 		else{
-			console.log('目标非 Element、NodeList、HTMLCollection 类型对象，无法监听');
+			log('目标非 Element、NodeList、HTMLCollection 类型对象，无法监听');
 		}
 	}
 	/**
@@ -187,7 +189,7 @@ let scroll = (callback)=>{
 				}
 			}
 			else{
-				console.log('scrollBar 参数设置错误');
+				log('scrollBar 参数设置错误');
 			}
 		}
 	}

@@ -2,6 +2,7 @@
 
 import Model from './model.js';
 import merge from '../util/merge.js';
+import log   from '../util/log.js';
 
 /**
  * 默认配置
@@ -94,7 +95,7 @@ class CacheStorageModel extends Model{
 		return this._store.then((caches)=>{
 			return caches.open( this._config.cacheName );
 		}).then((cache)=>{
-			console.log(`缓存 ${typeof topic === 'string' ? topic : topic.url}`);
+			log(`缓存 ${typeof topic === 'string' ? topic : topic.url}`);
 
 			return cache.put(CacheStorageModel.tranToRequest(topic), response);
 		});

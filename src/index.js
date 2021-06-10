@@ -106,43 +106,6 @@ import register from './register/index.js';
  * */
 import notify     from './view/notify.js';
 
-// const MODULE_LIST = []
-// 	;
-//
-// class App extends Base{
-// 	constructor(options){
-// 		super( options );
-// 	}
-//
-// 	static use(module){
-// 		this.modules.push( module );
-// 	}
-// 	static get modules(){
-// 		return MODULE_LIST;
-// 	}
-//
-// 	init(){
-// 		App.modules.forEach((module)=>{
-// 			module.inject && module.inject( this );
-// 		});
-// 	}
-//
-// 	inject(key, module){
-// 		if( key in this ){
-// 			throw Error('已存在同名模块');
-// 		}
-// 		else{
-// 			this.keys.push( key );
-//
-// 			Object.defineProperty(this, key, {
-// 				get(){
-// 					return module;
-// 				}
-// 			});
-// 		}
-// 	}
-// }
-
 import useAxios, {setOpts} from './service/useAxios.js';
 
 let maple = {
@@ -150,6 +113,8 @@ let maple = {
 	, Listener
 	, listener
 	, util
+	, log: util.log
+	, setDebug: util.setDebug
 
 	, url
 	, device

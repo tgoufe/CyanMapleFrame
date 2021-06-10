@@ -8,6 +8,8 @@
  * @namespace   maple.util
  * */
 
+import log, {setDebug} from './log.js';
+
 // 操作类
 import debounce     from './debounce.js';
 import throttle     from './throttle.js';
@@ -55,6 +57,9 @@ let util = {
 
 		, listener
 		, Listener
+
+		, log
+		, setDebug
 	}
 	;
 

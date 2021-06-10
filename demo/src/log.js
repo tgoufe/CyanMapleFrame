@@ -1,6 +1,6 @@
 'use strict';
 
-console._log = console.log;
+import maple from 'maple';
 
 let logArea = document.createElement('div')
 	;
@@ -17,16 +17,15 @@ height: 40px;
 document.body.appendChild( logArea );
 
 let log = function(){
-	let log = document.createElement('p')
-		;
+		let log = document.createElement('p')
+			;
 
-	log.innerHTML = Array.from( arguments ).join(' ');
+		log.innerHTML = Array.from( arguments ).join(' ');
 
-	logArea.appendChild( log );
+		logArea.appendChild( log );
 
-	console._log.apply(console, arguments);
-};
-
-console.log = log;
+		maple.log( ...arguments );
+	}
+	;
 
 export default log;

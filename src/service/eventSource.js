@@ -1,7 +1,8 @@
 'use strict';
 
 import Model from '../model/model.js';
-import merge from '../util/merge';
+import merge from '../util/merge.js';
+import log   from '../util/log.js';
 
 /**
  * 默认配置
@@ -90,14 +91,14 @@ class EventSourceModel extends Model{
 			conn = new EventSource(this._config.url, this._config);
 
 			this.$listener.on(conn, 'open', ()=>{
-				console.log('建立 Event Source 连接');
+				log('建立 Event Source 连接');
 				resolve( conn );
 			});
 			this.$listener.on(conn, 'error', (e)=>{
 				let error = new Error('该 Event Source 出现异常进而关闭')
 					;
 
-				console.log( e );
+				log( e );
 				this._conn = Promise.reject( error );
 
 				reject( error );
@@ -106,7 +107,7 @@ class EventSourceModel extends Model{
 				let error = new Error('该 Event Source 出现异常进而关闭')
 					;
 
-				console.log( e );
+				log( e );
 				this._conn = Promise.reject( error );
 
 				reject( error );
@@ -116,14 +117,14 @@ class EventSourceModel extends Model{
 			// todo
 			// this.$listener.on(conn, {
 			// 	open: ()=>{
-			// 		console.log('建立 Event Source 连接');
+			// 		log('建立 Event Source 连接');
 			// 		resolve( conn );
 			// 	}
 			// 	, error: (e)=>{
 			// 		let error = new Error('该 Event Source 出现异常进而关闭')
 			// 			;
 			//
-			// 		console.log( e );
+			// 		log( e );
 			// 		this._conn = Promise.reject( error );
 			//
 			// 		reject( error );
@@ -132,7 +133,7 @@ class EventSourceModel extends Model{
 			// 		let error = new Error('该 Event Source 出现异常进而关闭')
 			// 			;
 			//
-			// 		console.log( e );
+			// 		log( e );
 			// 		this._conn = Promise.reject( error );
 			//
 			// 		reject( error );
@@ -256,7 +257,7 @@ class EventSourceModel extends Model{
 	 * @return  {Promise<boolean>}  返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	close(){
-		console.log('关闭当前 Event Source 连接');
+		log('关闭当前 Event Source 连接');
 		return this._conn.then((conn)=>{
 			try{
 				conn.close();
@@ -283,7 +284,7 @@ class EventSourceModel extends Model{
 	 * @return  {Promise<boolean>}
 	 * */
 	reset(){
-		console.log('重置当前 Event Source 连接');
+		log('重置当前 Event Source 连接');
 		this.close().then(()=>{
 			this._conn = this._createConn();
 

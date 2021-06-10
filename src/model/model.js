@@ -1,8 +1,9 @@
 'use strict';
 
-import Base     from '../base.js';
-import {Listener}   from '../util/listener.js';
-import merge        from '../util/merge.js';
+import Base from '../base.js';
+import {Listener} from '../util/listener.js';
+import merge from '../util/merge.js';
+import log from '../util/log.js';
 
 /**
  * 默认配置
@@ -111,7 +112,7 @@ class Model extends Base{
 	 * */
 	static register(name, model){
 		if( name in Model._MODEL && name in Model._MODEL_CACHE ){
-			console.log(`${name} 重复注册，并已生成实例，不能覆盖`);
+			log(`${name} 重复注册，并已生成实例，不能覆盖`);
 		}
 		else{
 			Model._MODEL[name] = model;
@@ -133,7 +134,7 @@ class Model extends Base{
 				Model._MODEL_ALIAS[d] = name;
 			}
 			else{
-				console.log(`${d} 已经存在`);
+				log(`${d} 已经存在`);
 			}
 		});
 	}
@@ -172,25 +173,25 @@ class Model extends Base{
 						// 使用缓存，将该子类实例缓存
 						Model._MODEL_CACHE[type] = model;
 
-						console.log(`通过工厂方法生成 ${type} 类型的对象, 将 ${type} 类型的对象缓存`);
+						log(`通过工厂方法生成 ${type} 类型的对象, 将 ${type} 类型的对象缓存`);
 					}
 				}
 				else{   // 使用缓存并存在该子类实例
 					model = Model._MODEL_CACHE[type];
 
-					console.log(`从缓存中取到 ${type} 类型的对象`);
+					log(`从缓存中取到 ${type} 类型的对象`);
 				}
 			}
 			else{
 				model = new Model();
 
-				console.log(`不存在注册为 ${type} 的子类`);
+				log(`不存在注册为 ${type} 的子类`);
 			}
 		}
 		else{
 			model = new Model();
 
-			console.log('生成 model 对象');
+			log('生成 model 对象');
 		}
 
 		return model;
@@ -296,7 +297,7 @@ class Model extends Base{
 		if( newVal !== oldVal ){
 			this._history[topic].push( newVal );
 			
-			console.log(`设置 ${topic} 的值为 ${newVal}`);
+			log(`设置 ${topic} 的值为 ${newVal}`);
 
 			this._trigger(topic, newVal, oldVal);
 		}
@@ -336,10 +337,10 @@ class Model extends Base{
 			}
 
 			return result.catch(function(e){
-				console.log(`${m.constructor.name} ${topic} ${value} 同步失败`, e);
+				log(`${m.constructor.name} ${topic} ${value} 同步失败`, e);
 			});
 		}) ).then(function(){
-			console.log('同步完成');
+			log('同步完成');
 		});
 	}
 
@@ -569,7 +570,7 @@ class Model extends Base{
 				this._syncToList.push( m );
 			}
 			else{   // 该实例类型已经存在
-				console.log('该实例类型已经存在');
+				log('该实例类型已经存在');
 			}
 		});
 

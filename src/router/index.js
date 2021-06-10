@@ -2,9 +2,10 @@
 
 import Base     from '../base.js';
 import {Url}    from '../runtime/url.js';
-import merge    from '../util/merge.js';
 import HandlerQueue from '../util/handlerQueue.js';
 import {Listener}   from '../util/listener.js';
+import merge from '../util/merge.js';
+import log   from '../util/log.js';
 
 /**
  * 路由默认配置
@@ -194,10 +195,10 @@ class Router extends Base{
 
 		return execute.catch((e)=>{
 			if( e instanceof  Error){
-				console.log(`${path} 路由执行错误`, e);
+				log(`${path} 路由执行错误`, e);
 			}
 			else{
-				console.log(path, e);
+				log(path, e);
 			}
 
 			return Promise.reject();
@@ -248,7 +249,7 @@ class Router extends Base{
 			});
 		}
 		else{
-			console.log(`router 中不存在 ${location.href}`, e);
+			log(`router 中不存在 ${location.href}`, e);
 			this.config.fallback && this.config.fallback( tempUrl );
 		}
 	}
@@ -276,7 +277,7 @@ class Router extends Base{
 			});
 		}
 		else{
-			console.log(`router 中不存在 ${tempUrl.path}`, e);
+			log(`router 中不存在 ${tempUrl.path}`, e);
 			this.config.fallback && this.config.fallback( tempUrl.path );
 		}
 	}

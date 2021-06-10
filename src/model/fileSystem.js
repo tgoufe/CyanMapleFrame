@@ -2,6 +2,7 @@
 
 import Model from './model.js';
 import merge from '../util/merge.js';
+import log   from '../util/log.js';
 
 /**
  * 默认配置
@@ -134,7 +135,7 @@ class FileSystemModel extends Model{
 				resolve( true );
 			};
 			fileWriter.onerror = function(e){
-				console.log( e );
+				log( e );
 				reject( e );
 			};
 
@@ -149,7 +150,7 @@ class FileSystemModel extends Model{
 	 * */
 	_write(content){
 		return this._getFileEntry().then((fileEntry)=>{
-			console.log(`写入文件 ${fileEntry.toURL()}`);
+			log(`写入文件 ${fileEntry.toURL()}`);
 			return this._getFileWriter( fileEntry );
 		}).then((fileWriter)=>{
 			return this._writeFile(fileWriter, content);
@@ -183,7 +184,7 @@ class FileSystemModel extends Model{
 				resolve( e.target.result );
 			};
 			fileReader.onerror = function(e){
-				console.log( e );
+				log( e );
 				reject( e );
 			};
 
@@ -199,12 +200,12 @@ class FileSystemModel extends Model{
 		return this._getFileEntry({
 			create: true
 		}).then((fileEntry)=>{
-			console.log(`读取文件 ${fileEntry.toURL()}`);
+			log(`读取文件 ${fileEntry.toURL()}`);
 			return this._getFile( fileEntry );
 		}).then((file)=>{
 			return this._readFile( file );
 		}, (e)=>{
-			console.log( e );
+			log( e );
 
 			return '{}';
 		}).then((content)=>{
@@ -216,7 +217,7 @@ class FileSystemModel extends Model{
 				return content;
 			}
 			catch(e){
-				console.log( e );
+				log( e );
 				return Promise.reject( e );
 			}
 		});
@@ -367,7 +368,7 @@ class FileSystemModel extends Model{
 			});
 		}).then((fileEntry)=>{
 			return new Promise((resolve, reject)=>{
-				console.log(`${fileEntry.toURL()} 文件被删除`);
+				log(`${fileEntry.toURL()} 文件被删除`);
 
 				fileEntry.remove(resolve, reject);
 			});

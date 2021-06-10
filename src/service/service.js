@@ -1,8 +1,9 @@
 'use strict';
 
 import Model        from '../model/model.js';
-import merge        from '../util/merge.js';
 import HandlerQueue from '../util/handlerQueue.js';
+import merge from '../util/merge.js';
+import log   from '../util/log.js';
 
 /**
  * @file    所有 ajax 请求基类
@@ -301,33 +302,34 @@ class ServiceModel extends Model{
 
 		// 执行请求拦截器
 		let result = this._reqInterceptor(topic, options).then(()=>{
-			// 发送请求，向服务器发送数据
-			console.log(`发送 ${options.method} 请求 ${topic}`);
+				// 发送请求，向服务器发送数据
+				log(`发送 ${options.method} 请求 ${topic}`);
 
-			return this.$request(topic, options);
-		}).then((result)=>{
-			return Promise.all([
-				result
+				return this.$request(topic, options);
+			}).then((result)=>{
+				return Promise.all([
+					result
 
-				// 执行响应拦截器
-				, this._resInterceptor( result )
-			]);
-		}).then(([result])=>{
-			if( 'res' in result ){
-				return result.res;
-			}
-			else if( 'error' in result ){
-				return Promise.reject( result.error );
-			}
-			else{
-				return Promise.reject( new Error('未知错误') );
-			}
-		}).then((res)=>{
-			// 将数据同步
-			super.setData(topic, {topic, options, res});
+					// 执行响应拦截器
+					, this._resInterceptor( result )
+				]);
+			}).then(([result])=>{
+				if( 'res' in result ){
+					return result.res;
+				}
+				else if( 'error' in result ){
+					return Promise.reject( result.error );
+				}
+				else{
+					return Promise.reject( new Error('未知错误') );
+				}
+			}).then((res)=>{
+				// 将数据同步
+				super.setData(topic, {topic, options, res});
 
-			return res;
-		});
+				return res;
+			})
+			;
 
 		if( this.poolSize ){
 			result.catch(()=>{}).then(()=>{

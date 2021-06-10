@@ -1,5 +1,7 @@
 'use strict';
 
+import log from '../util/log.js';
+
 /**
  * 显示桌面通知
  * @function    notify
@@ -60,7 +62,7 @@ if( 'Notification' in self ){
 					};
 				}
 				catch(e){
-					console.log( e );
+					log( e );
 
 					reject( e );
 				}

@@ -1,6 +1,7 @@
 'use strict';
 
-import merge    from '../util/merge.js';
+import merge from '../util/merge.js';
+import log   from '../util/log.js';
 
 let serviceWorkerReady
 	;
@@ -55,7 +56,7 @@ function registerServiceWorker(options={}, welcome=''){
 			if( serviceWorker ){
 				// 监听 Service Worker 状态变化
 				serviceWorker.addEventListener('statechange', (e)=>{
-					console.log(`state change: ${e.target.state}`);
+					log(`state change: ${e.target.state}`);
 				});
 			}
 
@@ -63,7 +64,7 @@ function registerServiceWorker(options={}, welcome=''){
 		}).catch((e)=>{
 			// 注册失败 todo 发送 log
 
-			console.log( e );
+			log( e );
 			return Promise.reject( new Error('Service Worker 注册失败') );
 		});
 
@@ -98,7 +99,7 @@ function registerServiceWorker(options={}, welcome=''){
 		 * */
 		regist.pushManager.getSubscription().then((subscription)=>{ // 获取当前已订阅
 			if( subscription ){    // 已订阅
-				console.log(`已经订阅 ${subscription.endpoint}`);
+				log(`已经订阅 ${subscription.endpoint}`);
 
 				return subscription;
 			}
@@ -107,12 +108,12 @@ function registerServiceWorker(options={}, welcome=''){
 				userVisibleOnly: true   // 所有推送消息必须对用户可见
 				, applicationServerKey: urlBase64ToUnit8Array( options.applicationServerKey )
 			}).then((sub)=>{
-				console.log(`订阅成功 ${sub.endpoint}`);
+				log(`订阅成功 ${sub.endpoint}`);
 
 				return sub;
 			}).catch((e)=>{
 				// 订阅失败 todo 发送请求
-				console.log('订阅失败', e);
+				log('订阅失败', e);
 
 				return Promise.reject( new Error('订阅失败') );
 			});

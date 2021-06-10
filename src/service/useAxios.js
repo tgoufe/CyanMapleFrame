@@ -8,7 +8,8 @@
  * @todo    替换为自开发请求类库，优先使用 fetch 接口，降级使用 XMLHttpRequest
  * */
 
-import axios    from 'axios';
+import axios from 'axios';
+import log   from '../util/log.js';
 
 /**
  * 发送请求方法
@@ -40,7 +41,7 @@ let request = (topic, options)=>{
 					// 请求未响应
 				}
 				else{
-					console.log( error.message );
+					log( error.message );
 					return Promise.reject( error );
 				}
 
@@ -52,7 +53,7 @@ let request = (topic, options)=>{
 			});
 		}
 		catch(e){
-			console.log( e.message );
+			log( e.message );
 			return Promise.reject( e );
 		}
 	}

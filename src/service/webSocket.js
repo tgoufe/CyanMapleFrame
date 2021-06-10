@@ -3,6 +3,7 @@
 import {Url}    from '../runtime/url.js';
 import Model    from '../model/model.js';
 import merge    from '../util/merge.js';
+import log      from '../util/log.js';
 
 /**
  * 默认配置
@@ -97,23 +98,23 @@ class WebSocketModel extends Model{
 			conn = new WebSocket(this._config.url, this._config.protocol);
 
 			this.$listener.on(conn, 'open', ()=>{
-				console.log('建立 Web Socket 连接');
+				log('建立 Web Socket 连接');
 				resolve( conn );
 			});
 			this.$listener.on(conn, 'error', (e)=>{
 				let error = new Error('该 Web Socket 出现异常进而关闭')
-				;
+					;
 
-				console.log( e );
+				log( e );
 				this._conn = Promise.reject( error );
 
 				reject( error );
 			});
 			this.$listener.on(conn, 'close', (e)=>{
 				let error = new Error('该 Web Socket 连接已经被关闭')
-				;
+					;
 
-				console.log( e );
+				log( e );
 				this._conn = Promise.reject( error );
 
 				reject( error );
@@ -123,14 +124,14 @@ class WebSocketModel extends Model{
 			// todo
 			// this.$listener.on(conn, {
 			// 	open: ()=>{
-			// 		console.log('建立 Web Socket 连接');
+			// 		log('建立 Web Socket 连接');
 			// 		resolve( conn );
 			// 	}
 			// 	, error: ()=>{
 			// 		let error = new Error('该 Web Socket 出现异常进而关闭')
 			// 			;
 			//
-			// 		console.log( e );
+			// 		log( e );
 			// 		this._conn = Promise.reject( error );
 			//
 			// 		reject( error );
@@ -139,7 +140,7 @@ class WebSocketModel extends Model{
 			// 		let error = new Error('该 Web Socket 出现异常进而关闭')
 			// 			;
 			//
-			// 		console.log( e );
+			// 		log( e );
 			// 		this._conn = Promise.reject( error );
 			//
 			// 		reject( error );
@@ -188,7 +189,7 @@ class WebSocketModel extends Model{
 
 		if( data instanceof ArrayBuffer ){ // 二进制数据流
 			// 处理数据流，不能直接操作，而是要通过类型数组对象或 DataView 对象来操作
-			console.log('ArrayBuffer', data);
+			log('ArrayBuffer', data);
 			data = {
 				topic: 'ArrayBuffer'
 				, data
@@ -196,7 +197,7 @@ class WebSocketModel extends Model{
 		}
 		else if( data instanceof Blob ){
 			// 处理二进制数据，可用于文件传输
-			console.log('Blob', data);
+			log('Blob', data);
 			data = {
 				topic: 'Blob'
 				, data
@@ -325,7 +326,7 @@ class WebSocketModel extends Model{
 	 * @return  {Promise<boolean>}      返回一个 Promise 对象，在 resolve 时传回 true
 	 * */
 	close(code, reason){
-		console.log('关闭当前 Web Socket 连接');
+		log('关闭当前 Web Socket 连接');
 		return this._conn.then((socket)=>{
 			try{
 				socket.close();
@@ -352,7 +353,7 @@ class WebSocketModel extends Model{
 	 * @return  {Promise<boolean>}
 	 * */
 	reset(){
-		console.log('重置当前 Web Socket 连接');
+		log('重置当前 Web Socket 连接');
 		return this.close().then(()=>{
 			this._conn = this._createConn();
 

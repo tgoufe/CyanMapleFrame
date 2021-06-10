@@ -1,5 +1,7 @@
 'use strict';
 
+import log from '../util/log.js';
+
 /**
  * @file    Service Worker 后台执行文件
  * */
@@ -43,13 +45,13 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 		})
 		;
 
-	console.log('Service Worker 已加载');
+	log('Service Worker 已加载');
 
 	/**
 	 * Service Worker 安装事件
 	 * */
 	self.addEventListener('install', (event)=>{
-		console.log('Service Worker 安装完成，install event', event);
+		log('Service Worker 安装完成，install event', event);
 
 		let preCache = new Promise((resolve, reject)=>{
 				if( Array.isArray(cacheUrls) && cacheUrls.length ){
@@ -62,11 +64,11 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 			;
 
 		event.waitUntil( preCache.then((cacheUrls)=>{   // 预加载
-			console.log('预加载', cacheUrls);
+			log('预加载', cacheUrls);
 
 			return cacheStorage.addAll( cacheUrls );
 		}, ()=>{
-			console.log('没有预加载文件');
+			log('没有预加载文件');
 		}).then(()=>{
 			/**
 			 * self.skipWaiting 跳过等待激活新的 Service Worker
@@ -77,7 +79,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 			// 安装失败
 			// todo 发送记录
 
-			console.log( e );
+			log( e );
 		}) );
 	});
 
@@ -85,7 +87,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 	 * Service Worker 激活事件
 	 * */
 	self.addEventListener('activate', (event)=>{
-		console.log('新版本 Service Worker 激活 Active event,', event);
+		log('新版本 Service Worker 激活 Active event,', event);
 
 		// 更新，将不是正在使用的缓存删除
 		event.waitUntil( Promise.all([
@@ -169,7 +171,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 
 			return result;
 		}).catch((e)=>{
-			console.log( e && e.message );
+			log( e && e.message );
 
 			return fetch( request ).then((response)=>{
 				let isCache = false
@@ -182,7 +184,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 
 					}
 
-					console.log(`不缓存 ${request.url} status: ${response.status} type: ${response.type}`);
+					log(`不缓存 ${request.url} status: ${response.status} type: ${response.type}`);
 					// 异常响应，跨域资源，不缓存直接返回
 					// 跨域资源 response.status 会返回 0
 					// response.type:
@@ -252,7 +254,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 
 				if( isCache ){
 					cacheStorage.setData(request, response.clone()).then(()=>{
-						console.log(`已缓存 ${request.url}`);
+						log(`已缓存 ${request.url}`);
 					});
 				}
 
@@ -339,7 +341,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 	 * */
 	self.addEventListener('sync', (event)=>{
 		// todo do something
-		console.log(event.tag, event.lastChance);
+		log(event.tag, event.lastChance);
 	});
 
 	/**
@@ -348,7 +350,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 	self.addEventListener('notificationclick', (event)=>{
 		// 关闭点击的通知
 		event.notification.close();
-		console.log('桌面通知被点击');
+		log('桌面通知被点击');
 
 		let {action} = event
 			;
@@ -392,7 +394,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 	 * 通知关闭事件
 	 * */
 	self.addEventListener('notificationclose', (event)=>{
-		console.log('桌面通知被关闭');
+		log('桌面通知被关闭');
 
 		// todo 统计桌面通知被点击
 	});
