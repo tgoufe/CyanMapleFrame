@@ -63,7 +63,7 @@ class Router extends Base{
 	 * @constructor
 	 * @param   {Object}        [config={}]
 	 * @param   {string}        [config.baseUrl]
-	 * @param   {string}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式
+	 * @param   {string}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式，设置为其它任何值都视为 history 模式
 	 * @param   {RouteConfig[]} [config.routers]
 	 * @param   {Function}      [config.fallback]       当路由不存在时的回调函数，传入参数当前路由的 Url 类型参数
 	 * @param   {string}        [config.eventType]
@@ -88,11 +88,12 @@ class Router extends Base{
 
 		this._$trigger = this.$listener.on(this, this.config.eventType);
 
-		if( this.config.mode === 'history' ){
-			this.$url.popState( this._popState );
-		}
-		else if( this.config.mode === 'hash' ){
+		// mode 未设置为 hash 均按照 history 处理
+		if( this.config.mode === 'hash' ){
 			this.$url.hashChange( this._hashChange );
+		}
+		else{
+			this.$url.popState( this._popState );
 		}
 
 		if( 'routers' in this.config && Array.isArray(this.config.routers) ){
@@ -211,14 +212,11 @@ class Router extends Base{
 	 * */
 	_goHistory(targetUrl){
 		this._get( targetUrl ).then(()=>{
-			this.$url.pushHistory( targetUrl.pack() );
+			let url = targetUrl.pack()
+				;
 
-			this._historyList.push({
-				url: targetUrl.pack()
-				, time: Date.now()
-			});
-		}).then(()=>{
-			this._trigger();
+			this.$url.pushHistory( url );
+			this._handleTrigger( url );
 		});
 	}
 	/**
@@ -240,12 +238,7 @@ class Router extends Base{
 			;
 
 		if( this.has(tempUrl.path) ){
-			execute = this._get( tempUrl ).then(()=>{
-				this._historyList.push({
-					url: tempUrl.source
-					, time: Date.now()
-				});
-			});
+			execute = this._get( tempUrl );
 		}
 		else{
 			log(`router 中不存在 ${location.href}`, e);
@@ -253,7 +246,7 @@ class Router extends Base{
 		}
 
 		execute.then(()=>{
-			this._trigger();
+			this._handleTrigger( tempUrl.source );
 		});
 	}
 	/**
@@ -271,12 +264,7 @@ class Router extends Base{
 		tempUrl = this.$url.parseUrl( newHash );
 
 		if( this.has(tempUrl.path) ){
-			execute = this._get( tempUrl ).then(()=>{
-				this._historyList.push({
-					url: newUrl
-					, time: Date.now()
-				});
-			});
+			execute = this._get( tempUrl );
 		}
 		else{
 			log(`router 中不存在 ${tempUrl.path}`, e);
@@ -284,7 +272,7 @@ class Router extends Base{
 		}
 
 		execute.then(()=>{
-			this._trigger();
+			this._handleTrigger( newUrl );
 		});
 	}
 	/**
@@ -294,6 +282,19 @@ class Router extends Base{
 	 * */
 	_fallback(url){
 		return Promise.resolve( this.config.fallback && this.config.fallback( url ) );
+	}
+	/**
+	 * @summary 路由处理最后通用操作
+	 * @private
+	 * @param   {string}    url
+	 * */
+	_handleTrigger(url){
+		this._historyList.push({
+			url
+			, time: Date.now()
+		});
+
+		this._trigger();
 	}
 
 	// ---------- 公有方法 ----------
@@ -431,16 +432,21 @@ class Router extends Base{
 		if( rs ){
 			targetUrl.changeParams( params );
 
-			if( this.config.mode === 'history' ){   // history 模式
-				this._goHistory( targetUrl );
-			}
-			else if( this.config.mode === 'hash' ){ // hash 模式
+			if( this.config.mode === 'hash' ){ // hash 模式
 				// hash 模式下并不直接调用 _get 方法来执行路径跳转
 				// 使用 url.setHash 设置 hash 来触发 hashChange 事件来调用 _get 方法
 				// 因为修改 hash 与 pushState 方法不同，pushState 方法不会触发 popState 事件
 				// 但 hash 的修改都会触发 hashChange 事件
 				this._goHash( targetUrl );
 			}
+			else{   // history 模式
+				this._goHistory( targetUrl );
+			}
+		}
+		else{
+			this._fallback( targetUrl ).then(()=>{
+				this._handleTrigger( targetUrl.source );
+			});
 		}
 
 		return rs;
