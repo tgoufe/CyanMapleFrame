@@ -429,24 +429,17 @@ class Router extends Base{
 			, rs = this.has( targetUrl.path )
 			;
 
-		if( rs ){
-			targetUrl.changeParams( params );
+		targetUrl.changeParams( params );
 
-			if( this.config.mode === 'hash' ){ // hash 模式
-				// hash 模式下并不直接调用 _get 方法来执行路径跳转
-				// 使用 url.setHash 设置 hash 来触发 hashChange 事件来调用 _get 方法
-				// 因为修改 hash 与 pushState 方法不同，pushState 方法不会触发 popState 事件
-				// 但 hash 的修改都会触发 hashChange 事件
-				this._goHash( targetUrl );
-			}
-			else{   // history 模式
-				this._goHistory( targetUrl );
-			}
+		if( this.config.mode === 'hash' ){ // hash 模式
+			// hash 模式下并不直接调用 _get 方法来执行路径跳转
+			// 使用 url.setHash 设置 hash 来触发 hashChange 事件来调用 _get 方法
+			// 因为修改 hash 与 pushState 方法不同，pushState 方法不会触发 popState 事件
+			// 但 hash 的修改都会触发 hashChange 事件
+			this._goHash( targetUrl );
 		}
-		else{
-			this._fallback( targetUrl ).then(()=>{
-				this._handleTrigger( targetUrl.source );
-			});
+		else{   // history 模式
+			this._goHistory( targetUrl );
 		}
 
 		return rs;
