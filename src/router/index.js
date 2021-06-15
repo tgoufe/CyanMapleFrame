@@ -231,55 +231,69 @@ class Router extends Base{
 	}
 	/**
 	 * @summary popState 事件监听回调
+	 * @private
 	 * @param   {Event} e
 	 * */
 	_popState = (e)=>{
 		let tempUrl = this.$url.parseUrl( location.href )
+			, execute
 			;
 
 		if( this.has(tempUrl.path) ){
-
-			this._get( tempUrl ).then(()=>{
+			execute = this._get( tempUrl ).then(()=>{
 				this._historyList.push({
 					url: tempUrl.source
 					, time: Date.now()
 				});
-			}).then(()=>{
-				this._trigger();
 			});
 		}
 		else{
 			log(`router 中不存在 ${location.href}`, e);
-			this.config.fallback && this.config.fallback( tempUrl );
+			execute = this._fallback( tempUrl );
 		}
+
+		execute.then(()=>{
+			this._trigger();
+		});
 	}
 	/**
 	 * @summary hashChange 事件监听回调
+	 * @private
 	 * @param   {Event} e
 	 * */
 	_hashChange = (e)=>{
 		let newUrl = e.newURL
 			, tempUrl = this.$url.parseUrl( newUrl )
 			, newHash = tempUrl.hash
+			, execute
 			;
 
 		tempUrl = this.$url.parseUrl( newHash );
 
-		if( this.has( tempUrl.path ) ){
-
-			this._get( tempUrl ).then(()=>{
+		if( this.has(tempUrl.path) ){
+			execute = this._get( tempUrl ).then(()=>{
 				this._historyList.push({
 					url: newUrl
 					, time: Date.now()
 				});
-			}).then(()=>{
-				this._trigger();
 			});
 		}
 		else{
 			log(`router 中不存在 ${tempUrl.path}`, e);
-			this.config.fallback && this.config.fallback( tempUrl.path );
+			execute = this._fallback( tempUrl );
 		}
+
+		execute.then(()=>{
+			this._trigger();
+		});
+	}
+	/**
+	 * @summary 执行 fallback
+	 * @private
+	 * @param   {Url}   url
+	 * */
+	_fallback(url){
+		return Promise.resolve( this.config.fallback && this.config.fallback( url ) );
 	}
 
 	// ---------- 公有方法 ----------
