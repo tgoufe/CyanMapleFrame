@@ -452,7 +452,7 @@ class Listener extends Base{
 	/**
 	 * @summary 触发执行事件
 	 * @param   {Window|Document|Element|Object}    target
-	 * @param   {string}    type
+	 * @param   {string|boolean|*}    type  当 type 为 boolean 类型会视为 capture
 	 * @param   {boolean}   [capture=false]
 	 * @param   {...*}      [args]          触发事件时传递的参数
 	 * @return  {*}
@@ -461,6 +461,22 @@ class Listener extends Base{
 		let eventConfig
 			, handlers
 			;
+
+		if( typeof capture !== 'boolean' ){
+			args.unshift( capture );
+			capture = false;    // 设置会默认值
+		}
+
+		if( typeof type !== 'string' ){
+			if( typeof type === 'boolean' ){
+				capture = type;
+			}
+			else{
+				args.unshift( type );
+			}
+
+			type = '';
+		}
 
 		if( typeof target === "string" ){
 			type = target;
