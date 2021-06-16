@@ -303,18 +303,26 @@ class Router extends Base{
 	 * */
 	init(){
 		let tempUrl
+			, execute
 			;
 
-		if( this.config.mode === 'history' ){
-			tempUrl = this.$url;
-		}
-		else if( this.config.mode === 'hash' ){
+		if( this.config.mode === 'hash' ){
 			tempUrl = this.$url.parseUrl( this.$url.hash || '/' );
+		}
+		else{
+			tempUrl = this.$url;
 		}
 
 		if( this.has(tempUrl.path) ){
-			this._get( tempUrl );
+			execute = this._get( tempUrl );
 		}
+		else{
+			execute = this._fallback( tempUrl );
+		}
+
+		execute.then(()=>{
+			this._handleTrigger( tempUrl.source );
+		});
 	}
 	/**
 	 * @summary 注册路径
