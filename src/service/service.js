@@ -145,7 +145,9 @@ class ServiceModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.service]
 	 * @desc    注入为 $service，配置参数名 service
 	 * */
 	static inject(app){
@@ -155,6 +157,7 @@ class ServiceModel extends Model{
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置
+	 * @override
 	 * @static
 	 * @const
 	 * */
@@ -341,6 +344,8 @@ class ServiceModel extends Model{
 	}
 	/**
 	 * @summary     数据同步的内部实现
+	 * @override
+	 * @overload
 	 * @protected
 	 * @param       {string}    topic
 	 * @param       {*}         value
@@ -377,6 +382,7 @@ class ServiceModel extends Model{
 	/**
 	 * @summary     获取数据，默认视为发送 GET 请求到服务器，可以将返回结果保存到本地缓存
 	 * @override
+	 * @overload
 	 * @param       {string|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
 	 * @param       {string}            topic.url
 	 * @param       {Object}            [options={}]
@@ -390,6 +396,7 @@ class ServiceModel extends Model{
 	/**
 	 * @summary     删除数据
 	 * @override
+	 * @overload
 	 * @param       {string|Object}     topic
 	 * @param       {string}            topic.url
 	 * @param       {Object}            [options={}]
@@ -412,6 +419,7 @@ class ServiceModel extends Model{
 	/**
 	 * @summary     将数据同步到本地存储，只能设置一个本地缓存
 	 * @override
+	 * @overload
 	 * @param       {Model}     model
 	 * @param       {Function}  [handler=null]
 	 * @return      {Model}     返回 this

@@ -128,7 +128,9 @@ class IndexedDBModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.idb]
 	 * @desc    注入为 $idb，配置参数名 idb
 	 * */
 	static inject(app){
@@ -138,6 +140,7 @@ class IndexedDBModel extends Model{
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置
+	 * @override
 	 * @static
 	 * @const
 	 * */

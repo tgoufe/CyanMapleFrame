@@ -67,7 +67,9 @@ let request = (topic, options)=>{
 export default {
 	/**
 	 * @summary 与 App 类约定的注入接口
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.request]
 	 * @desc    注入为 $request
 	 * */
 	inject(app){

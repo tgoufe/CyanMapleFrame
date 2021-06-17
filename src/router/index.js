@@ -107,7 +107,9 @@ class Router extends Base{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.router]
 	 * @desc    注入为 $router，配置参数名 router
 	 * */
 	static inject(app){
@@ -230,7 +232,7 @@ class Router extends Base{
 	/**
 	 * @summary popState 事件监听回调
 	 * @private
-	 * @param   {Event} e
+	 * @param   {PopStateEvent} e
 	 * */
 	_popState = (e)=>{
 		let tempUrl = this.$url.parseUrl( location.href )
@@ -252,7 +254,7 @@ class Router extends Base{
 	/**
 	 * @summary hashChange 事件监听回调
 	 * @private
-	 * @param   {Event} e
+	 * @param   {HashChangeEvent}   e
 	 * */
 	_hashChange = (e)=>{
 		let newUrl = e.newURL
@@ -480,7 +482,7 @@ class Router extends Base{
 	 * @summary 获取当前路径
 	 * */
 	get currentPath(){
-		return this.$url.parseUrl( this._historyList[this._historyList.length -1] ).path;
+		return this.$url.parseUrl( this._historyList[this._historyList.length -1].url ).path;
 	}
 }
 

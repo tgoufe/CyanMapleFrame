@@ -80,6 +80,8 @@ class Base{
 	}
 	/**
 	 * @summary 子类继承的注入接口
+	 * @param   {string}    key
+	 * @param   {Object}    module
 	 * */
 	inject(key, module){
 		if( key in this ){

@@ -60,7 +60,9 @@ class FileSystemModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.fs]
 	 * @desc    注入为 $fs，配置参数名 fs
 	 * */
 	static inject(app){
@@ -70,6 +72,7 @@ class FileSystemModel extends Model{
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置
+	 * @override
 	 * @static
 	 * @const
 	 * */

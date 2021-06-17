@@ -9,7 +9,7 @@ import log   from '../util/log.js';
  * @const
  * */
 const EVENT_SOURCE_MODEL_CONFIG = {
-
+		eventType: 'receiveMessage'
 	}
 	;
 
@@ -24,11 +24,18 @@ const EVENT_SOURCE_MODEL_CONFIG = {
 class EventSourceModel extends Model{
 	/**
 	 * @constructor
-	 * @param   {Object}    [config={}]
-	 * @param   {boolean}   [config.withCredentials]
-	 * @param   {string}    [config.eventType]
+	 * @param   {Object|string} [config={}]
+	 * @param   {string}        [config.url]
+	 * @param   {boolean}       [config.withCredentials]
+	 * @param   {string}        [config.eventType]
 	 * */
 	constructor(config={}){
+		if( typeof config === 'string' ){
+			config = {
+				url: config
+			};
+		}
+
 		config = merge(config, EventSourceModel.CONFIG);
 		
 		super( config );
@@ -36,19 +43,21 @@ class EventSourceModel extends Model{
 		this._config = config;
 		this._syncTarget = null;
 
-		if( this.config.url ){
-			this._conn = this._createConn();
-		}
-		else{
+		if( !this.config.url ){
 			this._conn = Promise.reject( new Error('缺少参数 url，未建立连接') );
+			return ;
 		}
+
+		this._conn = this._createConn();
 	}
 
 	// ---------- 静态方法 ----------
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.sse]
 	 * @desc    注入为 $socket，配置参数名 sse
 	 * */
 	static inject(app){
@@ -145,6 +154,7 @@ class EventSourceModel extends Model{
 	/**
 	 * @summary     数据同步的内部实现
 	 * @override
+	 * @overload
 	 * @protected
 	 * @param       {Event}     e
 	 * @param       {string}    topic
@@ -160,7 +170,7 @@ class EventSourceModel extends Model{
 	/**
 	 * @summary     接收数据事件回调
 	 * @protected
-	 * @param       {Event} e
+	 * @param       {MessageEvent}  e
 	 * @return      {Promise<boolean>}
 	 * */
 	_onMessage = (e)=>{
@@ -184,6 +194,7 @@ class EventSourceModel extends Model{
 	/**
 	 * @summary 重写覆盖父类 setData 方法
 	 * @override
+	 * @overload
 	 * @return  {Promise}   返回 reject(false)
 	 * @desc    SSE 只支持服务器到客户端单向的事件推送，所以 setData 方法没有意义
 	 * */
@@ -193,6 +204,7 @@ class EventSourceModel extends Model{
 	/**
 	 * @summary 重写覆盖父类 getData 方法
 	 * @override
+	 * @overload
 	 * @return  {Promise}   返回 reject(null)
 	 * @desc    SSE 只支持服务器到客户端单向的事件推送，所以 getData 方法没有意义
 	 * */
@@ -202,6 +214,7 @@ class EventSourceModel extends Model{
 	/**
 	 * @summary 重写覆盖父类 removeData 方法
 	 * @override
+	 * @overload
 	 * @return  {Promise}   返回 reject(false)
 	 * @desc    SSE 只支持服务器到客户端单向的事件推送，所以 removeData 方法没有意义
 	 * */

@@ -1,9 +1,9 @@
 'use strict';
 
-import Base from '../base.js';
+import Base       from '../base.js';
 import {Listener} from '../util/listener.js';
-import merge from '../util/merge.js';
-import log from '../util/log.js';
+import merge      from '../util/merge.js';
+import log        from '../util/log.js';
 
 /**
  * 默认配置
@@ -222,7 +222,9 @@ class Model extends Base{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.model]
 	 * @desc    注入为 $model，配置参数名 model
 	 * */
 	static inject(app){

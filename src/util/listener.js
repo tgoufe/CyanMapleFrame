@@ -228,7 +228,7 @@ class Listener extends Base{
 	 * @param   {boolean}                   [options.once]
 	 * @return  {Object}
 	 * */
-	_handleArgs(target, type, callback, options){
+	_handleArgs(target, type, callback={}, options={}){
 		if( typeof callback === 'object' ){
 			options = callback;
 			callback = null;
@@ -321,10 +321,17 @@ class Listener extends Base{
 	 * @param   {boolean}                   [options.capture]
 	 * @param   {boolean}                   [options.passive]
 	 * @param   {boolean}                   [options.once]
+	 * @param   {boolean}                   [options.attribute]         type 为 mutationObserver 时使用
+	 * @param   {string[]}                  [options.attributeFilter]   type 为 mutationObserver 时使用
+	 * @param   {boolean}                   [options.attributeOldValue] type 为 mutationObserver 时使用
+	 * @param   {boolean}                   [options.characterData]     type 为 mutationObserver 时使用
+	 * @param   {boolean}                   [options.characterDataOldValue] type 为 mutationObserver 时使用
+	 * @param   {boolean}                   [options.childList]             type 为 mutationObserver 时使用
+	 * @param   {boolean}                   [options.subtree]               type 为 mutationObserver 时使用
 	 * @return  {Object}    返回一个带有 trigger 方法的对象，可以用来触发此次绑定的事件
 	 * @desc    可以传四个参数，最少传两个参数，若只传两个参数会视为 type 和 callback
 	 * */
-	on(target, type, callback={}, options={}){
+	on(target, type, callback, options){
 		let initBind = false
 			, targetConfig
 			, eventConfig
@@ -403,8 +410,9 @@ class Listener extends Base{
 	 * @param   {boolean}                   [options.once]
 	 * @return  {Listener}                  返回 this，可以使用链式操作
 	 * @desc    可以传四个参数，最少传一个参数，若只传一个参数会视为 type
+	 *          当 type 为 mutationObserver 时会取消对 target 的所有类型观察，无视 options 里的设置
 	 * */
-	off(target, type, callback={}, options={}){
+	off(target, type, callback, options){
 		let eventConfig
 			, handlers
 			, args = this._handleArgs( ...arguments )
@@ -436,7 +444,11 @@ class Listener extends Base{
 			this._intersect$.unobserve( target );
 		}
 		else if( type === Listener.MutationObserver ){
-			this._mutate$.unobserve(target, options);
+			// MutationObserver 没有 unobserve 方法
+			if( this._callbackList.has(target) ){
+				delete this._callbackList.get( target )[this._getKey(Listener.MutationObserver)];
+			}
+
 		}
 		else if( type === Listener.ResizeObserver ){
 			this._resize$.unobserve( target );

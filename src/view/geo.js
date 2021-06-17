@@ -50,7 +50,9 @@ export default geo;
 export const Geo = {
 	/**
 	 * @summary 与 App 类约定的注入接口
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.geo]
 	 * @desc    注入为 $geo，配置参数名 geo
 	 * */
 	inject(app){

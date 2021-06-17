@@ -84,7 +84,9 @@ class LocalStorageModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.ls]
 	 * @desc    注入为 $ls，配置参数名 ls
 	 * */
 	static inject(app){
@@ -94,6 +96,7 @@ class LocalStorageModel extends Model{
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认参数
+	 * @override
 	 * @static
 	 * @const
 	 * */
@@ -104,14 +107,12 @@ class LocalStorageModel extends Model{
 	// ---------- 私有方法 ----------
 	/**
 	 * @summary 全局 localStorage 改变事件监听回调
-	 * @param   {Event} e
+	 * @param   {StorageEvent}  e
 	 * @return  {Promise<boolean>}
 	 * */
 	_listenOn = (e)=>{
-		let {
-			key: topic
-			, newValue: newVal
-			} = e
+		let {key: topic
+			, newValue: newVal} = e
 			;
 
 		try{
@@ -351,8 +352,9 @@ class LocalStorageModel extends Model{
 			}
 			/**
 			 * @summary 语义化的同步保存数据接口
-			 * @param   {...*}  argv    参数与 getDatasync 方法相同
-			 * @return  {*}
+			 * @param   {string|string[]}  argv    参数与 getDatasync 方法相同
+			 * @param   {...string}
+			 * @return  {Object|string}
 			 * @desc    内部为调用 getDataSync 方法
 			 * */
 			, getData: (...argv)=>{

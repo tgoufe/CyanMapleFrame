@@ -66,7 +66,9 @@ class CacheStorageModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.cache]
 	 * @desc    注入为 $cache，配置参数名 cache
 	 * */
 	static inject(app){
@@ -76,6 +78,7 @@ class CacheStorageModel extends Model{
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置
+	 * @override
 	 * @static
 	 * @const
 	 * */
@@ -103,6 +106,7 @@ class CacheStorageModel extends Model{
 	/**
 	 * @summary 获取缓存
 	 * @override
+	 * @overload
 	 * @param   {string|Request}    topic
 	 * @param   {Object}            [options={}]
 	 * @param   {boolean}           [options.ignoreVary]    请求的 url 和 header 都一致才是相同的资源
@@ -130,6 +134,7 @@ class CacheStorageModel extends Model{
 	/**
 	 * @summary 将缓存删除
 	 * @override
+	 * @overload
 	 * @param   {string|Request}    topic
 	 * @param   {Object}            [options={}]    cache.delete 的可选参数
 	 * @return  {Promise<boolean, Error>}   返回一个 Promise 对象，在 resolve 时传回结果

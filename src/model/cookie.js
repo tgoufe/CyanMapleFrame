@@ -81,7 +81,9 @@ class CookieModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.cookie]
 	 * @desc    注入为 $cookie，配置参数名 cookie
 	 * */
 	static inject(app){
@@ -91,6 +93,7 @@ class CookieModel extends Model{
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认 cookie 设置参数
+	 * @override
 	 * @static
 	 * @const
 	 * */
@@ -187,6 +190,7 @@ class CookieModel extends Model{
 	/**
 	 * @summary     当 setData 传入一个 json 时内部调用函数
 	 * @override
+	 * @overload
 	 * @protected
 	 * @param       {Object}    topic
 	 * @param       {Object}    [options]
@@ -205,6 +209,7 @@ class CookieModel extends Model{
 	/**
 	 * @summary     设置数据
 	 * @override
+	 * @overload
 	 * @param       {string|Object}             topic
 	 * @param       {*}                         value               当 topic 为 object 类型时，被视为 options
 	 * @param       {Object|number|string}      [options]           相关配置
@@ -425,8 +430,9 @@ class CookieModel extends Model{
 			}
 			/**
 			 * @summary 语义化的同步保存数据接口
-			 * @param   {...string}  argv    参数与 getDatasync 方法相同
-			 * @return  {*}
+			 * @param   {string|string[]}  argv    参数与 getDatasync 方法相同
+			 * @param   {...string}
+			 * @return  {Object|string}
 			 * @desc    内部为调用 getDataSync 方法
 			 * */
 			, getData: (...argv)=>{

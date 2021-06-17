@@ -40,7 +40,9 @@ class SessionStorageModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.ss]
 	 * @desc    注入为 $ss
 	 * */
 	static inject(app){
@@ -277,8 +279,9 @@ class SessionStorageModel extends Model{
 			}
 			/**
 			 * @summary 语义化的同步保存数据接口
-			 * @param   {...*}  argv    参数与 getDatasync 方法相同
-			 * @return  {*}
+			 * @param   {string|string[]}  argv    参数与 getDatasync 方法相同
+			 * @param   {...string}
+			 * @return  {Object|string}
 			 * @desc    内部为调用 getDataSync 方法
 			 * */
 			, getData: (...argv)=>{

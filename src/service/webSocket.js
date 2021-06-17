@@ -11,6 +11,7 @@ import log      from '../util/log.js';
  * */
 const WEB_SOCKET_CONFIG = {
 		protocol: 'ws'  // ws 或 wss
+		, eventType: 'receiveMessage'
 	}
 	;
 
@@ -23,13 +24,19 @@ const WEB_SOCKET_CONFIG = {
 class WebSocketModel extends Model{
 	/**
 	 * @constructor
-	 * @param   {Object}            [config={}]
-	 * @param   {string|string[]}   config.url
+	 * @param   {Object|string}     [config={}]
+	 * @param   {string|string[]}   [config.url]
 	 * @param   {string}            [config.protocol]   单个的协议名字字符串或者包含多个协议名字字符串的数组
 	 * @param   {string}            [config.binaryType] 设置收到的二进制数据类型
 	 * @param   {string}            [config.eventType]
 	 * */
 	constructor(config={}){
+		if( typeof config === 'string' ){
+			config = {
+				url: config
+			};
+		}
+
 		config = merge(config, WebSocketModel.CONFIG);
 
 		super( config );
@@ -51,7 +58,9 @@ class WebSocketModel extends Model{
 	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
-	 * @param   {Base}  app
+	 * @param   {Base}      app
+	 * @param   {Object}    app.$options
+	 * @param   {Object}    [app.$options.socket]
 	 * @desc    注入为 $socket，配置参数名 socket
 	 * */
 	static inject(app){
@@ -165,6 +174,7 @@ class WebSocketModel extends Model{
 	/**
 	 * @summary     数据同步的内部实现
 	 * @override
+	 * @overload
 	 * @protected
 	 * @param       {Event}     e
 	 * @param       {string}    topic
@@ -180,7 +190,7 @@ class WebSocketModel extends Model{
 	/**
 	 * @summary     接收数据事件回调
 	 * @protected
-	 * @param       {Event} e
+	 * @param       {MessageEvent}  e
 	 * @return      {Promise<boolean>}
 	 * */
 	_onMessage = (e)=>{
@@ -254,6 +264,7 @@ class WebSocketModel extends Model{
 	/**
 	 * @summary 获取数据
 	 * @override
+	 * @overload
 	 * @param   {string}    topic
 	 * @param   {*}         data
 	 * @return  {Promise}   数据发送是否成功
@@ -265,6 +276,7 @@ class WebSocketModel extends Model{
 	/**
 	 * @summary 删除数据
 	 * @override
+	 * @overload
 	 * @param   {string}    topic
 	 * @param   {*}         data
 	 * @return  {Promise}   数据是否发送成功
@@ -276,6 +288,7 @@ class WebSocketModel extends Model{
 	/**
 	 * @summary 清空数据
 	 * @override
+	 * @overload
 	 * @param   {string}    topic
 	 * @param   {*}         data
 	 * @return  {Promise}   数据是否发送成功
