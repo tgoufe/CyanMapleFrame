@@ -26,9 +26,15 @@ const LISTENER_CONFIG = {
 	;
 
 /**
+ * @typedef     {Object}    TriggerEvent
+ * @property    {Object}    target
+ * @property    {string}    type
+ * */
+
+/**
  * @summary     监听事件回调
  * @callback    ListenerCallback
- * @param       {Object|Event}  event
+ * @param       {TriggerEvent|Event}  event
  * @param       {...*}
  * @this        target
  * */

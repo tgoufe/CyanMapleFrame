@@ -32,10 +32,10 @@ const MODEL_CONFIG = {
 /**
  * @summary     数据改变事件触发回调函数
  * @callback    ModelChangeEvent
- * @param       {Event}     event
- * @param       {string}    topic
- * @param       {*}         newValue
- * @param       {*}         [oldValue]
+ * @param       {TriggerEvent}  event
+ * @param       {string}        topic
+ * @param       {*}             newValue
+ * @param       {*}             [oldValue]
  * @this        {Model}
  * @desc        函数将传入 topic,newValue 值，当 removeData 执行时也会触发事件，newValue 被传为 null
  *              由于统一使用 Listener 对象，第一个参数将为事件对象，当前事件将传入 {type: modelChange, target: 对象实例}
@@ -317,17 +317,16 @@ class Model extends Base{
 	/**
 	 * @summary     modelChange 事件监听回调，以实现数据同步
 	 * @protected
-	 * @param       {Event}     e
-	 * @param       {string}    topic
-	 * @param       {*}         value
-	 * @return      {Promise}
+	 * @param       {TriggerEvent}  e
+	 * @param       {string}        topic
+	 * @param       {*}             value
 	 * */
 	_sync = (e, topic, value)=>{
 		if( !this._syncToList.length ){
 			return  Promise.resolve();
 		}
 
-		return Promise.all( this._syncToList.map((m)=>{
+		Promise.all( this._syncToList.map((m)=>{
 			let result
 				;
 

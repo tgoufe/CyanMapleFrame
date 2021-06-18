@@ -307,19 +307,18 @@ class CurrentUrl extends Url{
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary     对 url 进行解析
-	 * @param       {string|Url}    url
-	 * @return      {Url}           若出入的 url 参数是一个 Url 对象，则不做处理直接返回
+	 * @param       {Url|string}    url
+	 * @return      {Url}           若传入的 url 参数是一个 Url 对象实例，则不做处理直接返回
 	 * */
 	parseUrl(url){
-		if( url instanceof Url ){
-			return url;
+		let result = url
+			;
+
+		if( !(url instanceof Url) ){
+			result = new Url( typeof url === 'string' ? url : '' );
 		}
-		else if( typeof url === 'string' ){
-			return new Url( url );
-		}
-		else{
-			return new Url();
-		}
+		
+		return result;
 	}
 	/**
 	 * @summary     对没有协议头（以 // 开头）的路径加上协议头

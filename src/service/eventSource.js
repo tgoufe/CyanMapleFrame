@@ -156,9 +156,9 @@ class EventSourceModel extends Model{
 	 * @override
 	 * @overload
 	 * @protected
-	 * @param       {Event}     e
-	 * @param       {string}    topic
-	 * @param       {*}         value
+	 * @param       {TriggerEvent}  e
+	 * @param       {string}        topic
+	 * @param       {*}             value
 	 * */
 	_sync = (e, topic, value)=>{
 		if( !this._syncTarget ){
