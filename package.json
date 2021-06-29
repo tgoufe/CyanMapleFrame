@@ -20,6 +20,8 @@
     "express": "~4.16.4",
     "express-session": "~1.15.6",
     "file-loader": "~6.0.0",
+    "gulp": "~4.0.2",
+    "gulp-jsdoc3": "~3.0.0",
     "html-webpack-plugin": "~4.3.0",
     "jasmine": "~3.1.0",
     "jasmine-core": "~3.1.0",
@@ -38,7 +40,7 @@
     "karma-webpack": "~3.0.5",
     "lerna": "~3.20.2",
     "mocha": "~7.2.0",
-    "node-sass": "~4.14.1",
+    "sass": "~1.35.1",
     "sass-loader": "~8.0.2",
     "sinon": "~4.5.0",
     "sinon-chai": "~3.0.0",
@@ -67,7 +69,8 @@
     "bulidDemo": "webpack --config webpack.demo.config.js",
     "runDemoServer": "node demo/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:unit": "karma start test/unit/karma.config.js --single-run"
+    "test:unit": "karma start test/unit/karma.config.js --single-run",
+    "doc": "gulp doc"
   },
   "repository": {
     "type": "git",

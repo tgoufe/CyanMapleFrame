@@ -251,9 +251,9 @@ class ServiceModel extends Model{
 	}
 
 	/**
-	 * @summary
+	 * @summary 执行
 	 * @private
-	 * @desc
+	 * @desc    执行
 	 * */
 	_poolNext(){
 		this.poolCurrent--;

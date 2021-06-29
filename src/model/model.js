@@ -624,7 +624,7 @@ class Model extends Base{
 	}
 	/**
 	 * @summary 实现异步迭代器接口
-	 * @return
+	 * @return  {Generator}
 	 * @desc    适用于 for-await-of
 	 * */
 	*[Symbol.asyncIterator](){
