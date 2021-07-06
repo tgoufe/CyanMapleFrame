@@ -378,7 +378,11 @@ class IndexedDBModel extends Model{
 			return new Promise((resolve, reject)=>{
 				let transaction = db.transaction([this._config.tableName], 'readwrite')
 					, objectStore = transaction.objectStore( this._config.tableName )
-					, {index, only, min, max, eqMin=false, eqMax=false, direction} = options
+					,
+					{ index, only
+					, min, max
+					, eqMin=false, eqMax=false
+					, direction } = options
 					, range
 					, target
 					, cursor

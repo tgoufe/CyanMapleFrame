@@ -267,15 +267,20 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 	 * 收到消息事件
 	 * */
 	self.addEventListener('message', (event)=>{
-		let {data, source} = event
-			, {id, url, focused, visibilityState} = source
+		let { data
+			, source } = event
+			,
+			{ id
+			, url
+			, focused
+			, visibilityState } = source
 			;
 
 		// 向所有打开的窗口通信
 		// todo 消息处理
 		self.clients.matchAll().then((clients)=>{
 			clients.forEach((client)=>{
-			    let {id} = client
+			    let { id } = client
 			        ;
 
 				// event.source 为消息来源的页面
@@ -352,7 +357,7 @@ function serviceWorkerRun(cacheName='cacheStorage', cacheUrls=[], errorHandler=[
 		event.notification.close();
 		log('桌面通知被点击');
 
-		let {action} = event
+		let { action } = event
 			;
 
 		// 添加动作

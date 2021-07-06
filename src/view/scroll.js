@@ -246,10 +246,12 @@ else{
 	scrollTarget = doc;
 }
 
-scroll.observe = observe;
-scroll.unobserve = unobserve;
-scroll.scrollBar = scrollBar;
-scroll.disabled = disabled;
+Object.merge(scroll, {
+	observe
+	, unobserve
+	, scrollBar
+	, disabled
+});
 
 export default scroll;
 

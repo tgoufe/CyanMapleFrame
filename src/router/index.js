@@ -156,8 +156,8 @@ class Router extends Base{
 	 * @return  {Promise}
 	 * */
 	_get(targetUrl){
-		let path = targetUrl.path
-			, params = targetUrl.params
+		let { path
+			, params } = targetUrl
 			, index = this._getRouteIndex( path )
 			, router
 			, result
@@ -354,10 +354,9 @@ class Router extends Base{
 
 		// 处理 path
 		if( typeof route === 'object' && !(route instanceof RegExp) ){
-			path = route.path;
+			({path, before, after} = route);
+
 			callback = route.callback || (()=>{});
-			before = route.before;
-			after = route.after;
 		}
 		else{
 			path = route;

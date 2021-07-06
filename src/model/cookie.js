@@ -161,7 +161,7 @@ class CookieModel extends Model{
 			, t
 			;
 
-		for(l = cookies.length; i < l; i++ ){
+		for( l = cookies.length; i < l; i++ ){
 			t = cookies[i].split('=');
 
 			if( topic === decodeURIComponent(t[0]) ){

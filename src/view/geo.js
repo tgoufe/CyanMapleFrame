@@ -57,7 +57,8 @@ export const Geo = {
 	 * */
 	inject(app){
 		app.inject('$geo', geo( app.$options.geo ).then(({coords={}})=>{
-			let {latitude, longitude} = coords
+			let { latitude
+				, longitude } = coords
 				;
 
 			return {

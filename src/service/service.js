@@ -217,7 +217,10 @@ class ServiceModel extends Model{
 			count--;
 
 			if( count < pool && waitQueue.length > 0 ){
-				let {url, params, resolve} = waitQueue.pop();
+				let { url
+					, params
+					, resolve } = waitQueue.pop()
+					;
 
 				fetch(url, params).catch(()=>{return 1;}).then((rs)=>{
 					resolve( rs );
@@ -259,7 +262,9 @@ class ServiceModel extends Model{
 		this.poolCurrent--;
 
 		if( this.poolCurrent < this.poolSize && this.pool.length > 0 ){
-			let {args, resolve, reject} = this.pool.pop()
+			let { args
+				, resolve
+				, reject } = this.pool.pop()
 				;
 
 			this._send( ...args).then(resolve, reject).then(()=>{
@@ -355,7 +360,7 @@ class ServiceModel extends Model{
 			return ;
 		}
 
-		let {data} = res
+		let { data } = res
 			;
 
 		if( this._syncHandler ){
@@ -480,7 +485,8 @@ class ServiceModel extends Model{
 			};
 		}
 
-		let {method, url} = pathPattern
+		let { method
+			, url } = pathPattern
 			;
 
 		Object.defineProperty(this, name, {

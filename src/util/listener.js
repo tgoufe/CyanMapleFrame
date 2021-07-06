@@ -344,13 +344,11 @@ class Listener extends Base{
 			, handlers
 			, key
 			, args = this._handleArgs( ...arguments )
-			, {capture} = args
+			,
+			{ capture } = args
 			;
 
-		target = args.target;
-		type = args.type;
-		callback = args.callback;
-		options = args.options;
+		({target, type, callback, options} = args);
 
 		if( !this._callbackList.has(target) ){
 			this._callbackList.set(target, {});
@@ -422,13 +420,11 @@ class Listener extends Base{
 		let eventConfig
 			, handlers
 			, args = this._handleArgs( ...arguments )
-			, {capture} = args
+			,
+			{ capture } = args
 			;
 
-		target = args.target;
-		type = args.type;
-		callback = args.callback;
-		options = args.options;
+		({target, type, callback, options} = args);
 
 		eventConfig = this._getEventConfig(target, type, capture);
 

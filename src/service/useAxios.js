@@ -20,7 +20,8 @@ import log   from '../util/log.js';
  * */
 let request = (topic, options)=>{
 		try{
-			let {method, data} = options
+			let { method
+				, data } = options
 				;
 
 			if( method === 'GET' ){
