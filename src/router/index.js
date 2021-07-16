@@ -322,7 +322,7 @@ class Router extends Base{
 		}
 
 		execute.then(()=>{
-			this._handleTrigger( tempUrl.source );
+			this._handleTrigger( this.$url.source );
 		});
 	}
 	/**
@@ -480,6 +480,10 @@ class Router extends Base{
 	 * @summary 获取当前路径
 	 * */
 	get currentPath(){
+		if( this.config.mode === 'hash' ){
+			return this.$url.parseUrl( this._historyList[this._historyList.length -1].url ).hash;
+		}
+
 		return this.$url.parseUrl( this._historyList[this._historyList.length -1].url ).path;
 	}
 }

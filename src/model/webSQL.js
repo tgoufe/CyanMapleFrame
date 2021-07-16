@@ -11,7 +11,7 @@ function sqlTpl(strings, ...keys){
 			;
 
 		keys.forEach((k, i)=>{
-			let value = Number.isInteger(k) ? values[k] : dict[k]
+			let value = Number.isInteger( k ) ? values[k] : dict[k]
 				;
 
 			result.push(value, strings[i +1]);
