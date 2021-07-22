@@ -246,7 +246,7 @@ else{
 	scrollTarget = doc;
 }
 
-Object.merge(scroll, {
+Object.assign(scroll, {
 	observe
 	, unobserve
 	, scrollBar
