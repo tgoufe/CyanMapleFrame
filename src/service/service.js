@@ -505,10 +505,12 @@ class ServiceModel extends Model{
 						rs[method] = {
 							enumerable: true
 							, configurable: false
-							, get: (data)=>{
-								return this._send(this.transPath(url, data, keyTrans), merge(pathPattern, {
-									data
-								}), method.toUpperCase());
+							, get: ()=>{
+								return (data)=>{
+									return this._send(this.transPath(url, data, keyTrans), merge(pathPattern, {
+										data
+									}), method.toUpperCase());
+								};
 							}
 						}
 
