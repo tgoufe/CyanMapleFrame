@@ -54,7 +54,8 @@ class Url extends Base{
 		this.source     = target.href;
 		this.origin     = target.origin;
 		this.port       = target.port || '80';
-		this.host       = target.hostname + (this.port !== '80' ? ':'+ this.port : '');
+		this.hostname   = target.hostname
+		this.host       = this.hostname + (this.port !== '80' ? ':'+ this.port : '');
 		this.path       = target.pathname.replace(/^([^\/])/, '$1');
 		// 相对路径
 		this.relative   = (target.href.match(/tps?:\/\/[^\/]+(.*)/) || ['', ''])[1];
