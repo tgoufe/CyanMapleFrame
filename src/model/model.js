@@ -91,8 +91,6 @@ class Model extends Base{
 
 		super( config );
 
-		this.$listener = this.$listener || null;
-		
 		this._value = Object.create( null );    // 不会受到 prototype 的影响，适合用来存储数据，没有 hasOwnProperty、toString 等方法
 		this._history = Object.create( null );  // 历史记录
 		this._syncToList = [];

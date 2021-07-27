@@ -72,10 +72,6 @@ class Router extends Base{
 
 		super( config );
 
-		this.$url = this.$url || null;
-		this.$listener = this.$listener || null;
-		this.$handlers = this.$handlers || null;
-
 		this.routers = [];
 
 		this.config = config;

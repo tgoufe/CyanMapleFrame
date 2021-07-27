@@ -273,8 +273,6 @@ class CurrentUrl extends Url{
 	 * */
 	constructor(url){
 		super( url );
-
-		this.$listener = this.$listener || null;
 	}
 
 	// ---------- 私有方法 ----------

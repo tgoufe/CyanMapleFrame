@@ -41,8 +41,6 @@ class WebSocketModel extends Model{
 
 		super( config );
 
-		this.$url = this.$url || null;
-
 		this._config = config;
 		this._syncTarget = null;
 
