@@ -50,6 +50,13 @@ const ROUTER_CONFIG = {
  * */
 
 /**
+ * @summary     路由改变前置函数
+ * @callback    RouterChangeBefore
+ * @param       {RouteConfig}   targetUrl
+ * @return      {boolean|Promise|*}
+ * */
+
+/**
  * @class
  * @desc    路由配置类
  * @extends Base
@@ -63,9 +70,10 @@ class Router extends Base{
 	 * @param   {Object}        [config={}]
 	 * @param   {string}        [config.baseUrl]
 	 * @param   {string}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式，设置为其它任何值都视为 history 模式
-	 * @param   {RouteConfig[]} [config.routers]
-	 * @param   {Function}      [config.fallback]       当路由不存在时的回调函数，传入参数当前路由的 Url 类型参数
-	 * @param   {string}        [config.eventType]
+	 * @param   {RouterChangeBefore}    [config.before]
+	 * @param   {RouteConfig[]}         [config.routers]
+	 * @param   {Function}              [config.fallback]       当路由不存在时的回调函数，传入参数当前路由的 Url 类型参数
+	 * @param   {string}                [config.eventType]
 	 * */
 	constructor(config={}){
 		config = merge(config, Router.CONFIG);
@@ -167,28 +175,26 @@ class Router extends Base{
 			router = this.routers[index];
 			result = router.pattern.exec( path );
 
-			if( result ){    // 存在匹配 path
-				// 解析 url 中的参数
-				tempParams = result.slice(1).reduce((all, d, i)=>{
-					all[router.paramNames[i]] = d;
+			// 解析 url 中的参数
+			tempParams = result.slice(1).reduce((all, d, i)=>{
+				all[router.paramNames[i]] = d;
 
-					return all;
-				}, {});
+				return all;
+			}, {});
 
-				tempParams = merge(tempParams, params);
+			tempParams = merge(tempParams, params);
 
-				router.before && this.$handlers.add( router.before );
-				this.$handlers.add( router.callback );
-				router.after && this.$handlers.add( router.after );
+			this.config.before && this.$handlers.add(()=>{
+				return this.config.before( targetUrl );
+			});
+			router.before && this.$handlers.add( router.before );
+			this.$handlers.add( router.callback );
+			router.after && this.$handlers.add( router.after );
 
-				execute = this.$handlers.promise.line( tempParams );
-			}
-			else{
-				execute = Promise.reject( new Error('路由路径不匹配') );
-			}
+			execute = this.$handlers.promise.line( tempParams );
 		}
 		else{
-			execute = Promise.reject( new Error('router 中不存在') );
+			execute = Promise.reject( new Error(`router 中不存在 ${path}`) );
 		}
 
 		return execute.catch((e)=>{
@@ -199,7 +205,7 @@ class Router extends Base{
 				log(path, e);
 			}
 
-			return Promise.reject();
+			return this._fallback( targetUrl );
 		});
 	}
 	/**
@@ -231,18 +237,9 @@ class Router extends Base{
 	 * */
 	_popState = (e)=>{
 		let tempUrl = this.$url.parseUrl( location.href )
-			, execute
 			;
 
-		if( this.has(tempUrl.path) ){
-			execute = this._get( tempUrl );
-		}
-		else{
-			log(`router 中不存在 ${location.href}`, e);
-			execute = this._fallback( tempUrl );
-		}
-
-		execute.then(()=>{
+		this._get( tempUrl ).then(()=>{
 			this._handleTrigger( tempUrl.source );
 		});
 	}
@@ -255,20 +252,11 @@ class Router extends Base{
 		let newUrl = e.newURL
 			, tempUrl = this.$url.parseUrl( newUrl )
 			, newHash = tempUrl.hash
-			, execute
 			;
 
 		tempUrl = this.$url.parseUrl( newHash );
 
-		if( this.has(tempUrl.path) ){
-			execute = this._get( tempUrl );
-		}
-		else{
-			log(`router 中不存在 ${tempUrl.path}`, e);
-			execute = this._fallback( tempUrl );
-		}
-
-		execute.then(()=>{
+		this._get( tempUrl ).then(()=>{
 			this._handleTrigger( newUrl );
 		});
 	}
@@ -310,14 +298,7 @@ class Router extends Base{
 			tempUrl = this.$url;
 		}
 
-		if( this.has(tempUrl.path) ){
-			execute = this._get( tempUrl );
-		}
-		else{
-			execute = this._fallback( tempUrl );
-		}
-
-		execute.then(()=>{
+		this._get( tempUrl ).then(()=>{
 			this._handleTrigger( this.$url.source );
 		});
 	}
@@ -418,7 +399,6 @@ class Router extends Base{
 	 * @summary 页面前进到目标 path
 	 * @param   {string|Url|number} path
 	 * @param   {Object}            [params={}]
-	 * @return  {boolean}           是否存在对应 path
 	 * @desc    当为 hash 模式时，该方法实际并未直接执行 router 的 callback，仅仅调用 url.setHash 方法，来触发 hashChange 事件进而执行 router 的 callback，所以将会是异步
 	 *          当 path 为数字类型的时候，实际为调用 url.go 方法，该封装主要为了统一调用对象
 	 * */
@@ -430,7 +410,6 @@ class Router extends Base{
 		}
 
 		let targetUrl = this.$url.parseUrl( path )
-			, rs = this.has( targetUrl.path )
 			;
 
 		targetUrl.changeParams( params );

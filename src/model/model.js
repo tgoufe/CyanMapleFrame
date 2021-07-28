@@ -297,7 +297,7 @@ class Model extends Base{
 		if( newVal !== oldVal ){
 			this._history[topic].push( newVal );
 			
-			log(`设置 ${topic} 的值为 ${newVal}`);
+			log(`设置 ${topic} 的值为`, newVal);
 
 			this._trigger(topic, newVal, oldVal);
 		}
