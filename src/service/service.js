@@ -102,8 +102,6 @@ class ServiceModel extends Model{
 
 		this._config = config;
 
-		this.$request = this.$request || null
-
 		if( !this.$request ){
 			throw new Error(`$request 未注入，无法发送请求`);
 		}
