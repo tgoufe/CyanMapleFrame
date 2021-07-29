@@ -424,8 +424,6 @@ class Router extends Base{
 		else{   // history 模式
 			this._goHistory( targetUrl );
 		}
-
-		return rs;
 	}
 	/**
 	 * @summary 后退
