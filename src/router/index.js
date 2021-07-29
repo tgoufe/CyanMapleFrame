@@ -199,7 +199,7 @@ class Router extends Base{
 
 		return execute.catch((e)=>{
 			if( e instanceof  Error){
-				log(`${path} 路由执行错误`, e);
+				log( e.message );
 			}
 			else{
 				log(path, e);
