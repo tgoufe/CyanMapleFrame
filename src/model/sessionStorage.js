@@ -242,6 +242,8 @@ class SessionStorageModel extends Model{
 
 					super.setData(d, all[d]);
 				}
+
+				return all;
 			}, {});
 
 			if( !Array.isArray(topic) ){
