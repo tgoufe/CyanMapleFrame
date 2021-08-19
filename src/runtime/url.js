@@ -195,6 +195,10 @@ class Url extends Base{
 			});
 		}
 
+		this.source = this.pack();
+		// 相对路径
+		this.relative = (this.source.match(/tps?:\/\/[^\/]+(.*)/) || ['', ''])[1];
+
 		return this;
 	}
 	/**
