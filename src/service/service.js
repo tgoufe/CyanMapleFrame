@@ -133,9 +133,7 @@ class ServiceModel extends Model{
 
 		// 资源
 		if( 'resource' in config ){
-			Object.entries( config.resource ).forEach(([k, v])=>{
-				this.resource(k, v);
-			});
+			this.resource( config.resource );
 		}
 	}
 
@@ -464,15 +462,29 @@ class ServiceModel extends Model{
 	}
 	/**
 	 * @summary 定义资源
-	 * @param   {string}    name
-	 * @param   {string|Object} pathPattern
-	 * @param   {string}        pathPattern.url
-	 * @param   {string}        [pathPattern.method]
-	 * @param   {Function}      [keyTrans]
+	 * @param   {string|Object}             name
+	 * @param   {string|Object|Function}    [pathPattern]
+	 * @param   {string}                    [pathPattern.url]
+	 * @param   {string}                    [pathPattern.method]
+	 * @param   {Function}                  [keyTrans]
 	 * @desc    每个资源会返回包含 get、post、put、delete 方法的集合，以 RESTful api 规范的方式来使用
-	 *          路径内的参数已 :key 的方式使用
+	 *          路径内的参数以 :key 的方式使用
+	 *          若 name 为对象类型，则视为 resource 合集，pathPattern 被视为 keyTrans
 	 * */
 	resource(name, pathPattern, keyTrans){
+		if( typeof name === 'object' ){
+			keyTrans = typeof pathPattern === 'function' ? pathPattern : undefined;
+
+			Object.entries( name ).forEach(([key, value])=>{
+				this.resource(key, value, keyTrans);
+			});
+
+			return ;
+		}
+		else if( arguments.length < 2 ){
+			throw new Error('缺少路径参数');
+		}
+
 		if( name in this ){
 			throw new Error(`${name} 接口已经存在，不能重复定义`);
 		}
