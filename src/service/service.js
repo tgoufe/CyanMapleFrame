@@ -506,7 +506,7 @@ class ServiceModel extends Model{
 				let runner = (data)=>{
 						return this._send(this.transPath(url, data, keyTrans), merge(pathPattern, {
 							data
-						}), method.toUpperCase());
+						}), method ? method.toUpperCase() : undefined);
 					}
 					;
 
