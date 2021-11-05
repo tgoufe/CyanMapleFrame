@@ -61,7 +61,7 @@ class CacheStorageModel extends Model{
 			url = new Request( url );
 		}
 
-		return url
+		return url;
 	}
 	/**
 	 * @summary 与 App 类约定的注入接口
@@ -100,7 +100,7 @@ class CacheStorageModel extends Model{
 		}).then((cache)=>{
 			log(`缓存 ${typeof topic === 'string' ? topic : topic.url}`);
 
-			return cache.put(CacheStorageModel.tranToRequest(topic), response);
+			return cache.put(CacheStorageModel.tranToRequest( topic ), response);
 		});
 	}
 	/**
@@ -216,6 +216,7 @@ class CacheStorageModel extends Model{
 	// ---------- 公有属性 ----------
 	/**
 	 * @summary 实现 toStringTag 接口
+	 * @readonly
 	 * @desc    在 Object.prototype.toString.call( new Model() ); 时将返回 [object CacheStorageModel]
 	 * */
 	get [Symbol.toStringTag](){

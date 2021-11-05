@@ -68,6 +68,7 @@ class WebSocketModel extends Model{
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置
+	 * @override
 	 * @static
 	 * @const
 	 * */
@@ -174,9 +175,9 @@ class WebSocketModel extends Model{
 	 * @override
 	 * @overload
 	 * @protected
-	 * @param       {Event}     e
-	 * @param       {string}    topic
-	 * @param       {*}         value
+	 * @param       {TriggerEvent}  e
+	 * @param       {string}        topic
+	 * @param       {*}             value
 	 * */
 	_sync = (e, topic, value)=>{
 		if( !this._syncTarget ){
@@ -375,11 +376,14 @@ class WebSocketModel extends Model{
 	// ---------- 公有属性 ----------
 	/**
 	 * @summary 实现 toStringTag 接口
+	 * @readonly
 	 * @desc    在 Object.prototype.toString.call( new WebSocketModel() ); 时将返回 [object WebSocketModel]
 	 * */
 	get [Symbol.toStringTag](){
 		return 'WebSocketModel';
 	}
+
+	$url = null;
 }
 
 WebSocketModel.use( Url );

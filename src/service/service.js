@@ -348,10 +348,13 @@ class ServiceModel extends Model{
 	 * @override
 	 * @overload
 	 * @protected
-	 * @param       {string}    topic
-	 * @param       {*}         value
+	 * @param       {TriggerEvent}  e
+	 * @param       {string}        topic
+	 * @param       {*}             value
+	 * @param       {Object}        value.options
+	 * @param       {Response}      value.res
 	 * */
-	_sync(topic, {options, res}){
+	_sync(e, topic, {options, res}){
 		if( !this._syncTarget ){
 			return ;
 		}
@@ -552,11 +555,15 @@ class ServiceModel extends Model{
 	// ---------- 公有属性 ----------
 	/**
 	 * @summary 实现 toStringTag 接口
+	 * @readonly
 	 * @desc    在 Object.prototype.toString.call( new ServiceModel() ); 时将返回 [object ServiceModel]
 	 * */
 	get [Symbol.toStringTag](){
 		return 'ServiceModel';
 	}
+
+	$request = null;
+	interceptor = null;
 }
 
 /**

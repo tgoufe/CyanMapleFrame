@@ -407,62 +407,62 @@ class HandlerQueue extends Base{
 
 	// ---------- 公有属性 ----------
 	/**
-	 * @summary 返回以 promise 方式执行 handler 队列的方法集合
-	 * @return  {Object}
-	 * */
-	get promise(){
-		return {
-			/**
-			 * @summary 以 Promise.all 的方式同时执行所有 handler，将返回结果作为一个数组返回
-			 * @param   {...*}  [args]
-			 * @return  {Promise<Array>} 数组中将不包括已失效
-			 * @desc    当传入参数时，参数被视为传入 handler 的参数（所有 handler 都会传入相同的参数）
-			 *          若 handler 是 HandlerQueue 类型，将会执行其 all 方法将返回的结果评级的放入数组中
-			 * */
-			all: (...args)=>{
-				return Promise.all( this.all(...args) );
-			}
-			/**
-			 * @summary 以 promise 串行的方式执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
-			 * @param   {...*}      [args]
-			 * @return  {Promise<boolean>}
-			 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
-			 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
-			 * */
-			, line: (...args)=>{
-				return this._handlers.reduce(this._lineExecutorPromise(null, args), Promise.resolve());
-			}
-			/**
-			 * @summary 以 promise 串行的方式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
-			 * @param   {...*}  [args]
-			 * @return  {Promise<*>}
-			 * @desc    当传入参数时，参数被视为传入第一个 handler 的参数
-			 *          由于为 reduce 方式调用，将只允许第一个执行 handler（即第一个） 有多参数，其它 handler 都应只有一个参数
-			 *          若 handler 是 HandlerQueue 类型，将会执行其 pipe 方法
-			 * */
-			, pipe: (...args)=>{
-				return this._handlers.reduce( this._funcExecutorPromise('pipe', null, args) );
-			}
-			/**
-			 * @summary 为 pipe 方法的逆序，以 promise 串行的方式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
-			 * @param   {...*}  [args]
-			 * @return  {Promise<*>}
-			 * @desc    当传入参数时，参数被视为传入最后一个 handler 的参数
-			 *          由于为 reduce 方式调用，将只允许第一个执行 handler（即最后一个）有多参数，其它 handler 都应只有一个参数
-			 *          若 handler 是 HandlerQueue 类型，将会执行其 compose 方法
-			 * */
-			, compose: (...args)=>{
-				return this._handlers.reduceRight( this._funcExecutorPromise('compose', null, args) );
-			}
-		};
-	}
-	/**
 	 * @summary 实现 toStringTag 接口
+	 * @readonly
 	 * @desc    在 Object.prototype.toString.call( new HandlerQueue() ); 时将返回 [object HandlerQueue]
 	 * */
 	get [Symbol.toStringTag](){
 		return 'HandlerQueue';
 	}
+
+	/**
+	 * @summary 返回以 promise 方式执行 handler 队列的方法集合
+	 * @return  {Object}
+	 * */
+	promise = {
+		/**
+		 * @summary 以 Promise.all 的方式同时执行所有 handler，将返回结果作为一个数组返回
+		 * @param   {...*}  [args]
+		 * @return  {Promise<Array>} 数组中将不包括已失效
+		 * @desc    当传入参数时，参数被视为传入 handler 的参数（所有 handler 都会传入相同的参数）
+		 *          若 handler 是 HandlerQueue 类型，将会执行其 all 方法将返回的结果评级的放入数组中
+		 * */
+		all: (...args)=>{
+			return Promise.all( this.all(...args) );
+		}
+		/**
+		 * @summary 以 promise 串行的方式执行队列中的全部 handler，前一个 handler 的返回结果决定下一个 handler 是否执行
+		 * @param   {...*}      [args]
+		 * @return  {Promise<boolean>}
+		 * @desc    当 handler 返回 false 时，将终止队列的中后续 handler 的执行
+		 *          若 handler 是 HandlerQueue 类型，将会执行其 line 方法
+		 * */
+		, line: (...args)=>{
+			return this._handlers.reduce(this._lineExecutorPromise(null, args), Promise.resolve());
+		}
+		/**
+		 * @summary 以 promise 串行的方式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
+		 * @param   {...*}  [args]
+		 * @return  {Promise<*>}
+		 * @desc    当传入参数时，参数被视为传入第一个 handler 的参数
+		 *          由于为 reduce 方式调用，将只允许第一个执行 handler（即第一个） 有多参数，其它 handler 都应只有一个参数
+		 *          若 handler 是 HandlerQueue 类型，将会执行其 pipe 方法
+		 * */
+		, pipe: (...args)=>{
+			return this._handlers.reduce( this._funcExecutorPromise('pipe', null, args) );
+		}
+		/**
+		 * @summary 为 pipe 方法的逆序，以 promise 串行的方式执行队列中的全部 handler，即前一个 handler 的返回结果作为下一个 handler 的参数
+		 * @param   {...*}  [args]
+		 * @return  {Promise<*>}
+		 * @desc    当传入参数时，参数被视为传入最后一个 handler 的参数
+		 *          由于为 reduce 方式调用，将只允许第一个执行 handler（即最后一个）有多参数，其它 handler 都应只有一个参数
+		 *          若 handler 是 HandlerQueue 类型，将会执行其 compose 方法
+		 * */
+		, compose: (...args)=>{
+			return this._handlers.reduceRight( this._funcExecutorPromise('compose', null, args) );
+		}
+	};
 }
 
 export default HandlerQueue;

@@ -18,6 +18,7 @@ const FILE_SYSTEM_CONFIG = {
 /**
  * @class
  * @desc    对 File System 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 file，别名 fs，将可以使用工厂方法生成。默认使用文件名为 storage.txt，2MB 空间
+ *          最新标准似乎已经不支持 requestFileSystem 接口了。。。
  * @extends Model
  * */
 class FileSystemModel extends Model{
@@ -37,7 +38,7 @@ class FileSystemModel extends Model{
 		this._config = config;
 
 		this._fs = new Promise((resolve, reject)=>{
-			let requestFileSystem = self.requestFileSystem || self.webkitRequestFileSystem || null
+			let requestFileSystem = self.requestFileSystem
 				;
 
 			// if( 'webkitPersistentStorage' in navigator ){
@@ -82,6 +83,7 @@ class FileSystemModel extends Model{
 	/**
 	 * @summary 持久化文件类型的值
 	 * @static
+	 * @readonly
 	 * */
 	static get PERSISTENT(){
 		return self.PERSISTENT;
@@ -89,6 +91,7 @@ class FileSystemModel extends Model{
 	/**
 	 * @summary 临时文件类型的值
 	 * @static
+	 * @readonly
 	 * */
 	static get TEMPORARY(){
 		return self.TEMPORARY;

@@ -233,9 +233,8 @@ class Router extends Base{
 	/**
 	 * @summary popState 事件监听回调
 	 * @private
-	 * @param   {PopStateEvent} e
 	 * */
-	_popState = (e)=>{
+	_popState = ()=>{
 		let tempUrl = this.$url.parseUrl( location.href )
 			;
 
@@ -288,7 +287,6 @@ class Router extends Base{
 	 * */
 	init(){
 		let tempUrl
-			, execute
 			;
 
 		if( this.config.mode === 'hash' ){
@@ -450,7 +448,17 @@ class Router extends Base{
 
 	// ---------- 公有属性 ----------
 	/**
+	 * @summary 实现 toStringTag 接口
+	 * @readonly
+	 * @desc    在 Object.prototype.toString.call( new Router() ); 时将返回 [object Router]
+	 * */
+	get [Symbol.toStringTag](){
+		return 'Router';
+	};
+
+	/**
 	 * @summary 获取当前路径
+	 * @readonly
 	 * */
 	get currentPath(){
 		if( this.config.mode === 'hash' ){
@@ -459,6 +467,10 @@ class Router extends Base{
 
 		return this.$url.parseUrl( this._historyList[this._historyList.length -1].url ).path;
 	}
+
+	$url = null;
+	$listener = null;
+	$handlers = null;
 }
 
 Router.use(Url, Listener, HandlerQueue);

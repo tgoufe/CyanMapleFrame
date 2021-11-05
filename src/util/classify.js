@@ -14,18 +14,19 @@
  * @desc        如果对象不包含 key，则该对象不会出现在返回值中
  * */
 let classify = function(target, key){
-	return target.reduce((all, d)=>{
-		if( d[key] ){
+		return target.reduce((all, d)=>{
+			if( d[key] ){
 
-			if(!(d[key] in all) ){
-				all[d[key]] = [];
+				if(!(d[key] in all) ){
+					all[d[key]] = [];
+				}
+
+				all[d[key]].push( d );
 			}
 
-			all[d[key]].push( d );
-		}
-
-		return all;
-	}, {});
-};
+			return all;
+		}, {});
+	}
+	;
 
 export default classify;

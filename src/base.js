@@ -50,10 +50,9 @@ class Base{
 	static use(...module){
 		if( this.modules ){
 			if( !this.hasOwnProperty('modules') ){
-				let modules = this.modules
-					;
-
-				this.modules = new Set( Array.from(modules) );
+				// modules 属性是从父类继承的
+				// 需要重新初始化自身的 modules 属性，但是要继承父级已声明的依赖
+				this.modules = new Set( Array.from(this.modules) );
 			}
 		}
 		else{

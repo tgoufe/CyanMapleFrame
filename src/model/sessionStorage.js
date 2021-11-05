@@ -268,29 +268,27 @@ class SessionStorageModel extends Model{
 	 * @summary 提供更直观更语义化的同步数据读写接口
 	 * @desc    可以使用 ss.sync.getData 和 ss.sync.setData 同步的方式来读写数据
 	 * */
-	get sync(){
-		return {
-			/**
-			 * @summary 语义化的同步数据写接口
-			 * @param   {...*}  argv    参数与 setDataSync 方法相同
-			 * @return  {boolean}
-			 * @desc    内部为调用 setDataSync 方法
-			 * */
-			setData: (...argv)=>{
-				return this.setDataSync( ...argv );
-			}
-			/**
-			 * @summary 语义化的同步保存数据接口
-			 * @param   {string|string[]}  argv    参数与 getDatasync 方法相同
-			 * @param   {...string}
-			 * @return  {Object|string}
-			 * @desc    内部为调用 getDataSync 方法
-			 * */
-			, getData: (...argv)=>{
-				return this.getDataSync( ...argv );
-			}
+	sync = {
+		/**
+		 * @summary 语义化的同步数据写接口
+		 * @param   {...*}  argv    参数与 setDataSync 方法相同
+		 * @return  {boolean}
+		 * @desc    内部为调用 setDataSync 方法
+		 * */
+		setData: (...argv)=>{
+			return this.setDataSync( ...argv );
 		}
-	}
+		/**
+		 * @summary 语义化的同步保存数据接口
+		 * @param   {string|string[]}  argv    参数与 getDatasync 方法相同
+		 * @param   {...string}
+		 * @return  {Object|string}
+		 * @desc    内部为调用 getDataSync 方法
+		 * */
+		, getData: (...argv)=>{
+			return this.getDataSync( ...argv );
+		}
+	};
 }
 
 /**

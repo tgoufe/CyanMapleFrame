@@ -106,6 +106,15 @@ class Url extends Base{
 		return a;
 	}
 	/**
+	 * @summary 判断某一对象是否为 Url 类型
+	 * @static
+	 * @param   {*}         target
+	 * @return  {boolean}   返回结果
+	 * */
+	static is(target){
+		return target && target[Symbol.toStringTag] === 'Url';
+	}
+	/**
 	 * @summary 与 App 类约定的注入接口
 	 * @static
 	 * @param   {Base}  app
@@ -123,6 +132,11 @@ class Url extends Base{
 	}
 
 	// ---------- 静态属性 ----------
+	/**
+	 * @static
+	 * @private
+	 * @const
+	 * */
 	static get _INDEX(){
 		return URL_KEY_INDEX;
 	}
@@ -250,7 +264,17 @@ class Url extends Base{
 
 	// ---------- 公有属性 ----------
 	/**
+	 * @summary 实现 toStringTag 接口
+	 * @readonly
+	 * @desc    在 Object.prototype.toString.call( new Url() ); 时将返回 [object Url]
+	 * */
+	get [Symbol.toStringTag](){
+		return 'Url';
+	};
+
+	/**
 	 * @summary 当前页面参数拼接字符串
+	 * @readonly
 	 * */
 	get query(){
 		let query = Object.entries( this.params ).reduce((all, [k, v])=>{
@@ -317,7 +341,7 @@ class CurrentUrl extends Url{
 		let result = url
 			;
 
-		if( !(url instanceof Url) ){
+		if( !Url.is(url) ){
 			result = new Url( typeof url === 'string' ? url : '' );
 		}
 		
@@ -480,16 +504,20 @@ class CurrentUrl extends Url{
 	// ---------- 公有属性 ----------
 	/**
 	 * @summary Url 类对象
+	 * @const
 	 * */
 	get Url(){
 		return Url;
 	}
 	/**
 	 * @summary 返回当前 hash 的参数
+	 * @readonly
 	 * */
 	get hashParams(){
 		return this.parseUrl( this.hash ).params;
 	}
+
+	$listener = null;
 }
 
 CurrentUrl.use( Listener );

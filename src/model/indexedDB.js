@@ -43,7 +43,7 @@ let indexedDBModel = new IndexedDBModel()
 	, idb = Model.factory('idb')
 	;
 </pre>
- * @desc        IndexedDB 也提供同步 API，但同步 API 需要配合 WebWorker 一同使用。目前，没有主流浏览器支持同步 API
+ * @desc    IndexedDB 也提供同步 API，但同步 API 需要配合 WebWorker 一同使用。目前，没有主流浏览器支持同步 API
  * */
 class IndexedDBModel extends Model{
 	/**

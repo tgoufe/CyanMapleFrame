@@ -118,6 +118,8 @@ class Listener extends Base{
 	}
 	/**
 	 * @summary 所有 observer 类型的监听标识
+	 * @static
+	 * @const
 	 * */
 	static get ObserverTypeList(){
 		return ObSERVER_TYPE_LIST;
@@ -560,6 +562,7 @@ class Listener extends Base{
 	// ---------- 公有属性 ----------
 	/**
 	 * @summary 实现 toStringTag 接口
+	 * @readonly
 	 * @desc    在 Object.prototype.toString.call( new Listener() ); 时将返回 [object Listener]
 	 * */
 	get [Symbol.toStringTag](){

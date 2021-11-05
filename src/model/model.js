@@ -30,6 +30,10 @@ const MODEL_CONFIG = {
 	;
 
 /**
+ * @typedef {Object}    ModelConfig
+ * */
+
+/**
  * @summary     数据改变事件触发回调函数
  * @callback    ModelChangeEvent
  * @param       {TriggerEvent}  event
@@ -234,6 +238,7 @@ class Model extends Base{
 	 * @summary 默认配置
 	 * @static
 	 * @const
+	 * @type    {ModelConfig}
 	 * */
 	static get CONFIG(){
 		return MODEL_CONFIG;
@@ -321,7 +326,7 @@ class Model extends Base{
 	 * */
 	_sync = (e, topic, value)=>{
 		if( !this._syncToList.length ){
-			return  Promise.resolve();
+			return ;
 		}
 
 		Promise.all( this._syncToList.map((m)=>{
@@ -640,11 +645,14 @@ class Model extends Base{
 	// ---------- 公有属性 ----------
 	/**
 	 * @summary 实现 toStringTag 接口
+	 * @readonly
 	 * @desc    在 Object.prototype.toString.call( new Model() ); 时将返回 [object Model]
 	 * */
 	get [Symbol.toStringTag](){
 		return 'Model';
 	}
+
+	$listener = null;
 }
 
 Model.use( Listener );

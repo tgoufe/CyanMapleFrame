@@ -43,7 +43,7 @@ import Base from './base.js';
 /**
  * ---------- 通用工具 ----------
  * */
-import util     from './util/index.js';
+import util, {Util} from './util/index.js';
 export * from './util/index.js';
 
 /**
@@ -151,6 +151,6 @@ export {
 	, CurrentUrl
 	, Device
 	, View
-	, util as Util
+	, Util
 	, Router
 };

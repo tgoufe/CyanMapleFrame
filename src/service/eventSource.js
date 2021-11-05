@@ -67,6 +67,7 @@ class EventSourceModel extends Model{
 	// ---------- 静态属性 ----------
 	/**
 	 * @summary 默认配置
+	 * @override
 	 * @static
 	 * @const
 	 * */
@@ -308,6 +309,7 @@ class EventSourceModel extends Model{
 	// ---------- 公有属性 ----------
 	/**
 	 * @summary 实现 toStringTag 接口
+	 * @readonly
 	 * @desc    在 Object.prototype.toString.call( new EventSourceModel() ); 时将返回 [object ServiceModel]
 	 * */
 	get [Symbol.toStringTag](){
