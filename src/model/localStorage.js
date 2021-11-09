@@ -110,7 +110,7 @@ class LocalStorageModel extends Model{
 	 * @param   {StorageEvent}  e
 	 * @return  {Promise<boolean>}
 	 * */
-	_listenOn = (e)=>{
+	_listenOn(e){
 		let { key: topic
 			, newValue: newVal } = e
 			;

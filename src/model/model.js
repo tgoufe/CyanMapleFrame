@@ -1,9 +1,8 @@
 'use strict';
 
-import Base       from '../base.js';
-import {Listener} from '../util/listener.js';
-import merge      from '../util/merge.js';
-import log        from '../util/log.js';
+import Base     from '../base.js';
+import merge    from '../util/merge.js';
+import log      from '../util/log.js';
 
 /**
  * 默认配置
@@ -324,7 +323,7 @@ class Model extends Base{
 	 * @param       {string}        topic
 	 * @param       {*}             value
 	 * */
-	_sync = (e, topic, value)=>{
+	_sync(e, topic, value){
 		if( !this._syncToList.length ){
 			return ;
 		}
@@ -652,9 +651,10 @@ class Model extends Base{
 		return 'Model';
 	}
 
-	$listener = null;
+	/**
+	 * @property    $listener
+	 * @desc        依赖注入的公有属性
+	 * */
 }
-
-Model.use( Listener );
 
 export default Model;

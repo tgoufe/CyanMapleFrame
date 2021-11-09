@@ -33,6 +33,21 @@ const SERVICE_MODEL_CONFIG = {
 	;
 
 /**
+ * @typedef     {Object}    SyncHandleResult
+ * @property    {string}    topic
+ * @property    {*}         value
+ * */
+/**
+ * @summary     处理同步数据过程的格式化
+ * @callback    SyncBeforeHandler
+ * @param       {string}    topic   请求的路径
+ * @param       {Object}    options 请求的配置信息
+ * @param       {Response}  res     请求的返回信息
+ * @return      {boolean|SyncHandleResult}
+ * @desc        返回 false 则同步数据，否则返回一个对象
+ * */
+
+/**
  * @class
  * @desc    对服务器接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 service，别名 s，将可以使用工厂方法生成
  *          必须通过注入的方式注入一个 $request 方法用来发送请求
@@ -106,8 +121,6 @@ class ServiceModel extends Model{
 			throw new Error(`$request 未注入，无法发送请求`);
 		}
 		
-		this._value = new Map();
-
 		// 同步相关
 		this._syncTarget = null;
 		this._syncHandler = null;
@@ -363,7 +376,14 @@ class ServiceModel extends Model{
 			;
 
 		if( this._syncHandler ){
-			data = this._syncHandler(topic, options, res);
+			let exec = this._syncHandler(topic, options, res)
+				;
+
+			if( exec === false ){
+				return ;
+			}
+
+			({topic, value: data} = exec);
 		}
 
 		this._syncTarget.setData(topic, data);
@@ -424,8 +444,8 @@ class ServiceModel extends Model{
 	 * @summary     将数据同步到本地存储，只能设置一个本地缓存
 	 * @override
 	 * @overload
-	 * @param       {Model}     model
-	 * @param       {Function}  [handler=null]
+	 * @param       {Model}         model
+	 * @param       {SyncBeforeHandler}   [handler=null]
 	 * @return      {Model}     返回 this
 	 * @desc        目前只能将数据同步到一个本地缓存中，若想同步到多个本地缓存，可由本地缓存之间设置同步
 	 * */
@@ -562,8 +582,15 @@ class ServiceModel extends Model{
 		return 'ServiceModel';
 	}
 
-	$request = null;
+	/**
+	 * @summary 拦截器
+	 * */
 	interceptor = null;
+
+	/**
+	 * @property    $request
+	 * @desc        依赖注入的公有属性
+	 * */
 }
 
 /**

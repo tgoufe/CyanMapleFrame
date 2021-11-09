@@ -1,6 +1,5 @@
 'use strict';
 
-import {Url}    from '../runtime/url.js';
 import Model    from '../model/model.js';
 import merge    from '../util/merge.js';
 import log      from '../util/log.js';
@@ -179,7 +178,7 @@ class WebSocketModel extends Model{
 	 * @param       {string}        topic
 	 * @param       {*}             value
 	 * */
-	_sync = (e, topic, value)=>{
+	_sync(e, topic, value){
 		if( !this._syncTarget ){
 			return ;
 		}
@@ -192,7 +191,7 @@ class WebSocketModel extends Model{
 	 * @param       {MessageEvent}  e
 	 * @return      {Promise<boolean>}
 	 * */
-	_onMessage = (e)=>{
+	_onMessage(e){
 		let data = e.data
 			;
 
@@ -230,7 +229,6 @@ class WebSocketModel extends Model{
 
 		return super.setData(data.topic, data.data);
 	}
-
 
 	// ---------- 公有方法 ----------
 	/**
@@ -383,10 +381,11 @@ class WebSocketModel extends Model{
 		return 'WebSocketModel';
 	}
 
-	$url = null;
+	/**
+	 * @property    $url
+	 * @desc        依赖注入的公有属性
+	 * */
 }
-
-WebSocketModel.use( Url );
 
 /**
  * 在 Model.factory 工厂方法注册，将可以使用工厂方法生成

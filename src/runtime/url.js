@@ -290,9 +290,10 @@ class Url extends Base{
 
 /**
  * @class
- * @desc    对当前 url 进行操作
+ * @desc    对当前 url 进行操作，为内部操作类，立即声明实例，所以必须先声明依赖关系
  * @extends Url
  * @requires    Listener
+ * @todo    提到单独文件
  * */
 class CurrentUrl extends Url{
 	/**
@@ -517,7 +518,10 @@ class CurrentUrl extends Url{
 		return this.parseUrl( this.hash ).params;
 	}
 
-	$listener = null;
+	/**
+	 * @property    $listener
+	 * @desc        依赖注入的公有属性
+	 * */
 }
 
 CurrentUrl.use( Listener );

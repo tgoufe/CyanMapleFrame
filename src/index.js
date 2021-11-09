@@ -43,7 +43,7 @@ import Base from './base.js';
 /**
  * ---------- 通用工具 ----------
  * */
-import util, {Util} from './util/index.js';
+import util, {Util, HandlerQueue}   from './util/index.js';
 export * from './util/index.js';
 
 /**
@@ -80,15 +80,15 @@ import geo from './view/geo.js';
 /**
  * ---------- Router 路由控制 ----------
  * */
-import router, {Router}  from './router/index.js';
+import router, {Router} from './router/index.js';
 
 /**
  * ---------- 错误处理 ----------
  * */
 // 全局错误
-import error              from './view/error.js';
+import error                from './view/error.js';
 // 为捕获的 promise reject
-import unHandledRejection from './view/unHandledRejection.js';
+import unHandledRejection   from './view/unHandledRejection.js';
 
 // /**
 //  * ---------- 动画库 ----------
@@ -108,40 +108,58 @@ import notify     from './view/notify.js';
 
 import useAxios, {setOpts} from './service/useAxios.js';
 
+const
+	{ Model
+	, ServiceModel
+	, WebSocketModel } = ModelList
+	;
 let maple = {
-	App: Base
-	, Listener
-	, listener
-	, util
-	, log: util.log
-	, setDebug: util.setDebug
+		App: Base
+		, Listener
+		, listener
+		, util
+		, log: util.log
+		, setDebug: util.setDebug
 
-	, url
-	, device
+		, url
+		, device
 
-	, ...ModelList
-	, model
+		, ...ModelList
+		, model
 
-	, view
+		, view
 
-	, Router
-	, router
+		, Router
+		, router
 
-	, error
-	, unHandledRejection
+		, error
+		, unHandledRejection
 
-	, geo
+		, geo
 
-	// 实验性功能
-	// , animate
-	, register
-	, notify
-	, useAxios(options){
-		setOpts( options );
+		// 实验性功能
+		// , animate
+		, register
+		, notify
+		, useAxios(options){
+			setOpts( options );
 
-		ModelList.ServiceModel.use( useAxios );
+			ServiceModel.use( useAxios );
+		}
+
+		/**
+		 * 设置默认依赖关系
+		 * 此方法应该在 useAxios 前使用
+		 * */
+		, setDefaultDI(){
+			Router.use(Url, Listener, HandlerQueue);
+
+			Model.use( Listener );
+
+			WebSocketModel.use( Url );
+		}
 	}
-};
+	;
 
 export default maple;
 

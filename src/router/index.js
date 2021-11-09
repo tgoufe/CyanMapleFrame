@@ -1,11 +1,8 @@
 'use strict';
 
 import Base     from '../base.js';
-import {Url}    from '../runtime/url.js';
-import HandlerQueue from '../util/handlerQueue.js';
-import {Listener}   from '../util/listener.js';
-import merge from '../util/merge.js';
-import log   from '../util/log.js';
+import merge    from '../util/merge.js';
+import log      from '../util/log.js';
 
 /**
  * 路由默认配置
@@ -468,12 +465,13 @@ class Router extends Base{
 		return this.$url.parseUrl( this._historyList[this._historyList.length -1].url ).path;
 	}
 
-	$url = null;
-	$listener = null;
-	$handlers = null;
+	/**
+	 * @property    $url
+	 * @property    $listener
+	 * @property    $handlers
+	 * @desc        依赖注入的公有属性
+	 * */
 }
-
-Router.use(Url, Listener, HandlerQueue);
 
 export default Router;
 

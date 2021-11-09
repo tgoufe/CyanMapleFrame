@@ -161,7 +161,7 @@ class EventSourceModel extends Model{
 	 * @param       {string}        topic
 	 * @param       {*}             value
 	 * */
-	_sync = (e, topic, value)=>{
+	_sync(e, topic, value){
 		if( !this._syncTarget ){
 			return ;
 		}
@@ -174,7 +174,7 @@ class EventSourceModel extends Model{
 	 * @param       {MessageEvent}  e
 	 * @return      {Promise<boolean>}
 	 * */
-	_onMessage = (e)=>{
+	_onMessage(e){
 		let data = e.data
 			;
 

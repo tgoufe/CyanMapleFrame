@@ -54,6 +54,12 @@ class Base{
 				// 需要重新初始化自身的 modules 属性，但是要继承父级已声明的依赖
 				this.modules = new Set( Array.from(this.modules) );
 			}
+			else{
+				/**
+				 * todo
+				 * 一旦子类的 modules 属性被声明了，将不再继承父类的注入
+				 * */
+			}
 		}
 		else{
 			this.modules = new Set();
