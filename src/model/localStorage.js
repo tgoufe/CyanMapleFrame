@@ -141,7 +141,7 @@ class LocalStorageModel extends Model{
 		}
 		else{
 			result = this._store.then((store)=>{
-				store.setItem(topic, LocalStorageModel.stringify(value));
+				store.setItem(topic, LocalStorageModel.stringify( value ));
 
 				super.setData(topic, value);
 

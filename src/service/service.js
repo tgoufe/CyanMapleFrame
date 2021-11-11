@@ -34,17 +34,35 @@ const SERVICE_MODEL_CONFIG = {
 
 /**
  * @typedef     {Object}    SyncHandleResult
- * @property    {string}    topic
- * @property    {*}         value
+ * @property    {string|Object} topic
+ * @property    {*}             [value]
+ * @desc        若 topic 为对象类型，则视为存储多个数据，无视 value 属性
  * */
 /**
- * @summary     处理同步数据过程的格式化
+ * @summary     处理同步数据过程前参数的格式化
  * @callback    SyncBeforeHandler
  * @param       {string}    topic   请求的路径
  * @param       {Object}    options 请求的配置信息
  * @param       {Response}  res     请求的返回信息
  * @return      {boolean|SyncHandleResult}
- * @desc        返回 false 则同步数据，否则返回一个对象
+ * @desc        返回 false 则不同步数据，否则返回一个对象
+ * */
+
+/**
+ * @summary     处理读取缓存数据过程前参数的格式化
+ * @callback    SourceBeforeHandler
+ * @param       {string}    topic   请求的路径
+ * @param       {Object}    options 请求的配置信息
+ * @return      {boolean|string|string[]}
+ * @desc        返回 false 则不从缓存中读取数据，否则返回一个字符串或一个字符串数组
+ * */
+/**
+ * @summary     处理从缓存中读取数据后的格式化
+ * @callback    SourceAfterHandler
+ * @param       {string|string[]}   topic   请求的路径
+ * @param       {Object}            options 请求的配置信息
+ * @param       {*}                 data
+ * @return      {*}
  * */
 
 /**
@@ -124,6 +142,11 @@ class ServiceModel extends Model{
 		// 同步相关
 		this._syncTarget = null;
 		this._syncHandler = null;
+
+		// 数据源相关
+		this._sourceTarget = null;
+		this._sourceBeforeHandler = null;
+		this._sourceAfterHandler = null;
 
 		// 请求池
 		this.poolSize = config.pool || 0;
@@ -317,8 +340,52 @@ class ServiceModel extends Model{
 
 		options.method = options.method || method;
 
+		let result
+			;
+
+		if( this._sourceTarget ){
+			if( this._sourceBeforeHandler ){
+				let exec = this._sourceBeforeHandler(topic, options)
+					;
+
+				if( exec !== false ){
+					if( Array.isArray(exec) ){
+						// 由于 getData 传入字符串数组后，返回的结果会是一个对象，缓存中不存在的数据会返回 null，不会走到 reject
+						result = Promise.all( exec.map((topic)=>{
+							return this._sourceTarget.getData( topic );
+						}) );
+					}
+					else{
+						result = this._sourceTarget.getData( exec );
+					}
+				}
+				else{
+					result = Promise.reject();
+				}
+			}
+			else{
+				result = this._sourceTarget.getData( topic );
+			}
+
+			result = result.then((data)=>{
+				if( this._sourceAfterHandler ){
+					data = this._sourceAfterHandler(topic, options, data);
+				}
+
+				return data;
+			}).then((data)=>{
+				return {
+					data
+				};
+			});
+		}
+		else{
+			result = Promise.reject();
+		}
+
 		// 执行请求拦截器
-		let result = this._reqInterceptor(topic, options).then(()=>{
+		result = result.catch(()=>{
+			return this._reqInterceptor(topic, options).then(()=>{
 				// 发送请求，向服务器发送数据
 				log(`发送 ${options.method} 请求 ${topic}`);
 
@@ -345,8 +412,8 @@ class ServiceModel extends Model{
 				super.setData(topic, {topic, options, res});
 
 				return res;
-			})
-			;
+			});
+		});
 
 		if( this.poolSize ){
 			result.catch(()=>{}).then(()=>{
@@ -384,6 +451,12 @@ class ServiceModel extends Model{
 			}
 
 			({topic, value: data} = exec);
+
+			if( typeof topic === 'object' ){
+				this._syncTarget.setData( topic );
+
+				return ;
+			}
 		}
 
 		this._syncTarget.setData(topic, data);
@@ -444,9 +517,9 @@ class ServiceModel extends Model{
 	 * @summary     将数据同步到本地存储，只能设置一个本地缓存
 	 * @override
 	 * @overload
-	 * @param       {Model}         model
-	 * @param       {SyncBeforeHandler}   [handler=null]
-	 * @return      {Model}     返回 this
+	 * @param       {Model} model
+	 * @param       {SyncBeforeHandler} [handler=null]
+	 * @return      {Model} 返回 this
 	 * @desc        目前只能将数据同步到一个本地缓存中，若想同步到多个本地缓存，可由本地缓存之间设置同步
 	 * */
 	syncTo(model, handler=null){
@@ -459,6 +532,23 @@ class ServiceModel extends Model{
 		return this;
 	}
 
+	/**
+	 * @summary     请求发送前从 model 中先获取数据，若没有则再发送请求
+	 * @param       {Model} model
+	 * @param       {SourceBeforeHandler}   [beforeHandler=null]
+	 * @param       {SourceAfterHandler}    [afterHandler=null]
+	 * @return      {Model} 返回 this
+	 * */
+	sourceFrom(model, beforeHandler=null, afterHandler=null){
+		// 判断 model 是继承自 Model 的类，且 Symbol.toStringTag 设置为 Model
+		if( Model.is( model ) ){
+			this._sourceTarget = model;
+			this._sourceBeforeHandler = beforeHandler;
+			this._sourceAfterHandler = afterHandler;
+		}
+
+		return this;
+	}
 	/**
 	 * @summary 使用 get 方式发请求，与 getData 相同
 	 * @param       {string|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填

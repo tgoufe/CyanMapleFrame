@@ -67,7 +67,7 @@ class SessionStorageModel extends Model{
 		}
 		else{
 			result = this._store.then((store)=>{
-				store.setItem(topic, SessionStorageModel.stringify(value));
+				store.setItem(topic, SessionStorageModel.stringify( value ));
 
 				super.setData(topic, value);
 
