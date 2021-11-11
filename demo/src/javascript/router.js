@@ -2,7 +2,11 @@
 
 import maple    from 'maple';
 import log      from '../log.js';
-           window.maple = maple;
+
+window.maple = maple;
+
+maple.setDefaultDI();
+
 let router = new maple.Router({
 		mode: maple.device.weixin ? 'hash' : 'history'
 		// mode: 'hash'

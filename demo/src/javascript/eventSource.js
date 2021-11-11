@@ -3,6 +3,8 @@
 import maple    from 'maple';
 import log      from '../log.js';
 
+maple.setDefaultDI();
+
 let sse = maple.model.factory('sse', {
 		url: '/test/sse'
 	})

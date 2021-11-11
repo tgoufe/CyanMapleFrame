@@ -3,6 +3,7 @@
 import maple    from 'maple';
 import log      from '../log.js';
 
+maple.setDefaultDI();
 maple.useAxios();
 
 let service = maple.model.factory('s')

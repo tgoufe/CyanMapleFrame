@@ -3,6 +3,8 @@
 import maple    from 'maple';
 import log      from '../log.js';
 
+maple.setDefaultDI();
+
 let model = maple.model
 	, ls = model.factory('ls')
 	, ss = model.factory('ss')
