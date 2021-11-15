@@ -40,21 +40,21 @@
     "karma-webpack": "~3.0.5",
     "lerna": "~3.20.2",
     "mocha": "~7.2.0",
-    "sass": "~1.35.1",
+    "sass": "~1.35.2",
     "sass-loader": "~8.0.2",
     "sinon": "~4.5.0",
     "sinon-chai": "~3.0.0",
     "style-loader": "~1.2.1",
     "url-loader": "~4.1.1",
-    "vue-loader": "~15.9.6",
-    "vue-template-compiler": "~2.6.12",
+    "vue-loader": "~15.9.8",
+    "vue-template-compiler": "~2.6.14",
     "webpack": "~4.43.0",
     "webpack-cli": "~3.3.12",
     "ws": "~6.1.4"
   },
   "dependencies": {
-    "axios": "~0.21.1",
-    "vue": "~2.6.12"
+    "axios": "~0.24.0",
+    "vue": "~2.6.14"
   },
   "files": [
     "src/",
