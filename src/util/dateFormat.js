@@ -15,10 +15,11 @@ import tools from './tools.js';
  * @return      {string}
  * */
 let dateFormat = function(date=new Date(), format='YYYY-MM-DD'){
-	return format.replace(/(YYYY|YY|MM|DD|hh|mm|ss|星期|周|www|week)/g, function(str){
-		return dateFormat._dateStrReplace[str]( date );
-	});
-};
+		return format.replace(/(YYYY|YY|MM|DD|hh|mm|ss|星期|周|www|week)/g, function(str){
+			return dateFormat._dateStrReplace[str]( date );
+		});
+	}
+	;
 
 /**
  * 时间格式字符串替换函数集合
@@ -101,7 +102,7 @@ dateFormat._dateStrReplace = {
 	 * @param   {Date}      date
 	 * @return  {string}
 	 * */
-	, '星期': function(date){
+	, ['星期'](date){
 		return '星期'+ dateFormat.WEEK_CN[date.getDay()];
 	}
 	/**
@@ -109,7 +110,7 @@ dateFormat._dateStrReplace = {
 	 * @param   {Date}      date
 	 * @return  {string}
 	 * */
-	, '周': function(date){
+	, ['周'](date){
 		return '周'+ dateFormat.WEEK_CN[date.getDay()];
 	}
 };
@@ -119,10 +120,19 @@ dateFormat._dateStrReplace = {
  * @param   {number|string} str
  * @param   {string}        [unit='d']
  * @return  {number}
+ * @desc    支持复合式的时间格式，如：
+ *          1d5h === 1 天 5 小时
+ *          -1y2m === 过去 1 年 2 分钟
+ *          对时间单位并不要求唯一，也没有顺序要求，只是对每个可解析的时间进行相加，如
+ *          1y3y === 3y
+ *          1m2y === 2y1m
+ *          1d2m1y1m === 1y1d3m
  * */
 dateFormat.formatTimeStr = function(str, unit='d'){
 	let result = 0
 		, temp
+		, flag
+		, dateStr
 		;
 
 	if( typeof str === 'number' ){
@@ -134,7 +144,17 @@ dateFormat.formatTimeStr = function(str, unit='d'){
 		}
 	}
 	else if( typeof str === 'string' && (temp = dateFormat._SHORT_TIME_EXPR.exec(str)) ){
-		result = Number( temp[1] ) * (dateFormat._SHORT_TIME_NUM[temp[2]] || 1);
+		flag = !!temp[1];   // 负号
+		dateStr = temp[2];
+
+		let expr = /((\d+)([smhdy])?)/ig
+			;
+
+		while( temp = expr.exec(dateStr) ){
+			result += Number( temp[2] ) * (dateFormat._SHORT_TIME_NUM[temp[3]] || 1);
+		}
+
+		result = flag ? -result : result;
 	}
 	
 	return result;
@@ -156,7 +176,7 @@ dateFormat.WEEK_CN = ['日', '一', '二', '三', '四', '五', '六'];
  * @private
  * @const
  * */
-dateFormat._SHORT_TIME_EXPR = /^(-?\d+)([smhdy])?$/i;
+dateFormat._SHORT_TIME_EXPR =  /^(-?)((?:\d+[smhdy]?)+)$/i;
 /**
  * 时间单位对应的毫秒数
  * @static
