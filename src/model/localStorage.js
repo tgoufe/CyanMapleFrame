@@ -11,6 +11,7 @@ import listener from '../util/listener.js';
 const LOCAL_STORAGE_MODEL_CONFIG = {
 		listen: true
 	}
+	, MAX_SIZE = (10 *1024 *1024 / 2) - 8 / 2   // 10M 字节空间
 	;
 
 /**
@@ -362,6 +363,10 @@ class LocalStorageModel extends Model{
 			return this.getDataSync( ...argv );
 		}
 	};
+
+	get size(){
+		return Object.entries( localStorage ).map( v=>v.join('') ).join('').length;
+	}
 }
 
 /**
