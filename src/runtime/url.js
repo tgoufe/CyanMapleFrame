@@ -358,6 +358,22 @@ class CurrentUrl extends Url{
 	}
 
 	/**
+	 * @summary     将数据组装成 query 格式
+	 * @param       {Object}    params
+	 * @return      {string}
+	 * */
+	packQuery(params){
+		let query = Object.entries( params ).reduce((all, [k, v])=>{
+				all.push( encodeURIComponent(k) +'='+ encodeURIComponent(v) );
+
+				return all;
+			}, [])
+			;
+
+		return query.length ? '?'+ query.join('&') : '';
+	}
+
+	/**
 	 * @summary     刷新当前页面
 	 * */
 	reload(){
