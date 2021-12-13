@@ -83,10 +83,10 @@ module.exports = {
 		}]
 	}
 	, externals:{
-		Vue:'Vue'
+		Vue: 'Vue'
 	}
 	, resolve: {
-		modules: ["node_modules", __dirname]
+		modules: ['node_modules', __dirname]
 		, alias: {
 			vue$: 'vue/dist/vue.common.js'
 			, maple: 'src/index.js'
