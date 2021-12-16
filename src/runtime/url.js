@@ -423,15 +423,15 @@ class CurrentUrl extends Url{
 	// ---------- url 上的参数操作 ----------
 	/**
 	 * @summary     调整参数并指向调整后的路径，当前 url 添加到历史记录
-	 * @param       {string[]|Object}   params
-	 * @param       {*|Object}          [pushState]
+	 * @param       {string|string[]|Object}    params
+	 * @param       {...string|Object}          [pushState]
 	 * @return      {CurrentUrl}               this
 	 * @desc        只有两种情况下 pushState 才有效：
 	 *              1.当 params 是 Object 类型时
 	 *              2.当不满足 1 条件时，参数中的最后一个为 Object 类型时，视为 pushState
 	 * */
 	pushParams(params, pushState){
-		let state = this._handlerParams(params, pushState)
+		let state = this._handlerParams( ... arguments )
 			;
 
 		// 将当前浏览器上 url 换为替换后组装出来的链接，当期 url 进入
@@ -441,13 +441,13 @@ class CurrentUrl extends Url{
 	}
 	/**
 	 * @summary     替换当前 url 上的参数
-	 * @param       {Object|string[]}   params
-	 * @param       {*|Object}          [replaceState]
+	 * @param       {string|string[]|Object}    params
+	 * @param       {...string|Object}          [replaceState]
 	 * @return      {CurrentUrl}               this
 	 * @desc        执行效果
 	 * */
 	replaceParams(params, replaceState){
-		let state = this._handlerParams(params, replaceState)
+		let state = this._handlerParams( ...arguments )
 			;
 
 		// 将当前浏览器上 url 换为替换后组装出来的链接
