@@ -455,6 +455,14 @@ class CurrentUrl extends Url{
 
 		return this;
 	}
+	/**
+	 * @summary     清楚掉当前 url 上的参数
+	 * @return      {CurrentUrl}    this
+	 * @desc        内部为调用 replaceParams 方法，此方法为基于业务提炼的快捷方法
+	 * */
+	clearParams(){
+		return this.replaceParams( ...Object.keys(this.params) );
+	}
 
 	// ---------- 修改 url 历史记录 ----------
 	/**
