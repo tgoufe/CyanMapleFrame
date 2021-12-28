@@ -15,7 +15,11 @@ import tools from './tools.js';
  * @return      {string}
  * */
 let dateFormat = function(date=new Date(), format='YYYY-MM-DD'){
-		return format.replace(/(YYYY|YY|MM|DD|hh|mm|ss|星期|周|www|week)/g, function(str){
+		let keys = Object.keys( dateFormat._dateStrReplace )
+			, expr = new RegExp(`(${keys.join('|')})`, 'g')
+			;
+
+		return format.replace(expr, function(str){
 			return dateFormat._dateStrReplace[str]( date );
 		});
 	}
@@ -124,7 +128,7 @@ dateFormat._dateStrReplace = {
  *          1d5h === 1 天 5 小时
  *          -1y2m === 过去 1 年 2 分钟
  *          对时间单位并不要求唯一，也没有顺序要求，只是对每个可解析的时间进行相加，如
- *          1y3y === 3y
+ *          1y3y === 4y
  *          1m2y === 2y1m
  *          1d2m1y1m === 1y1d3m
  * */
@@ -133,6 +137,8 @@ dateFormat.formatTimeStr = function(str, unit='d'){
 		, temp
 		, flag
 		, dateStr
+		, keys = Object.keys( dateFormat._SHORT_TIME_NUM ).join('')
+		, shortTimeExpr = new RegExp(`^(-?)((?:\\d+[${keys}]?)+)$`, 'i')
 		;
 
 	if( typeof str === 'number' ){
@@ -143,11 +149,11 @@ dateFormat.formatTimeStr = function(str, unit='d'){
 			result = str;
 		}
 	}
-	else if( typeof str === 'string' && (temp = dateFormat._SHORT_TIME_EXPR.exec(str)) ){
+	else if( typeof str === 'string' && (temp = shortTimeExpr.exec(str)) ){
 		flag = !!temp[1];   // 负号
 		dateStr = temp[2];
 
-		let expr = /((\d+)([smhdy])?)/ig
+		let expr = new RegExp(`((\\d+)([${keys}])?)`, 'ig')
 			;
 
 		while( temp = expr.exec(dateStr) ){
@@ -159,24 +165,19 @@ dateFormat.formatTimeStr = function(str, unit='d'){
 	
 	return result;
 };
+
 /**
  * 英文一周名称
  * @static
  * */
 dateFormat.WEEK_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 /**
  * 中文一周名称
  * @static
  * */
 dateFormat.WEEK_CN = ['日', '一', '二', '三', '四', '五', '六'];
 
-/**
- * 简短时间设置格式
- * @static
- * @private
- * @const
- * */
-dateFormat._SHORT_TIME_EXPR =  /^(-?)((?:\d+[smhdy]?)+)$/i;
 /**
  * 时间单位对应的毫秒数
  * @static
