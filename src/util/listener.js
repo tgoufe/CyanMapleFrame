@@ -18,7 +18,7 @@ const LISTENER_CONFIG = {
 	, INTERSECTION_OBSERVER = 'intersectionObserver'
 	, MUTATION_OBSERVER = 'mutationObserver'
 	, RESIZE_OBSERVER = 'resizeObserver'
-	, ObSERVER_TYPE_LIST = [
+	, OBSERVER_TYPE_LIST = [
 		INTERSECTION_OBSERVER
 		, MUTATION_OBSERVER
 		, RESIZE_OBSERVER
@@ -122,7 +122,7 @@ class Listener extends Base{
 	 * @const
 	 * */
 	static get ObserverTypeList(){
-		return ObSERVER_TYPE_LIST;
+		return OBSERVER_TYPE_LIST;
 	}
 
 	// ---------- 私有方法 ----------

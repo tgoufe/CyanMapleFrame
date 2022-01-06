@@ -69,7 +69,7 @@ class Router extends Base{
 	 * @param   {string}        [config.mode='history'] 路由模式，默认为 history 模式，也可以设置为 hash 模式，设置为其它任何值都视为 history 模式
 	 * @param   {RouterChangeBefore}    [config.before]
 	 * @param   {RouteConfig[]}         [config.routers]
-	 * @param   {Function}              [config.fallback]       当路由不存在时的回调函数，传入参数当前路由的 Url 类型参数
+	 * @param   {Function}              [config.fallback]       当路由不存在时的回调函数，传入参数当前路由的 Url 类型参数和 fallback 的原因
 	 * @param   {string}                [config.eventType]
 	 * */
 	constructor(config={}){
@@ -162,11 +162,14 @@ class Router extends Base{
 			, index = this._getRouteIndex( path )
 			, router
 			, result
-			, execute
 			, tempParams
 			;
 
 		this.$handlers.clear();
+
+		this.config.before && this.$handlers.add(()=>{
+			return this.config.before( targetUrl );
+		});
 
 		if( index !== -1 ){
 			router = this.routers[index];
@@ -181,20 +184,17 @@ class Router extends Base{
 
 			tempParams = merge(tempParams, params);
 
-			this.config.before && this.$handlers.add(()=>{
-				return this.config.before( targetUrl );
-			});
-			router.before && this.$handlers.add( router.before );
+			this.$handlers.add( router.before || null );
 			this.$handlers.add( router.callback );
-			router.after && this.$handlers.add( router.after );
-
-			execute = this.$handlers.promise.line( tempParams );
+			this.$handlers.add( router.after || null );
 		}
 		else{
-			execute = Promise.reject( new Error(`router 中不存在 ${path}`) );
+			this.$handlers.add(()=>{
+				return Promise.reject( new Error(`router 中不存在 ${path}`) );
+			});
 		}
 
-		return execute.catch((e)=>{
+		return this.$handlers.promise.line( tempParams ).catch((e)=>{
 			if( e instanceof  Error){
 				log( e.message );
 			}
@@ -202,7 +202,7 @@ class Router extends Base{
 				log(path, e);
 			}
 
-			return this._fallback( targetUrl );
+			return this._fallback(targetUrl, e);
 		});
 	}
 	/**
@@ -260,9 +260,10 @@ class Router extends Base{
 	 * @summary 执行 fallback
 	 * @private
 	 * @param   {Url}   url
+	 * @param   {Error} e
 	 * */
-	_fallback(url){
-		return Promise.resolve( this.config.fallback && this.config.fallback( url ) );
+	_fallback(url, e){
+		return Promise.resolve( this.config.fallback && this.config.fallback(url, e) );
 	}
 	/**
 	 * @summary 路由处理最后通用操作
