@@ -190,7 +190,7 @@ class Url extends Base{
 			;
 
 		if( typeof params === 'string' ){
-			argv = [].slice.call( arguments );
+			argv = Array.from( arguments );
 		}
 		else{
 			argv = params;

@@ -13,18 +13,20 @@
  * @return      {string}
  * */
 let fillZero = function(str, len){
-	let i
-		;
+	return (''+ str).padStart(len, '0');
 
-	str += '';
-
-	if( len > str.length ){
-		for(i = str.length; i < len; i++){
-			str = '0'+ str;
-		}
-	}
-
-	return str;
+	// let i
+	// 	;
+	//
+	// str += '';
+	//
+	// if( len > str.length ){
+	// 	for(i = str.length; i < len; i++){
+	// 		str = '0'+ str;
+	// 	}
+	// }
+	//
+	// return str;
 };
 
 export default {

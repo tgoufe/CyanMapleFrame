@@ -299,7 +299,7 @@ class IndexedDBModel extends Model{
 			result = this._getByArray( topic );
 		}
 		else if( argc > 1 ){
-			result = this._getByArray( [].slice.call(arguments) );
+			result = this._getByArray( Array.from(arguments) );
 		}
 		else{
 			result = this._select( topic ).then((rs)=>{
@@ -342,7 +342,7 @@ class IndexedDBModel extends Model{
 			result = this._removeByArray( topic );
 		}
 		else if( argc > 1 ){
-			result = this._removeByArray( [].slice.call(arguments) );
+			result = this._removeByArray( Array.from(arguments) );
 		}
 		else{
 			result = this._delete( topic );

@@ -291,7 +291,7 @@ class FileSystemModel extends Model{
 			topicList = topic;
 		}
 		else if( argc > 1 ){
-			topicList = [].slice.call( arguments );
+			topicList = Array.from( arguments );
 		}
 		else{
 			topicList = [topic];
@@ -341,7 +341,7 @@ class FileSystemModel extends Model{
 			topicList = topic;
 		}
 		else if( argc > 1 ){
-			topicList = [].slice.call( arguments );
+			topicList = Array.from( arguments );
 		}
 		else{
 			topicList = [topic];

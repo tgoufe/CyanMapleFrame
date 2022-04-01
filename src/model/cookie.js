@@ -254,7 +254,7 @@ class CookieModel extends Model{
 			result = this._getByArray( topic );
 		}
 		else if( argc > 1 ){
-			result = this._getByArray( [].slice.call(arguments) );
+			result = this._getByArray( Array.from(arguments) );
 		}
 		else{
 			result = this._store.then(()=>{
@@ -280,7 +280,7 @@ class CookieModel extends Model{
 			result = this._removeByArray( topic );
 		}
 		else if( argc > 1 ){
-			result = this._removeByArray( [].slice.call(arguments) );
+			result = this._removeByArray( Array.from(arguments) );
 		}
 		else{
 			result = this._store.then(()=>{
@@ -355,7 +355,7 @@ class CookieModel extends Model{
 				keyList = [topic];
 			}
 			else if( argc > 1 ){
-				keyList = [].slice.call( arguments );
+				keyList = Array.from( arguments );
 			}
 			else{
 				keyList = topic;

@@ -14,7 +14,7 @@ let vibrate = function(pattern){
 
 		if( navigator.vibrate ){
 			if( argc > 1 ){
-				return navigator.vibrate( [].slice.call(arguments) );
+				return navigator.vibrate( Array.from(arguments) );
 			}
 			else{
 				return navigator.vibrate( pattern );
