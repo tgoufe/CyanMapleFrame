@@ -33,6 +33,9 @@ import tools        from './tools.js';
 
 import thread       from './thread.js';
 
+// 数据转化工具函数
+import transformer  from './transformer.js';
+
 let util = {
 		debounce
 		, throttle
@@ -54,6 +57,8 @@ let util = {
 		, tools
 
 		, thread
+
+		, ...transformer
 
 		, listener
 		, Listener

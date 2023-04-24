@@ -10,7 +10,7 @@ import log      from '../util/log.js';
  * */
 const ROUTER_CONFIG = {
 		mode: 'history'
-		, baseUrl: ''   // 若设置 baseUrl 应以 / 结尾
+		, baseUrl: ''   // 若设置 baseUrl 不应以 / 结尾
 		, eventType: 'routerChange'
 	}
 	;
