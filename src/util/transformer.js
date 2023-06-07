@@ -2,7 +2,7 @@
 
 /**
  * @param   {string}    src
- * @param   {string}    [type='image/jpeg]
+ * @param   {string}    [type='image/jpeg']
  * @param   {number}    [quality=1.0]
  * @return  {Promise<string>}
  * */

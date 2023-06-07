@@ -11,7 +11,7 @@ import listener from '../util/listener.js';
 const LOCAL_STORAGE_MODEL_CONFIG = {
 		listen: true
 	}
-	, MAX_SIZE = (10 *1024 *1024 / 2) - 8 / 2   // 10M 字节空间
+	, MAX_SIZE = (10 * 1024 * 1024 / 2) - 8 / 2   // 10M 字节空间
 	;
 
 /**
@@ -19,7 +19,6 @@ const LOCAL_STORAGE_MODEL_CONFIG = {
  * @desc    对 localStorage 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 localStorage，别名 ls，将可以使用工厂方法生成
  * @extends Model
  * @example
- *
 <pre>
 let localStorageModel = new LocalStorageModel()
 	, storage = Model.factory('localStorage')

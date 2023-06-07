@@ -13,7 +13,7 @@
  * @return      {string}
  * */
 let fillZero = function(str, len){
-	return (''+ str).padStart(len, '0');
+	return `${str}`.padStart(len, '0');
 
 	// let i
 	// 	;

@@ -548,6 +548,9 @@ class CurrentUrl extends Url{
 	 * */
 }
 
+/**
+ * 因为 CurrentUrl 是偏向预置使用工具函数，所以直接设置了依赖注入
+ * */
 CurrentUrl.use( Listener );
 
 let url = new CurrentUrl()

@@ -142,7 +142,7 @@ class Listener extends Base{
 					;
 
 				if( this._callbackList.has(target) ){
-					handlers = this._callbackList.get( target )[this._getKey(Listener.IntersectionObserver)];
+					handlers = this._callbackList.get( target )[this._getKey( Listener.IntersectionObserver )];
 
 					if( handlers && handlers.handlers ){
 						handlers.handlers.with( target ).line({
@@ -172,7 +172,7 @@ class Listener extends Base{
 					;
 
 				if( this._callbackList.has(target) ){
-					handlers = this._callbackList.get( target )[this._getKey(Listener.MutationObserver)];
+					handlers = this._callbackList.get( target )[this._getKey( Listener.MutationObserver )];
 
 					if( handlers && handlers.handlers ){
 						handlers.handlers.with( target ).line({
@@ -202,7 +202,7 @@ class Listener extends Base{
 					;
 
 				if( this._callbackList.has(target) ){
-					handlers = this._callbackList.get( target )[this._getKey(Listener.ResizeObserver)];
+					handlers = this._callbackList.get( target )[this._getKey( Listener.ResizeObserver )];
 
 					if( handlers && handlers.handlers ){
 						handlers.handlers.with( target ).line({
@@ -291,7 +291,7 @@ class Listener extends Base{
 	 * @private
 	 * @param   {string}    type
 	 * @param   {boolean}   [capture]
-	 * @return  {symbol}
+	 * @return  {Symbol}
 	 * */
 	_getKey(type, capture){
 		if( this._isObserver(type) ){
@@ -450,7 +450,7 @@ class Listener extends Base{
 		else if( type === Listener.MutationObserver ){
 			// MutationObserver 没有 unobserve 方法
 			if( this._callbackList.has(target) ){
-				delete this._callbackList.get( target )[this._getKey(Listener.MutationObserver)];
+				delete this._callbackList.get( target )[this._getKey( Listener.MutationObserver )];
 			}
 
 		}

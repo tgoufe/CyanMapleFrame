@@ -185,7 +185,7 @@ class IndexedDBModel extends Model{
 	 * @param   {string}    value
 	 * @return  {Promise<boolean, ErrorEvent>}   返回一个 Promise 对象，在 resolve 时传回 true
 	 * @desc    add 接口要求数据库中不能已经有相同键的对象存在，因此统一使用 put 接口
-	 *          保持值得时候，同时会保持在内存中
+	 *          保存值得时候，同时会保存在内存中
 	 * */
 	_put(topic, value){
 		return this._store.then((db)=>{
@@ -379,9 +379,12 @@ class IndexedDBModel extends Model{
 				let transaction = db.transaction([this._config.tableName], 'readwrite')
 					, objectStore = transaction.objectStore( this._config.tableName )
 					,
-					{ index, only
-					, min, max
-					, eqMin=false, eqMax=false
+					{ index
+					, only
+					, min
+					, max
+					, eqMin= false
+					, eqMax= false
 					, direction } = options
 					, range
 					, target
