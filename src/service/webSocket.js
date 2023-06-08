@@ -209,7 +209,7 @@ class WebSocketModel extends Model{
 			data = {
 				topic: 'Blob'
 				, data
-			}
+			};
 		}
 		else{
 			if( typeof data === 'string' ){
