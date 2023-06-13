@@ -71,6 +71,7 @@ const SERVICE_MODEL_CONFIG = {
  *          必须通过注入的方式注入一个 $request 方法用来发送请求
  * @extends Model
  * @requires    $request
+ * @example
 <pre>
 let serviceModel = new ServiceModel()
     , service = Model.factory('service')
@@ -562,7 +563,7 @@ class ServiceModel extends Model{
 		return this._send(topic, options, 'GET');
 	}
 	/**
-	 * @summary 使用 set 方式发请求，与 setData 相同
+	 * @summary 使用 post 方式发请求，与 setData 相同
 	 * @param       {string|Object}     topic               字符串类型为请求 url，对象类型为所有参数，其中 url 为必填
 	 * @param       {string}            topic.url
 	 * @param       {Object}            [options={}]        对象类型为 ajax 参数

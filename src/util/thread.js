@@ -4,6 +4,8 @@
  * @file    利用 worker 建立独立线程
  * */
 
+import {strToURL} from './transformer.js';
+
 /**
  * @summary     利用 worker 建立独立线程
  * @function    thread
@@ -13,8 +15,10 @@
  * @return      {Function}
  * */
 let thread = function(executor=()=>{}, once=true){
-	let code = `
-var executor = ${executor.toString()};
+	let worker = new Worker( strToURL(`
+let executor = ${executor.toString()}
+	;
+
 onmessage = function(e){
 	try{
 		postMessage( executor(e.data) );
@@ -22,12 +26,8 @@ onmessage = function(e){
 	catch(error){
 		postMessage( error );
 	}			
-}
-`
-		, blob = new Blob([code], {
-			type: 'text/javascript'
-		})
-		, worker = new Worker( URL.createObjectURL(blob) )
+};
+`, 'text/javascript') )
 		;
 
 	return function(data){

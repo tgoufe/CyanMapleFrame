@@ -47,7 +47,7 @@ const LISTENER_CONFIG = {
 class Listener extends Base{
 	/**
 	 * @constructor
-	 * @param   {Object}    [config]
+	 * @param   {Object}    [config={}]
 	 * @param   {Object}    [config.observerOptions]
 	 * @param   {Element}   [config.observerOptions.root]
 	 * @param   {string}    [config.observerOptions.rootMargin] 计算交叉值时添加至根的边界盒中的一组偏移量，语法和 CSS 中的 margin 属性等同，默认值为 '0px 0px 0px 0px'
@@ -228,15 +228,27 @@ class Listener extends Base{
 	 * @summary 处理 on 和 off 参数的内部方法
 	 * @private
 	 * @param   {Window|Document|Element|Object|string} target
-	 * @param   {string|ListenerCallback}   type
-	 * @param   {ListenerCallback|Object}   [callback={}]
-	 * @param   {Object}                    [options={}]
-	 * @param   {boolean}                   [options.capture]
-	 * @param   {boolean}                   [options.passive]
-	 * @param   {boolean}                   [options.once]
+	 * @param   {string|ListenerCallback}           type
+	 * @param   {ListenerCallback|Object|boolean}   [callback={}]
+	 * @param   {Object|boolean}                    [options={}]
+	 * @param   {boolean}                           [options.capture]
+	 * @param   {boolean}                           [options.passive]
+	 * @param   {boolean}                           [options.once]
 	 * @return  {Object}
 	 * */
 	_handleArgs(target, type, callback={}, options={}){
+		if( typeof options === 'boolean' ){
+			options = {
+				capture: options
+			};
+		}
+
+		if( typeof callback === 'boolean' ){
+			callback = {
+				capture: callback
+			};
+		}
+
 		if( typeof callback === 'object' ){
 			options = callback;
 			callback = null;
@@ -319,23 +331,66 @@ class Listener extends Base{
 		}, ...args);
 	}
 
+	/**
+	 * @summary 判断原生 addEventListener 方法是否可用
+	 * @protected
+	 * @param   {Window|Document|Element}    target
+	 * @return  {boolean}
+	 * @desc    判断原生 addEventListener 方法是否可用，二次开发时可以覆盖该方法，返回 false，将使初始化事件绑定调用 _customInitBind 方法
+	 * */
+	_isAddEventListener(target){
+		return 'addEventListener' in target && typeof target.addEventListener === 'function';
+	}
+	/**
+	 * @summary 自定义事件绑定初始化
+	 * @protected
+	 * @param   {Window|Document|Element|Object}    target
+	 * @param   {string}            type
+	 * @param   {ListenerCallback}  callback
+	 * @param   {Object}            options
+	 * @desc    当前函数为空，目的为二次开发提供的抽象接口，二次开发时可覆盖该方法
+	 * */
+	_customInitBind(target, type, callback, options){}
+	/**
+	 * @summary 判断原生 removeEventListener 方法是否可用
+	 * @protected
+	 * @param   {Window|Document|Element}    target
+	 * @return  {boolean}
+	 * @desc    判断原生 removeEventListener 方法是否可用，自定义开发时可以覆盖该方法，返回 false，将使事件解绑调用 _customRemoveBind 方法
+	 * */
+	_isRemoveEventListener(target){
+		return 'removeEventListener' in target && typeof target.removeEventListener === 'function';
+	}
+	/**
+	 * @summary 自定义事件解绑
+	 * @protected
+	 * @param   {Window|Document|Element|Object}    target
+	 * @param   {string}            type
+	 * @param   {ListenerCallback}  callback
+	 * @param   {Object}            options
+	 * @desc    当前函数为空，目的为二次开发提供的抽象接口，二次开发时可覆盖该方法
+	 * */
+	_customRemoveBind(target, type, callback, options){
+
+	}
+
 	// ---------- 公有方法 ----------
 	/**
 	 * @summary 添加监听事件
 	 * @param   {Window|Document|Element|Object|string} target
-	 * @param   {string|ListenerCallback}   type
-	 * @param   {ListenerCallback|Object}   [callback={}]
-	 * @param   {Object}                    [options={}]
-	 * @param   {boolean}                   [options.capture]
-	 * @param   {boolean}                   [options.passive]
-	 * @param   {boolean}                   [options.once]
-	 * @param   {boolean}                   [options.attribute]         type 为 mutationObserver 时使用
-	 * @param   {string[]}                  [options.attributeFilter]   type 为 mutationObserver 时使用
-	 * @param   {boolean}                   [options.attributeOldValue] type 为 mutationObserver 时使用
-	 * @param   {boolean}                   [options.characterData]     type 为 mutationObserver 时使用
-	 * @param   {boolean}                   [options.characterDataOldValue] type 为 mutationObserver 时使用
-	 * @param   {boolean}                   [options.childList]             type 为 mutationObserver 时使用
-	 * @param   {boolean}                   [options.subtree]               type 为 mutationObserver 时使用
+	 * @param   {string|ListenerCallback}           type
+	 * @param   {ListenerCallback|Object|boolean}   [callback={}]
+	 * @param   {Object|boolean}                    [options={}]
+	 * @param   {boolean}                           [options.capture]
+	 * @param   {boolean}                           [options.passive]
+	 * @param   {boolean}                           [options.once]
+	 * @param   {boolean}                           [options.attribute]         type 为 mutationObserver 时使用
+	 * @param   {string[]}                          [options.attributeFilter]   type 为 mutationObserver 时使用
+	 * @param   {boolean}                           [options.attributeOldValue] type 为 mutationObserver 时使用
+	 * @param   {boolean}                           [options.characterData]     type 为 mutationObserver 时使用
+	 * @param   {boolean}                           [options.characterDataOldValue] type 为 mutationObserver 时使用
+	 * @param   {boolean}                           [options.childList]             type 为 mutationObserver 时使用
+	 * @param   {boolean}                           [options.subtree]               type 为 mutationObserver 时使用
 	 * @return  {Object}    返回一个带有 trigger 方法的对象，可以用来触发此次绑定的事件
 	 * @desc    可以传四个参数，最少传两个参数，若只传两个参数会视为 type 和 callback
 	 * */
@@ -390,12 +445,15 @@ class Listener extends Base{
 				this._initResizeObserver();
 				this._resize$.observe( target );
 			}
-			else if( 'addEventListener' in target && typeof target.addEventListener === 'function' ){
+			else if( this._isAddEventListener(target) ){
 				eventConfig.callback = function(...args){
 					return handlers.with( this ).line( ...args );
 				};
 
 				target.addEventListener(type, eventConfig.callback, options);
+			}
+			else{   // 定制事件绑定
+				this._customInitBind(target, type, callback, options);
 			}
 		}
 
@@ -408,13 +466,13 @@ class Listener extends Base{
 	/**
 	 * @summary 取消监听
 	 * @param   {Window|Document|Element|Object|string} target
-	 * @param   {string|ListenerCallback}   type
-	 * @param   {ListenerCallback|Object}   [callback={}]
-	 * @param   {Object}                    [options={}]
-	 * @param   {boolean}                   [options.capture]
-	 * @param   {boolean}                   [options.passive]
-	 * @param   {boolean}                   [options.once]
-	 * @return  {Listener}                  返回 this，可以使用链式操作
+	 * @param   {string|ListenerCallback}           type
+	 * @param   {ListenerCallback|Object|boolean}   [callback={}]
+	 * @param   {Object|boolean}                    [options={}]
+	 * @param   {boolean}                           [options.capture]
+	 * @param   {boolean}                           [options.passive]
+	 * @param   {boolean}                           [options.once]
+	 * @return  {Listener}  返回 this，可以使用链式操作
 	 * @desc    可以传四个参数，最少传一个参数，若只传一个参数会视为 type
 	 *          当 type 为 mutationObserver 时会取消对 target 的所有类型观察，无视 options 里的设置
 	 * */
@@ -457,8 +515,11 @@ class Listener extends Base{
 		else if( type === Listener.ResizeObserver ){
 			this._resize$.unobserve( target );
 		}
-		else if( 'removeEventListener' in target && typeof target.removeEventListener === 'function' ){
+		else if( this._isRemoveEventListener(target) ){
 			target.removeEventListener(type, eventConfig.callback, options);
+		}
+		else{   // 定制事件解绑
+			this._customRemoveBind(target, type, callback, options);
 		}
 
 		delete this._callbackList.get( target )[this._getKey(type, capture)];

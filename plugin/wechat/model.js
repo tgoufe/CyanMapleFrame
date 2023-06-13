@@ -116,7 +116,7 @@ class WechatModel extends Model{
 	removeData(topic){
 		let argc = arguments.length
 			, result
-		;
+			;
 
 		if( Array.isArray(topic) ){
 			result = this._removeByArray( topic );
