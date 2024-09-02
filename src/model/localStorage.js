@@ -16,7 +16,7 @@ const LOCAL_STORAGE_MODEL_CONFIG = {
 
 /**
  * @class
- * @desc    对 localStorage 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 localStorage，别名 ls，将可以使用工厂方法生成
+ * @desc    对 localStorage 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 localStorage，别名 ls,local，将可以使用工厂方法生成
  * @extends Model
  * @example
 <pre>
@@ -358,13 +358,13 @@ class LocalStorageModel extends Model{
 		}
 		/**
 		 * @summary 语义化的同步保存数据接口
-		 * @param   {string|string[]}  argv    参数与 getDatasync 方法相同
-		 * @param   {...string}
+		 * @param   {string|string[]}   topic   参数与 getDatasync 方法相同
+		 * @param   {...string}         argv
 		 * @return  {Object|string}
 		 * @desc    内部为调用 getDataSync 方法
 		 * */
-		, getData: (...argv)=>{
-			return this.getDataSync( ...argv );
+		, getData: (topic, ...argv)=>{
+			return this.getDataSync(topic, ...argv);
 		}
 	};
 
@@ -380,6 +380,6 @@ Model.register('localStorage', LocalStorageModel);
 /**
  * 注册别名
  * */
-Model.registerAlias('localStorage', 'ls');
+Model.registerAlias('localStorage', ['ls', 'local']);
 
 export default LocalStorageModel;

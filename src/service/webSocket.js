@@ -16,7 +16,7 @@ const WEB_SOCKET_CONFIG = {
 
 /**
  * @class
- * @desc    WebSocket 接口，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 webSocket，别名 socket，将可以使用工厂方法生成
+ * @desc    WebSocket 接口，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 webSocket，别名 socket,wss，将可以使用工厂方法生成
  * @extends Model
  * @requires    Url
  * */
@@ -337,6 +337,7 @@ class WebSocketModel extends Model{
 	 * */
 	close(code, reason){
 		log('关闭当前 Web Socket 连接');
+
 		return this._conn.then((socket)=>{
 			try{
 				socket.close();
@@ -393,7 +394,11 @@ class WebSocketModel extends Model{
 Model.register('webSocket', WebSocketModel);
 /**
  * 注册别名
+ *
+ * 注意 ws 在 webSQL 中已注册
  * */
-Model.registerAlias('webSocket', 'socket');
+Model.registerAlias('webSocket', ['socket'
+	// , 'ws'
+	, 'wss']);
 
 export default WebSocketModel;

@@ -4,7 +4,7 @@ import Model from './model.js';
 
 /**
  * @class
- * @desc    对 sessionStorage 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 sessionStorage，别名 ss，将可以使用工厂方法生成
+ * @desc    对 sessionStorage 进行封装，统一调用接口，在 Model.factory 工厂方法注册为 sessionStorage，别名 ss,session，将可以使用工厂方法生成
  * @extends Model
  * @example
 <pre>
@@ -280,13 +280,13 @@ class SessionStorageModel extends Model{
 		}
 		/**
 		 * @summary 语义化的同步保存数据接口
-		 * @param   {string|string[]}  argv    参数与 getDatasync 方法相同
-		 * @param   {...string}
+		 * @param   {string|string[]}   topic   参数与 getDatasync 方法相同
+		 * @param   {...string}         argv
 		 * @return  {Object|string}
 		 * @desc    内部为调用 getDataSync 方法
 		 * */
-		, getData: (...argv)=>{
-			return this.getDataSync( ...argv );
+		, getData: (topic, ...argv)=>{
+			return this.getDataSync(topic, ...argv);
 		}
 	};
 }
@@ -299,6 +299,6 @@ Model.register('sessionStorage', SessionStorageModel);
 /**
  * 注册别名
  * */
-Model.registerAlias('sessionStorage', 'ss');
+Model.registerAlias('sessionStorage', ['ss', 'session']);
 
 export default SessionStorageModel;

@@ -15,7 +15,7 @@ const EVENT_SOURCE_MODEL_CONFIG = {
 
 /**
  * @class
- * @desc    对 EventSource 接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 eventSource，别名 ess，将可以使用工厂方法生成
+ * @desc    对 EventSource 接口进行封装，与 Model 统一接口，隔离数据与数据来源的问题，在 Model.factory 工厂方法注册为 eventSource，别名 sse,es,event，将可以使用工厂方法生成
  *          非实时，默认 3 秒延迟
  *          SSE 只支持服务器到客户端单向的事件推送
  *          使用 SSE 时，服务器需要要对 SSE 的路径设置为 Cache-Control: no-transform，不使用 Gzip 压缩等
@@ -272,6 +272,7 @@ class EventSourceModel extends Model{
 	 * */
 	close(){
 		log('关闭当前 Event Source 连接');
+
 		return this._conn.then((conn)=>{
 			try{
 				conn.close();
@@ -310,7 +311,7 @@ class EventSourceModel extends Model{
 	/**
 	 * @summary 实现 toStringTag 接口
 	 * @readonly
-	 * @desc    在 Object.prototype.toString.call( new EventSourceModel() ); 时将返回 [object ServiceModel]
+	 * @desc    在 Object.prototype.toString.call( new EventSourceModel() ); 时将返回 [object WebTransportModel]
 	 * */
 	get [Symbol.toStringTag](){
 		return 'EventSourceModel';

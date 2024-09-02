@@ -45,6 +45,12 @@ const MODEL_CONFIG = {
  * */
 
 /**
+ * @typedef     {Object}    ModelIteratorValue
+ * @property    {string}    topic
+ * @property    {*}         value
+ * */
+
+/**
  * @class
  * @desc    数据层基类，将数据保存在内存中
  * @extends Base
@@ -610,7 +616,8 @@ class Model extends Base{
 	}
 	/**
 	 * @summary 实现迭代器接口
-	 * @return  {Array}
+	 * @yield  {ModelIteratorValue}
+	 * @return  {Generator<ModelIteratorValue>}
 	 * @desc    适用于 for-of
 	 * */
 	*[Symbol.iterator](){
@@ -626,7 +633,8 @@ class Model extends Base{
 	}
 	/**
 	 * @summary 实现异步迭代器接口
-	 * @return  {Generator}
+	 * @return  {Generator<Promise<ModelIteratorValue>>}
+	 * @yields  {Promise<ModelIteratorValue>}
 	 * @desc    适用于 for-await-of
 	 * */
 	*[Symbol.asyncIterator](){

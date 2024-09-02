@@ -415,6 +415,6 @@ Model.register('file', FileSystemModel);
 /**
  * 注册别名
  * */
-Model.registerAlias('file', ['fs']);
+Model.registerAlias('file', 'fs');
 
 export default FileSystemModel;
