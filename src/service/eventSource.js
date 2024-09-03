@@ -45,6 +45,7 @@ class EventSourceModel extends Model{
 
 		if( !this.config.url ){
 			this._conn = Promise.reject( new Error('缺少参数 url，未建立连接') );
+			
 			return ;
 		}
 

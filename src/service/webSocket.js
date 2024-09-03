@@ -45,6 +45,7 @@ class WebSocketModel extends Model{
 
 		if( !this.config.url ){
 			this._conn = Promise.reject( new Error('缺少参数 url，未建立连接') );
+			
 			return ;
 		}
 
@@ -340,7 +341,7 @@ class WebSocketModel extends Model{
 
 		return this._conn.then((socket)=>{
 			try{
-				socket.close();
+				socket.close(code, reason);
 			}
 			catch(e){
 				// 失败不做处理
