@@ -153,20 +153,34 @@ class WebTransportModel extends Model{
 	 * @param   {*}         data
 	 * @param   {Object}    [options]
 	 * @param   {number}    [options.sendOrder]
+	 * @param   {boolean}   [options.useUDP]
 	 * @return  {Promise}   数据发送是否成功
 	 * */
 	setData(topic, data, options){
 		return this._conn.then((transport)=>{
-			return transport.createUnidirectionalStream( options );
+			return options.useUDP ? transport.datagrams : transport.createUnidirectionalStream( options );
 		}).then((stream)=>{
 			let writer = stream.writable.getWriter()
 				;
 
-			// todo
-			writer.write( new Uint8Array({
-				topic
-				, data
-			}) );
+			if( data instanceof ArrayBuffer ){
+				writer.write( data );
+			}
+			else if( data instanceof Blob ){
+				writer.write( data );
+			}
+			else{
+				let encoder = new TextEncoder()
+					, encoded = encoder.encode( JSON.stringify({
+						topic
+						, data
+					}) )
+					;
+
+				encoded.forEach((chunk)=>{
+					writer.write( chunk );
+				});
+			}
 
 			return writer.close();
 		}).then(()=>{
@@ -184,23 +198,25 @@ class WebTransportModel extends Model{
 	 * @param   {string}    topic
 	 * @param   {Object}    [options]
 	 * @param   {number}    [options.sendOrder]
+	 * @param   {boolean}   [options.useUDP]
 	 * @return  {Promise}   数据发送是否成功
-	 * @desc    内部为调用 setData 方法，仅有语义上的区别
 	 * */
 	getData(topic, options){
 		return this._conn.then((transport)=>{
-			return transport.createBidirectionalStream( options );
+			return options.useUDP ? transport.datagrams : transport.createBidirectionalStream( options );
 		}).then((stream)=>{
 			let reader = stream.readable.getReader()
-				, rs = []
-				// , exec = reader.read()
+				, data = []
 				, handle = ({value, done})=>{
-					rs.push( value );
-
 					if( done ){
-						return rs;
+						return {
+							topic
+							, data
+						};
 					}
 					else{
+						data.push( value );
+
 						return reader.read().then( handle );
 					}
 				}
@@ -215,11 +231,14 @@ class WebTransportModel extends Model{
 	 * @overload
 	 * @param   {string}    topic
 	 * @param   {*}         data
+	 * @param   {Object}    [options]
+	 * @param   {number}    [options.sendOrder]
+	 * @param   {boolean}   [options.useUDP]
 	 * @return  {Promise}   数据是否发送成功
 	 * @desc    内部为调用 setData 方法，仅有语义上的区别
 	 * */
-	removeData(topic, data){
-		return this.setData(topic, data);
+	removeData(topic, data, options){
+		return this.setData(topic, data, options);
 	}
 	/**
 	 * @summary 清空数据
@@ -227,11 +246,14 @@ class WebTransportModel extends Model{
 	 * @overload
 	 * @param   {string}    topic
 	 * @param   {*}         data
+	 * @param   {Object}    [options]
+	 * @param   {number}    [options.sendOrder]
+	 * @param   {boolean}   [options.useUDP]
 	 * @return  {Promise}   数据是否发送成功
 	 * @desc    内部为调用 setData 方法，仅有语义上的区别
 	 * */
-	clearData(topic, data){
-		return this.setData(topic, data);
+	clearData(topic, data, options){
+		return this.setData(topic, data, options);
 	}
 	/**
 	 * @summary     将数据同步到本地存储，只能设置一个本地缓存
